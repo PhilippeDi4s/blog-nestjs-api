@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:3000
+@baseUrl = http://localhost:3001
 @jwtToken = {{authLogin.response.body.accessToken}}
 
 @postUuid = {{createPostOwned.response.body.id}}
@@ -8,8 +8,8 @@
 
 @userNameForTesting = Júlia
 @userEmailForTesting = julia@email.com
-@userPasswordForTesting = 123456
-@userNewPasswordForTesting = 123458
+@userPasswordForTesting = 123458
+@userNewPasswordForTesting = 1234589
 
 # AUTH ########################################################################
 
@@ -54,8 +54,8 @@ Content-Type: application/json
 Authorization: Bearer {{jwtToken}}
 
 {
-  "currentPassword": "{{userPasswordForTesting}}",
-  "newPassword": "{{userNewPasswordForTesting}}"
+  "currentPasswordHash": "{{userPasswordForTesting}}",
+  "newPasswordHash": "{{userNewPasswordForTesting}}"
 }
 
 ### Read one user

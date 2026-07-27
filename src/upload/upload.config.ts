@@ -1,8 +1,6 @@
 import { memoryStorage } from 'multer';
 import { BadRequestException } from '@nestjs/common';
 
-// Isso é o storage do multer
-// O memory storage fica na memória do servidor
 export const storage = memoryStorage();
 
 export const fileFilter = (
@@ -20,5 +18,5 @@ export const fileFilter = (
 };
 
 export const limits = {
-  // fileSize: 900 * 1024, // Limite de 900KB por imagem
+  fileSize: 900 * 1024,
 };
