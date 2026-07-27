@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -25,8 +24,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: process.env.DB_SYNCHRONIZE === '1',
       autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
     }),
+    UploadModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
