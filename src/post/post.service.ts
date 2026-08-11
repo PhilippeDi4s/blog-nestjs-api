@@ -11,12 +11,15 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { User } from 'src/user/entities/user.entity';
 import { createSlugFromText } from 'src/commoun/utils/create-slug-from-text';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class PostService {
   private readonly logger = new Logger(PostService.name);
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+
+    private readonly imageService: ImagesService,
   ) {}
 
   async findOneOrFail(postData: Partial<Post>) {
@@ -87,13 +90,17 @@ export class PostService {
   }
 
   async create(dto: CreatePostDto, author: User) {
+    const image = await this.imageService.findOneByOrFail({
+      url: dto.coverImage,
+    });
     const post = this.postRepository.create({
       slug: createSlugFromText(dto.title),
       author,
       content: dto.content,
       excerpt: dto.excerpt,
-      coverImageUrl: dto.coverImageUrl,
+      coverImage: image,
       title: dto.title,
+      published: dto.published ?? false,
     });
 
     const createdPost = await this.postRepository
@@ -118,8 +125,15 @@ export class PostService {
     post.title = dto.title ?? post.title;
     post.content = dto.content ?? post.content;
     post.excerpt = dto.excerpt ?? post.excerpt;
-    post.coverImageUrl = dto.coverImageUrl ?? post.coverImageUrl;
     post.published = dto.published ?? post.published;
+
+    if (dto.coverImage) {
+      const image = await this.imageService.findOneByOrFail({
+        url: dto.coverImage,
+      });
+
+      post.coverImage = image;
+    }
 
     return this.postRepository.save(post);
   }

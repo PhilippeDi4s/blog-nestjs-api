@@ -8,12 +8,15 @@ import { UploadModule } from './upload/upload.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './commoun/filters/all-exeptions.filter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
     PostModule,
+    UploadModule,
+    ImagesModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -36,7 +39,6 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       synchronize: process.env.DB_SYNCHRONIZE === '1',
       autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
     }),
-    UploadModule,
   ],
   controllers: [],
   providers: [

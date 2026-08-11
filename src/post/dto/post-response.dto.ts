@@ -6,7 +6,9 @@ export class PostResponseDto {
   readonly slug: string;
   readonly content: string;
   readonly excerpt: string;
-  readonly coverImageUrl: string | null;
+  readonly coverImage: {
+    url: string;
+  };
   readonly published: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
@@ -22,7 +24,7 @@ export class PostResponseDto {
     this.slug = post.slug;
     this.content = post.content;
     this.excerpt = post.excerpt;
-    this.coverImageUrl = post.coverImageUrl;
+    this.coverImage = post.coverImage;
     this.published = post.published;
     this.createdAt = post.createdAt;
     this.updatedAt = post.updatedAt;

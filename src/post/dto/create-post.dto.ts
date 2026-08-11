@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -19,10 +20,13 @@ export class CreatePostDto {
   @IsNotEmpty({ message: 'Conteúdo não pode ficar vazio' })
   content: string;
 
-  @IsOptional()
   @IsUrl(
     { require_tld: false },
     { message: 'URL da imagem precisa ser uma URL vàlida' },
   )
-  coverImageUrl?: string;
+  coverImage: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'Campo de publicar post precisa ser boolean' })
+  published?: boolean;
 }

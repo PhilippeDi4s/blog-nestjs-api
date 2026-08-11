@@ -1,3 +1,4 @@
+import { Images } from 'src/images/entities/image.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -25,9 +26,6 @@ export class Post {
   @Column()
   excerpt: string;
 
-  @Column({ nullable: true })
-  coverImageUrl: string;
-
   @Column({ default: false })
   published: boolean;
 
@@ -36,6 +34,9 @@ export class Post {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Images)
+  coverImage: Images;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   author: User;
