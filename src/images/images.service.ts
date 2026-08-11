@@ -17,6 +17,20 @@ export class ImagesService {
     private readonly imagesRepository: Repository<Images>,
   ) {}
 
+  async findAll() {
+    const images = await this.imagesRepository.find({
+      relations: {
+        uploaded_by: true,
+      },
+    });
+
+    if (!images) {
+      throw new NotFoundException('Nenhuma imagem encontrada');
+    }
+
+    return images;
+  }
+
   async findOneByOrFail(imageUrl: Partial<Images>) {
     const image = await this.imagesRepository.findOneBy(imageUrl);
 
