@@ -8,13 +8,16 @@ import { fileTypeFromBuffer } from 'file-type';
 import sharp from 'sharp';
 import { generateRandomSuffix } from 'src/commoun/utils/generate-random-suffix';
 import { ImagesService } from 'src/images/images.service';
-import { CLOUDINARY } from './cloudinary/cloudinary.provider';
-import { v2 as CloudinaryType } from 'cloudinary';
+import { IMAGE_STORAGE_PROVIDER } from './storage/image-storage.interface';
+import type { ImageStorageProvider } from './storage/image-storage.interface';
 
 @Injectable()
 export class UploadService {
-  @Inject(CLOUDINARY) private readonly cloudinary: typeof CloudinaryType;
-  constructor(private readonly imageService: ImagesService) {}
+  constructor(
+    @Inject(IMAGE_STORAGE_PROVIDER)
+    private readonly storageProvider: ImageStorageProvider,
+    private readonly imageService: ImagesService,
+  ) {}
 
   async handleUpload(userId: string, file: Express.Multer.File) {
     if (!file) {
@@ -75,47 +78,17 @@ export class UploadService {
     }
 
     const today = new Date().toISOString().split('T')[0];
-
     const uniqueSuffix = `${Date.now()}-${generateRandomSuffix()}`;
-    // const publicId = `${today}/${uniqueSuffix}`;
 
-    const uploadResult = await new Promise<{
-      secure_url: string;
-      public_id: string;
-    }>((resolve, reject) => {
-      const uploadStream = this.cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'image',
-          folder: today,
-          public_id: uniqueSuffix,
-
-          context: {
-            uploaded_by: userId,
-          },
-        },
-        (error, result) => {
-          if (error || !result) {
-            reject(
-              new InternalServerErrorException(
-                'Não foi possível enviar a imagem ao servidor',
-              ),
-            );
-            return;
-          }
-
-          resolve({
-            secure_url: result.secure_url,
-            public_id: result.public_id,
-          });
-        },
-      );
-
-      uploadStream.end(outputBuffer);
+    const uploadResult = await this.storageProvider.upload(outputBuffer, {
+      folder: today,
+      publicId: uniqueSuffix,
+      uploadedBy: userId,
     });
 
     const savedImage = await this.imageService.saveImageUrl(
       userId,
-      uploadResult.secure_url,
+      uploadResult.url,
     );
 
     return savedImage;
