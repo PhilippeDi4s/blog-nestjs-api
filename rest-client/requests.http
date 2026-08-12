@@ -153,9 +153,9 @@ Authorization: Bearer {{jwtToken}}
 DELETE  {{baseUrl}}/images/ff280828-720d-493b-9b40-d3f8ebe28723
 Authorization: Bearer {{jwtToken}}
  
-### FIND ALL IMAGES OWNED
+### FIND ONE IMAGE
 # @name findAllImages
-GET {{baseUrl}}/images/me/
+GET {{baseUrl}}/images/ff280828-720d-493b-9b40-d3f8ebe28723
 Authorization: Bearer {{jwtToken}}
  
 ###############################################################################
