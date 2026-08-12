@@ -9,7 +9,7 @@ import {
   ImageStorageProvider,
   UploadImageOptions,
   UploadImageResult,
-} from '../storage/image-storage.interface';
+} from '../image-storage.interface';
 
 @Injectable()
 export class CloudinaryStorageProvider implements ImageStorageProvider {
@@ -49,5 +49,26 @@ export class CloudinaryStorageProvider implements ImageStorageProvider {
     );
 
     return { url: result.secure_url, id: result.public_id };
+  }
+
+  async delete(id: string): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      void this.cloudinary.uploader.destroy(
+        id,
+        { resource_type: 'image' },
+        (error, result) => {
+          if (error || !result) {
+            reject(
+              new InternalServerErrorException(
+                'Não foi possível excluir a imagem do servidor',
+              ),
+            );
+            return;
+          }
+
+          resolve();
+        },
+      );
+    });
   }
 }

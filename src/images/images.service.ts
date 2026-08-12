@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  ForbiddenException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -7,12 +9,18 @@ import {
 import { Images } from './entities/image.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { IMAGE_STORAGE_PROVIDER } from 'src/storage/image-storage.interface';
+import type { ImageStorageProvider } from 'src/storage/image-storage.interface';
 
 @Injectable()
 export class ImagesService {
   private readonly logger = new Logger(ImagesService.name);
 
   constructor(
+    @Inject(IMAGE_STORAGE_PROVIDER)
+    private readonly storageProvider: ImageStorageProvider,
+
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
   ) {}
@@ -31,11 +39,31 @@ export class ImagesService {
     return images;
   }
 
-  async findOneByOrFail(imageUrl: Partial<Images>) {
-    const image = await this.imagesRepository.findOneBy(imageUrl);
+  async findAllOwned(author: User) {
+    const images = this.imagesRepository.find({
+      where: {
+        uploaded_by: { id: author.id },
+      },
+      relations: {
+        uploaded_by: true,
+      },
+    });
+    return images;
+  }
+  async findOne(imageData: Partial<Images>) {
+    const image = await this.imagesRepository.findOne({
+      where: imageData,
+      relations: { uploaded_by: true },
+    });
+
+    return image;
+  }
+
+  async findOneOrFail(imageData: Partial<Images>) {
+    const image = await this.findOne(imageData);
 
     if (!image) {
-      throw new NotFoundException('Imagem não cadastrada');
+      throw new NotFoundException('Imagem não encontrada');
     }
 
     return image;
@@ -62,5 +90,24 @@ export class ImagesService {
       });
 
     return savedUrl;
+  }
+
+  async remove(author: User, imageData: Partial<Images>) {
+    const image = await this.findOneOrFail(imageData);
+
+    if (image.uploaded_by.id !== author.id) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esta imagem',
+      );
+    }
+
+    await this.imagesRepository.delete({
+      image_id: image.image_id,
+      uploaded_by: { id: author.id },
+    });
+
+    await this.storageProvider.delete(image.image_id);
+
+    return image;
   }
 }

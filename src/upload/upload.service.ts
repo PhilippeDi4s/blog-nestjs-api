@@ -8,8 +8,8 @@ import { fileTypeFromBuffer } from 'file-type';
 import sharp from 'sharp';
 import { generateRandomSuffix } from 'src/commoun/utils/generate-random-suffix';
 import { ImagesService } from 'src/images/images.service';
-import { IMAGE_STORAGE_PROVIDER } from './storage/image-storage.interface';
-import type { ImageStorageProvider } from './storage/image-storage.interface';
+import { IMAGE_STORAGE_PROVIDER } from '../storage/image-storage.interface';
+import type { ImageStorageProvider } from '../storage/image-storage.interface';
 
 @Injectable()
 export class UploadService {

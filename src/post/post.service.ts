@@ -90,7 +90,7 @@ export class PostService {
   }
 
   async create(dto: CreatePostDto, author: User) {
-    const image = await this.imageService.findOneByOrFail({
+    const image = await this.imageService.findOneOrFail({
       url: dto.coverImage,
     });
     const post = this.postRepository.create({
@@ -128,7 +128,7 @@ export class PostService {
     post.published = dto.published ?? post.published;
 
     if (dto.coverImage) {
-      const image = await this.imageService.findOneByOrFail({
+      const image = await this.imageService.findOneOrFail({
         url: dto.coverImage,
       });
 
@@ -141,7 +141,7 @@ export class PostService {
   async remove(postData: Partial<Post>, author: User) {
     const post = await this.findOneOrFail(postData);
     await this.postRepository.delete({
-      ...postData,
+      id: postData.id,
       author: { id: author.id },
     });
     return post;

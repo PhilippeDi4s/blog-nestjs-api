@@ -5,6 +5,7 @@
 @postSlug = {{createPostOwned.response.body.slug}}
 @imagePath = {{uploadImage.response.body.url}}
 @imageUrl = {{baseUrl}}{{imagePath}}
+@imageUuid = {{uploadImage.response.body.id}}
 
 @userNameForTesting = Júlia
 @userEmailForTesting = julia@email.com
@@ -134,9 +135,7 @@ Content-Type: image/png
 < ../dev/images/image.jpeg
 ------BryenFormBoundary--
 
-### Read Image
-# @name readImage
-GET {{imageUrl}}
+
 
 
 ### FIND ALL IMAGES
@@ -144,4 +143,19 @@ GET {{imageUrl}}
 GET {{baseUrl}}/images
 Authorization: Bearer {{jwtToken}}
 
+### FIND ALL IMAGES OWNED
+# @name findAllImagesOwned
+GET {{baseUrl}}/images/me
+Authorization: Bearer {{jwtToken}}
+ 
+### DELETE IMAGE
+# @name deleteImage
+DELETE  {{baseUrl}}/images/ff280828-720d-493b-9b40-d3f8ebe28723
+Authorization: Bearer {{jwtToken}}
+ 
+### FIND ALL IMAGES OWNED
+# @name findAllImages
+GET {{baseUrl}}/images/me/
+Authorization: Bearer {{jwtToken}}
+ 
 ###############################################################################

@@ -14,7 +14,7 @@ export interface ImageStorageProvider {
     buffer: Buffer,
     options: UploadImageOptions,
   ): Promise<UploadImageResult>;
-  delete?(id: string): Promise<void>;
+  delete(id: string): Promise<void>;
 }
 
 export const IMAGE_STORAGE_PROVIDER = Symbol('IMAGE_STORAGE_PROVIDER');
