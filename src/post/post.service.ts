@@ -53,7 +53,7 @@ export class PostService {
     return posts;
   }
 
-  async findOneOwnedOrFail(postData: Partial<Post>, author: User) {
+  async findOneOwnedOrFail(postData: Partial<Post>, author: Partial<User>) {
     const post = await this.findOneOwned(postData, author);
 
     if (!post) {
@@ -63,7 +63,7 @@ export class PostService {
     return post;
   }
 
-  async findOneOwned(postData: Partial<Post>, author: User) {
+  async findOneOwned(postData: Partial<Post>, author: Partial<User>) {
     const post = await this.postRepository.findOne({
       where: {
         ...postData,
@@ -75,7 +75,7 @@ export class PostService {
     return post;
   }
 
-  async findAllOwned(author: User) {
+  async findAllOwned(author: Partial<User>) {
     const posts = await this.postRepository.find({
       where: {
         author: { id: author.id },
@@ -89,7 +89,7 @@ export class PostService {
     return posts;
   }
 
-  async create(dto: CreatePostDto, author: User) {
+  async create(dto: CreatePostDto, author: Partial<User>) {
     const image = await this.imageService.findOneOrFail({
       url: dto.coverImage,
     });
@@ -115,7 +115,11 @@ export class PostService {
     return createdPost;
   }
 
-  async update(postData: Partial<Post>, dto: UpdatePostDto, author: User) {
+  async update(
+    postData: Partial<Post>,
+    dto: UpdatePostDto,
+    author: Partial<User>,
+  ) {
     if (Object.keys(dto).length === 0) {
       throw new BadRequestException('Dados não enviados');
     }
@@ -138,7 +142,7 @@ export class PostService {
     return this.postRepository.save(post);
   }
 
-  async remove(postData: Partial<Post>, author: User) {
+  async remove(postData: Partial<Post>, author: Partial<User>) {
     const post = await this.findOneOrFail(postData);
     await this.postRepository.delete({
       id: postData.id,

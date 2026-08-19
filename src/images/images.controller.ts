@@ -18,7 +18,7 @@ export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @UseGuards(InternalApiKeyGuard)
-  @Get()
+  @Get('admin')
   async findAll() {
     const images = await this.imagesService.findAll();
 

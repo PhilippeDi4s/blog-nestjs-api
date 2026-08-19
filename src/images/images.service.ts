@@ -39,7 +39,7 @@ export class ImagesService {
     return images;
   }
 
-  async findAllOwned(author: User) {
+  async findAllOwned(author: Partial<User>) {
     const images = this.imagesRepository.find({
       where: {
         uploaded_by: { id: author.id },
@@ -92,7 +92,7 @@ export class ImagesService {
     return savedUrl;
   }
 
-  async remove(author: User, imageData: Partial<Images>) {
+  async remove(author: Partial<User>, imageData: Partial<Images>) {
     const image = await this.findOneOrFail(imageData);
 
     if (image.uploaded_by.id !== author.id) {

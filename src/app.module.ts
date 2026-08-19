@@ -9,6 +9,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AllExceptionsFilter } from './commoun/filters/all-exeptions.filter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ImagesModule } from './images/images.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ImagesModule } from './images/images.module';
       synchronize: process.env.DB_SYNCHRONIZE === '1',
       autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
     }),
+    ActivityLogsModule,
   ],
   controllers: [],
   providers: [

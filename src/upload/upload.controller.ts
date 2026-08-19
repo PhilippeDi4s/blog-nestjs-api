@@ -23,6 +23,6 @@ export class UploadController {
     @Req() req: AuthenticatedRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.uploadService.handleUpload(req.user.id, file);
+    return this.uploadService.handleUpload(req.user.sub, file);
   }
 }

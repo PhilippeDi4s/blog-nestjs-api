@@ -12,10 +12,10 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +27,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async findOne(@Req() req: AuthenticatedRequest) {
-    const user = await this.userService.findOneByOrFail({ id: req.user.id });
+    const user = await this.userService.findOneByOrFail({ id: req.user.sub });
     return new UserResponseDto(user);
   }
 
@@ -40,14 +40,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Delete('me')
   async remove(@Req() req: AuthenticatedRequest) {
-    const user = await this.userService.remove(req.user.id);
+    const user = await this.userService.remove(req.user.sub);
     return new UserResponseDto(user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   async update(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserDto) {
-    const user = await this.userService.update(req.user.id, dto);
+    const user = await this.userService.update(req.user.sub, dto);
     return new UserResponseDto(user);
   }
 
@@ -57,7 +57,7 @@ export class UserController {
     @Req() req: AuthenticatedRequest,
     @Body() dto: UpdatePasswordDto,
   ) {
-    const user = await this.userService.updatePassword(req.user.id, dto);
+    const user = await this.userService.updatePassword(req.user.sub, dto);
     return new UserResponseDto(user);
   }
 }

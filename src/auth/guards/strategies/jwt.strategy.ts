@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
     const user = await this.userService.findById(payload.sub);
 
     if (!user) {
@@ -35,6 +35,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Sessão encerrada. Faça login novamente');
     }
 
-    return user;
+    return { sub: user.id, role: user.role };
   }
 }

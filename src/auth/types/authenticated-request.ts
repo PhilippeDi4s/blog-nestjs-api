@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { User } from 'src/user/entities/user.entity';
+import { JwtPayload } from './jwt-payload.type';
 
 export interface AuthenticatedRequest extends Request {
-  user: User;
+  user: JwtPayload;
 }
