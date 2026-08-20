@@ -12,12 +12,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly hashingService: HashingService,
+    private readonly logService: ActivityLogsService,
   ) {}
 
   async failIfEmailExists(email: string) {
@@ -43,15 +47,22 @@ export class UserService {
   async create(dto: CreateUserDto) {
     await this.failIfEmailExists(dto.email);
 
-    const hashedPassword = await this.hashingService.hash(dto.passwordHash);
+    const hashedPassword = await this.hashingService.hash(dto.password);
 
-    const newUser: CreateUserDto = {
+    const created = await this.userRepository.save({
       name: dto.name,
       email: dto.email,
       passwordHash: hashedPassword,
-    };
+    });
 
-    const created = await this.userRepository.save(newUser);
+    await this.logService.create({
+      user: created,
+      action: ActionType.CREATED,
+      entityId: created.id,
+      entityType: EntityType.USER,
+      metadata: { after: { name: created.name } },
+    });
+
     return created;
   }
 
@@ -70,6 +81,8 @@ export class UserService {
 
     const user = await this.findOneByOrFail({ id });
 
+    const before = { name: user.name, email: user.email };
+
     user.name = dto.name ?? user.name;
 
     if (dto.email && dto.email !== user.email) {
@@ -79,14 +92,29 @@ export class UserService {
       user.forceLogout = true;
     }
 
-    return this.save(user);
+    const updatedUser = await this.save(user);
+
+    const after = { name: updatedUser.name, email: updatedUser.email };
+
+    await this.logService.create({
+      user: updatedUser,
+      action: ActionType.UPDATED,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        before,
+        after,
+      },
+    });
+
+    return updatedUser;
   }
 
   async updatePassword(id: string, dto: UpdatePasswordDto) {
     const user = await this.findOneByOrFail({ id });
 
     const isCurrentPasswordValid = await this.hashingService.compare(
-      dto.currentPasswordHash,
+      dto.currentPassword,
       user.passwordHash,
     );
 
@@ -95,7 +123,7 @@ export class UserService {
     }
 
     const isNewPasswordEqual = await this.hashingService.compare(
-      dto.newPasswordHash,
+      dto.newPassword,
       user.passwordHash,
     );
 
@@ -105,10 +133,20 @@ export class UserService {
       );
     }
 
-    user.passwordHash = await this.hashingService.hash(dto.newPasswordHash);
+    user.passwordHash = await this.hashingService.hash(dto.newPassword);
     user.forceLogout = true;
 
-    return this.save(user);
+    const updatedUser = await this.save(user);
+
+    await this.logService.create({
+      user: updatedUser,
+      action: ActionType.PASSWORD_CHANGE,
+      entityId: updatedUser.id,
+      entityType: EntityType.USER,
+      metadata: {},
+    });
+
+    return updatedUser;
   }
 
   async remove(id: string) {

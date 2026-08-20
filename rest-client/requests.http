@@ -7,9 +7,9 @@
 @imageUrl = {{baseUrl}}{{imagePath}}
 @imageUuid = {{uploadImage.response.body.id}}
 
-@userNameForTesting = Júlia
-@userEmailForTesting = julia@email.com
-@userPasswordForTesting = 123458
+@userNameForTesting = João Silva
+@userEmailForTesting = joao@email.com
+@userPasswordForTesting = 123456
 @userNewPasswordForTesting = 1234589
 
 # AUTH ########################################################################
@@ -34,7 +34,7 @@ Content-Type: application/json
 {
   "name": "{{userNameForTesting}}",
   "email": "{{userEmailForTesting}}",
-  "passwordHash": "{{userPasswordForTesting}}"
+  "password": "{{userPasswordForTesting}}"
 }
 
 ### Update user

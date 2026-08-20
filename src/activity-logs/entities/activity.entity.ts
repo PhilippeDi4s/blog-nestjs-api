@@ -12,7 +12,7 @@ import { EntityType } from '../enums/entity-type.enum';
 @Entity('activity_logs')
 export class ActivityLog {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  activityLogId: string;
 
   @ManyToOne(() => User)
   user: User;
