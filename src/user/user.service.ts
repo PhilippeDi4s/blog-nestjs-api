@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,6 +16,8 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { UserRole } from './enum/user-role.enum';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
 @Injectable()
 export class UserService {
@@ -34,8 +37,8 @@ export class UserService {
     }
   }
 
-  async findOneByOrFail(userDate: Partial<User>) {
-    const user = await this.userRepository.findOneBy(userDate);
+  async findOneByOrFail(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -79,7 +82,7 @@ export class UserService {
       throw new BadRequestException('Dados não enviados');
     }
 
-    const user = await this.findOneByOrFail({ id });
+    const user = await this.findOneByOrFail(id);
 
     const before = { name: user.name, email: user.email };
 
@@ -111,7 +114,7 @@ export class UserService {
   }
 
   async updatePassword(id: string, dto: UpdatePasswordDto) {
-    const user = await this.findOneByOrFail({ id });
+    const user = await this.findOneByOrFail(id);
 
     const isCurrentPasswordValid = await this.hashingService.compare(
       dto.currentPassword,
@@ -150,12 +153,54 @@ export class UserService {
   }
 
   async remove(id: string) {
-    const user = await this.findOneByOrFail({ id });
+    const user = await this.findOneByOrFail(id);
     await this.userRepository.delete({ id });
     return user;
   }
 
   save(user: User) {
     return this.userRepository.save(user);
+  }
+
+  async softRemove(targetId: string, requestingUser: JwtPayload) {
+    const userToDelete = await this.findOneByOrFail(targetId);
+
+    const isSelfDelete = requestingUser.sub === targetId;
+
+    if (!isSelfDelete && requestingUser.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir essa conta',
+      );
+    }
+
+    if (isSelfDelete && requestingUser.role === UserRole.ADMIN) {
+      const adminCount = await this.userRepository.count({
+        where: { role: UserRole.ADMIN },
+      });
+      if (adminCount <= 1) {
+        throw new BadRequestException(
+          'Não é possível excluir o único administrador do sistema',
+        );
+      }
+    }
+
+    const removedUser = await this.userRepository.softRemove(userToDelete);
+
+    await this.logService.create({
+      user: { id: requestingUser.sub } as User,
+      action: ActionType.DELETED,
+      entityId: targetId,
+      entityType: EntityType.USER,
+      metadata: {
+        selfDelete: isSelfDelete,
+        targetSnapshot: {
+          name: removedUser.name,
+          email: removedUser.email,
+          role: removedUser.role,
+        },
+      },
+    });
+
+    return removedUser;
   }
 }

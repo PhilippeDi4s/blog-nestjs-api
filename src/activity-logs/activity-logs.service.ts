@@ -72,6 +72,9 @@ export class ActivityLogsService {
 
     const [logs, total] = await this.activityLogRepository.findAndCount({
       where,
+      relations: {
+        user: true,
+      },
       order: {
         createdAt: 'DESC',
       },
