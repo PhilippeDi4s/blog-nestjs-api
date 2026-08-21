@@ -12,14 +12,15 @@ import { User } from 'src/user/entities/user.entity';
 import { createSlugFromText } from 'src/commoun/utils/create-slug-from-text';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ImagesService } from 'src/images/images.service';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 
 @Injectable()
 export class PostService {
   private readonly logger = new Logger(PostService.name);
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
-
     private readonly imageService: ImagesService,
+    private readonly logService: ActivityLogsService,
   ) {}
 
   async findOneOrFail(postData: Partial<Post>) {

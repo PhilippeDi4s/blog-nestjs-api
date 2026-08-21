@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -16,6 +17,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from './enum/user-role.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('user')
 export class UserController {
@@ -36,11 +40,18 @@ export class UserController {
     const user = await this.userService.create(dto);
     return new UserResponseDto(user);
   }
-
   @UseGuards(JwtAuthGuard)
   @Delete('me')
-  async remove(@Req() req: AuthenticatedRequest) {
-    const user = await this.userService.remove(req.user.sub);
+  async removeSelf(@Req() req: AuthenticatedRequest) {
+    const user = await this.userService.removeSelf(req.user);
+    return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const user = await this.userService.removeByAdmin(id, req.user);
     return new UserResponseDto(user);
   }
 

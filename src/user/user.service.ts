@@ -152,28 +152,27 @@ export class UserService {
     return updatedUser;
   }
 
-  async remove(id: string) {
-    const user = await this.findOneByOrFail(id);
-    await this.userRepository.delete({ id });
-    return user;
+  async removeSelf(user: JwtPayload) {
+    return this.executeSoftRemove(user.sub, user);
   }
 
-  save(user: User) {
-    return this.userRepository.save(user);
-  }
-
-  async softRemove(targetId: string, requestingUser: JwtPayload) {
-    const userToDelete = await this.findOneByOrFail(targetId);
-
-    const isSelfDelete = requestingUser.sub === targetId;
-
-    if (!isSelfDelete && requestingUser.role !== UserRole.ADMIN) {
+  async removeByAdmin(targetId: string, admin: JwtPayload) {
+    if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
-        'Você não tem permissão para excluir essa conta',
+        'Apenas administradores podem executar esta ação.',
       );
     }
+    return this.executeSoftRemove(targetId, admin, { isAdminAction: true });
+  }
 
-    if (isSelfDelete && requestingUser.role === UserRole.ADMIN) {
+  private async executeSoftRemove(
+    targetId: string,
+    requestingUser: JwtPayload,
+    options: { isAdminAction?: boolean } = {},
+  ) {
+    const userToDelete = await this.findOneByOrFail(targetId);
+
+    if (userToDelete.role === UserRole.ADMIN) {
       const adminCount = await this.userRepository.count({
         where: { role: UserRole.ADMIN },
       });
@@ -192,7 +191,7 @@ export class UserService {
       entityId: targetId,
       entityType: EntityType.USER,
       metadata: {
-        selfDelete: isSelfDelete,
+        selfDelete: !options.isAdminAction,
         targetSnapshot: {
           name: removedUser.name,
           email: removedUser.email,
@@ -202,5 +201,9 @@ export class UserService {
     });
 
     return removedUser;
+  }
+
+  save(user: User) {
+    return this.userRepository.save(user);
   }
 }

@@ -10,6 +10,12 @@ import { generateRandomSuffix } from 'src/commoun/utils/generate-random-suffix';
 import { ImagesService } from 'src/images/images.service';
 import { IMAGE_STORAGE_PROVIDER } from '../storage/image-storage.interface';
 import type { ImageStorageProvider } from '../storage/image-storage.interface';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { User } from 'src/user/entities/user.entity';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { UserService } from 'src/user/user.service';
+import { slugify } from 'src/commoun/utils/slugify';
 
 @Injectable()
 export class UploadService {
@@ -17,6 +23,8 @@ export class UploadService {
     @Inject(IMAGE_STORAGE_PROVIDER)
     private readonly storageProvider: ImageStorageProvider,
     private readonly imageService: ImagesService,
+    private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
   ) {}
 
   async handleUpload(userId: string, file: Express.Multer.File) {
@@ -36,7 +44,7 @@ export class UploadService {
 
     const allowedTypes = process.env.ALLOWED_IMAGE_TYPES?.split(',') ?? [];
 
-    if (!allowedTypes) {
+    if (allowedTypes.length === 0) {
       throw new InternalServerErrorException(
         'ALLOWED_IMAGE_TYPES não foi configurada.',
       );
@@ -65,7 +73,7 @@ export class UploadService {
     const outputMetadata = await sharp(outputBuffer).metadata();
 
     if (outputMetadata.format !== 'webp') {
-      throw new Error('Falha ao gerar imagem');
+      throw new InternalServerErrorException('Falha ao gerar imagem');
     }
 
     if (
@@ -74,14 +82,17 @@ export class UploadService {
       outputMetadata.width > 1920 ||
       outputMetadata.height > 1080
     ) {
-      throw new Error('Dimensões inválidas');
+      throw new InternalServerErrorException('Dimensões inválidas');
     }
 
     const today = new Date().toISOString().split('T')[0];
+    const user = await this.userService.findOneByOrFail(userId);
+    const authorSlug = slugify(user.name);
     const uniqueSuffix = `${Date.now()}-${generateRandomSuffix()}`;
+    const folder = `${today}/${authorSlug}-${user.id}`;
 
     const uploadResult = await this.storageProvider.upload(outputBuffer, {
-      folder: today,
+      folder,
       publicId: uniqueSuffix,
       uploadedBy: userId,
     });
@@ -90,6 +101,19 @@ export class UploadService {
       userId,
       uploadResult.url,
     );
+
+    await this.logService.create({
+      user: { id: userId } as User,
+      action: ActionType.CREATED,
+      entityId: savedImage.image_id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        after: {
+          url: savedImage.url,
+          folder,
+        },
+      },
+    });
 
     return savedImage;
   }
