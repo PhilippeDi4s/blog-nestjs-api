@@ -16,9 +16,6 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { PostResponseDto } from './dto/post-response.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/user/enum/user-role.enum';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('post')
 export class PostController {
@@ -51,11 +48,15 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @Patch('me/:id')
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseUUIDPipe) targetId: string,
     @Req() req: AuthenticatedRequest,
     @Body() dto: UpdatePostDto,
   ) {
-    const updatedPost = await this.postService.update({ id }, dto, req.user);
+    const updatedPost = await this.postService.updateSelf(
+      req.user,
+      targetId,
+      dto,
+    );
     return new PostResponseDto(updatedPost);
   }
 
@@ -66,17 +67,6 @@ export class PostController {
     @Req() req: AuthenticatedRequest,
   ) {
     const post = await this.postService.removeSelf(id, req.user);
-    return new PostResponseDto(post);
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Delete(':id')
-  async removeByAdmin(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
-    const post = await this.postService.removeByAdmin(id, req.user);
     return new PostResponseDto(post);
   }
 

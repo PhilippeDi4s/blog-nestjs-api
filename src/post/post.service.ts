@@ -47,7 +47,7 @@ export class PostService {
     return post;
   }
 
-  async findAll(postData: Partial<Post>) {
+  async findAll(postData?: Partial<Post>) {
     const posts = await this.postRepository.find({
       where: postData as FindOptionsWhere<Post>,
       order: {
@@ -135,16 +135,40 @@ export class PostService {
     return createdPost;
   }
 
-  async update(
-    postData: Partial<Post>,
+  async updateSelf(user: JwtPayload, targetId: string, dto: UpdatePostDto) {
+    const updatedPost = await this.executeUpdate(user, targetId, dto);
+    return updatedPost;
+  }
+
+  async updateByAdmin(admin: JwtPayload, targetId: string, dto: UpdatePostDto) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    const updatedPost = await this.executeUpdate(admin, targetId, dto);
+    return updatedPost;
+  }
+
+  private async executeUpdate(
+    user: JwtPayload,
+    targetId: string,
     dto: UpdatePostDto,
-    author: JwtPayload,
+    options: { isAdminAction?: boolean } = {},
   ) {
     if (Object.keys(dto).length === 0) {
       throw new BadRequestException('Dados não enviados');
     }
 
-    const post = await this.findOneOwnedOrFail(postData, author);
+    const post = await this.findOneOrFail({ id: targetId });
+
+    const isPostOwned = post.author?.id === user.sub;
+
+    if (!isPostOwned && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esse post',
+      );
+    }
 
     const before: Partial<Post> = {
       title: post.title,
@@ -176,11 +200,12 @@ export class PostService {
     };
 
     await this.logService.create({
-      user: { id: author.sub } as User,
-      action: ActionType.CREATED,
-      entityId: author.sub,
+      user: { id: user.sub } as User,
+      action: ActionType.UPDATED,
+      entityId: updatedPost.id,
       entityType: EntityType.POST,
       metadata: {
+        selfUpdate: !options.isAdminAction,
         before,
         after,
       },

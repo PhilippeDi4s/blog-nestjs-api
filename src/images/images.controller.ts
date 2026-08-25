@@ -11,19 +11,10 @@ import { ImagesService } from './images.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ImageResponseDto } from './dto/image-response.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
-import { InternalApiKeyGuard } from 'src/auth/guards/internal-api-key.guard';
 
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
-
-  @UseGuards(InternalApiKeyGuard)
-  @Get('admin')
-  async findAll() {
-    const images = await this.imagesService.findAll();
-
-    return images.map((image) => new ImageResponseDto(image));
-  }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
