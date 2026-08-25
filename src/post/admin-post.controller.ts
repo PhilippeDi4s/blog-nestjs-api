@@ -19,6 +19,8 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 export class AdminPostController {
   constructor(private readonly postService: PostService) {}
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get()
   async findAll() {
     const posts = await this.postService.findAll();

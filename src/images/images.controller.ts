@@ -35,11 +35,10 @@ export class ImagesController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(
-    @Param('id', ParseUUIDPipe) image_id: string,
+    @Param('id', ParseUUIDPipe) targetId: string,
     @Req() req: AuthenticatedRequest,
   ) {
-    const image = await this.imagesService.remove(req.user, { image_id });
-
+    const image = await this.imagesService.selfRemove(req.user, targetId);
     return new ImageResponseDto(image);
   }
 }

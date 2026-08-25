@@ -4,7 +4,9 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -19,16 +21,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FiltersUserDto } from './dto/filters-user.dto';
 
 @Controller('admin/users')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
 export class AdminUserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Get()
-  async findMany(
-    @Req() req: AuthenticatedRequest,
-    @Body() filters: FiltersUserDto,
-  ) {
+  async findMany(@Query() filters: FiltersUserDto) {
     const users = await this.userService.findMany(filters);
     return {
       ...users,
@@ -36,12 +35,10 @@ export class AdminUserController {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Patch(':id')
   async updateUser(
     @Req() req: AuthenticatedRequest,
-    @Param('id') targetId: string,
+    @Param('id', ParseUUIDPipe) targetId: string,
     @Body() dto: UpdateUserDto,
   ) {
     const updatedUser = await this.userService.updateByAdmin(
@@ -52,12 +49,10 @@ export class AdminUserController {
     return new UserResponseDto(updatedUser);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Delete(':id')
   async softRemove(
     @Req() req: AuthenticatedRequest,
-    @Param('id') targetId: string,
+    @Param('id', ParseUUIDPipe) targetId: string,
   ) {
     const removedUser = await this.userService.removeByAdmin(
       targetId,

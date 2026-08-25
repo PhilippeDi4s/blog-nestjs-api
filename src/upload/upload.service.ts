@@ -99,7 +99,9 @@ export class UploadService {
 
     const savedImage = await this.imageService.saveImageUrl(
       userId,
+      uniqueSuffix,
       uploadResult.url,
+      folder,
     );
 
     await this.logService.create({

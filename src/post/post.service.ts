@@ -47,9 +47,20 @@ export class PostService {
     return post;
   }
 
-  async findAll(postData?: Partial<Post>) {
+  async findAllPublic() {
     const posts = await this.postRepository.find({
-      where: postData as FindOptionsWhere<Post>,
+      where: { published: true },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: { author: true },
+    });
+
+    return posts;
+  }
+
+  async findAll() {
+    const posts = await this.postRepository.find({
       order: {
         createdAt: 'DESC',
       },
@@ -247,7 +258,7 @@ export class PostService {
     await this.logService.create({
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
-      entityId: targetId,
+      entityId: removedPost.id,
       entityType: EntityType.POST,
       metadata: {
         selfDelete: !options.isAdminAction,

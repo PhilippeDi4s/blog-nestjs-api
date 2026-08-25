@@ -8,10 +8,16 @@ import {
 } from '@nestjs/common';
 import { Images } from './entities/image.entity';
 import { Repository } from 'typeorm';
+import type { FindOptionsWhere } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { IMAGE_STORAGE_PROVIDER } from 'src/storage/image-storage.interface';
 import type { ImageStorageProvider } from 'src/storage/image-storage.interface';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 
 @Injectable()
 export class ImagesService {
@@ -23,6 +29,8 @@ export class ImagesService {
 
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
+
+    private readonly logService: ActivityLogsService,
   ) {}
 
   async findAll() {
@@ -31,10 +39,6 @@ export class ImagesService {
         uploaded_by: true,
       },
     });
-
-    if (!images) {
-      throw new NotFoundException('Nenhuma imagem encontrada');
-    }
 
     return images;
   }
@@ -50,9 +54,10 @@ export class ImagesService {
     });
     return images;
   }
+
   async findOne(imageData: Partial<Images>) {
     const image = await this.imagesRepository.findOne({
-      where: imageData,
+      where: imageData as FindOptionsWhere<Images>,
       relations: { uploaded_by: true },
     });
 
@@ -69,9 +74,16 @@ export class ImagesService {
     return image;
   }
 
-  async saveImageUrl(userId: string, publicUrl: string) {
+  async saveImageUrl(
+    userId: string,
+    publicId: string,
+    publicUrl: string,
+    folder: string,
+  ) {
     const url = this.imagesRepository.create({
       url: publicUrl,
+      folder,
+      publicId,
       uploaded_by: {
         id: userId,
       },
@@ -92,22 +104,62 @@ export class ImagesService {
     return savedUrl;
   }
 
-  async remove(author: Partial<User>, imageData: Partial<Images>) {
-    const image = await this.findOneOrFail(imageData);
+  async selfRemove(user: JwtPayload, targetId: string) {
+    const deletedImage = await this.executeSoftRemove(user, targetId);
+    return deletedImage;
+  }
 
-    if (image.uploaded_by.id !== author.id) {
+  async removeByAdmin(admin: JwtPayload, targetId: string) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem realizar essa ação',
+      );
+    }
+    const deletedImage = await this.executeSoftRemove(admin, targetId, {
+      isAdminAction: true,
+    });
+    return deletedImage;
+  }
+
+  private async executeSoftRemove(
+    user: JwtPayload,
+    targetId: string,
+    options: { isAdminAction?: boolean } = {},
+  ) {
+    const imageToDelete = await this.findOneOrFail({ image_id: targetId });
+
+    const isImageOwner = user.sub === imageToDelete.uploaded_by.id;
+
+    if (!isImageOwner && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Você não tem permissão para excluir esta imagem',
       );
     }
 
-    await this.imagesRepository.delete({
-      image_id: image.image_id,
-      uploaded_by: { id: author.id },
+    const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
+
+    await this.storageProvider.delete(deletedImage.publicId);
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      action: ActionType.DELETED,
+      entityId: deletedImage.image_id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        selfDelete: !options.isAdminAction,
+        targetSnapshot: {
+          url: deletedImage.url,
+          folder: deletedImage.folder,
+          uploadedAt: deletedImage.created_at,
+          uploadedBy: {
+            id: deletedImage.uploaded_by.id,
+            name: deletedImage.uploaded_by.name,
+            email: deletedImage.uploaded_by.email,
+          },
+        },
+      },
     });
 
-    await this.storageProvider.delete(image.image_id);
-
-    return image;
+    return deletedImage;
   }
 }
