@@ -8,7 +8,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import {
+  Between,
+  FindOptionsWhere,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,6 +24,7 @@ import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { UserRole } from './enum/user-role.enum';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { FiltersUserDto } from './dto/filters-user.dto';
 
 @Injectable()
 export class UserService {
@@ -77,34 +84,118 @@ export class UserService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async update(id: string, dto: UpdateUserDto) {
+  async findMany(filters: FiltersUserDto) {
+    const {
+      id,
+      name,
+      email,
+      forceLogout,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 20,
+    } = filters;
+
+    const where: FindOptionsWhere<User> = {};
+
+    if (id) {
+      where.id = id;
+    }
+    if (name) {
+      where.name = name;
+    }
+    if (email) {
+      where.email = email;
+    }
+
+    if (forceLogout) {
+      where.forceLogout = forceLogout;
+    }
+
+    if (startDate && endDate) {
+      where.createdAt = Between(startDate, endDate);
+    } else if (startDate) {
+      where.createdAt = MoreThanOrEqual(startDate);
+    } else if (endDate) {
+      where.createdAt = LessThanOrEqual(endDate);
+    }
+
+    const [logs, total] = await this.userRepository.findAndCount({
+      where,
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: logs,
+      total,
+      page,
+      limit,
+    };
+  }
+
+  async updateSelf(user: JwtPayload, dto: UpdateUserDto) {
+    const updatedUser = await this.executeUpdate(user.sub, user, dto);
+    return updatedUser;
+  }
+
+  async updateByAdmin(admin: JwtPayload, targetId: string, dto: UpdateUserDto) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar este usuário',
+      );
+    }
+    const updatedUser = await this.executeUpdate(targetId, admin, dto, {
+      isAdminAction: true,
+    });
+    return updatedUser;
+  }
+
+  private async executeUpdate(
+    targetId: string,
+    requestingUser: JwtPayload,
+    dto: UpdateUserDto,
+    options: { isAdminAction?: boolean } = {},
+  ) {
+    const userToUpdate = await this.findOneByOrFail(targetId);
+
     if (!dto.name && !dto.email) {
       throw new BadRequestException('Dados não enviados');
     }
 
-    const user = await this.findOneByOrFail(id);
+    const isSelfUpdate = requestingUser.sub === userToUpdate.id;
 
-    const before = { name: user.name, email: user.email };
-
-    user.name = dto.name ?? user.name;
-
-    if (dto.email && dto.email !== user.email) {
-      await this.failIfEmailExists(dto.email);
-
-      user.email = dto.email;
-      user.forceLogout = true;
+    if (!isSelfUpdate && requestingUser.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar este usuário',
+      );
     }
 
-    const updatedUser = await this.save(user);
+    const before = { name: userToUpdate.name, email: userToUpdate.email };
+
+    userToUpdate.name = dto.name ?? userToUpdate.name;
+
+    if (dto.email && dto.email !== userToUpdate.email) {
+      await this.failIfEmailExists(dto.email);
+
+      userToUpdate.email = dto.email;
+      userToUpdate.forceLogout = true;
+    }
+
+    const updatedUser = await this.save(userToUpdate);
 
     const after = { name: updatedUser.name, email: updatedUser.email };
 
     await this.logService.create({
-      user: updatedUser,
+      user: { id: requestingUser.sub } as User,
       action: ActionType.UPDATED,
-      entityId: user.id,
+      entityId: updatedUser.id,
       entityType: EntityType.USER,
       metadata: {
+        selfUpdate: !options.isAdminAction,
         before,
         after,
       },

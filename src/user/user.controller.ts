@@ -3,13 +3,11 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -17,16 +15,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from './enum/user-role.enum';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
@@ -40,6 +32,7 @@ export class UserController {
     const user = await this.userService.create(dto);
     return new UserResponseDto(user);
   }
+
   @UseGuards(JwtAuthGuard)
   @Delete('me')
   async removeSelf(@Req() req: AuthenticatedRequest) {
@@ -47,18 +40,10 @@ export class UserController {
     return new UserResponseDto(user);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Delete(':id')
-  async remove(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
-    const user = await this.userService.removeByAdmin(id, req.user);
-    return new UserResponseDto(user);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Patch('me')
   async update(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserDto) {
-    const user = await this.userService.update(req.user.sub, dto);
+    const user = await this.userService.updateSelf(req.user, dto);
     return new UserResponseDto(user);
   }
 

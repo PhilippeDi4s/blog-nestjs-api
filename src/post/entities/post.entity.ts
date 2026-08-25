@@ -3,6 +3,7 @@ import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -40,4 +41,7 @@ export class Post {
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   author: User;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

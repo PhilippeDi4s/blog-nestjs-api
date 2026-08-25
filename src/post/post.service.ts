@@ -1,10 +1,11 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -13,6 +14,10 @@ import { createSlugFromText } from 'src/commoun/utils/create-slug-from-text';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ImagesService } from 'src/images/images.service';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { UserRole } from 'src/user/enum/user-role.enum';
 
 @Injectable()
 export class PostService {
@@ -35,7 +40,7 @@ export class PostService {
 
   async findOne(postData: Partial<Post>) {
     const post = await this.postRepository.findOne({
-      where: postData,
+      where: postData as FindOptionsWhere<Post>,
       relations: { author: true },
     });
 
@@ -44,7 +49,7 @@ export class PostService {
 
   async findAll(postData: Partial<Post>) {
     const posts = await this.postRepository.find({
-      where: postData,
+      where: postData as FindOptionsWhere<Post>,
       order: {
         createdAt: 'DESC',
       },
@@ -67,7 +72,7 @@ export class PostService {
   async findOneOwned(postData: Partial<Post>, author: Partial<User>) {
     const post = await this.postRepository.findOne({
       where: {
-        ...postData,
+        ...(postData as FindOptionsWhere<Post>),
         author: { id: author.id },
       },
       relations: { author: true },
@@ -113,19 +118,40 @@ export class PostService {
         throw new BadRequestException('Erro ao criar o post');
       });
 
+    await this.logService.create({
+      user: { id: author.id } as User,
+      action: ActionType.CREATED,
+      entityId: createdPost.id,
+      entityType: EntityType.POST,
+      metadata: {
+        after: {
+          title: createdPost.title,
+          exerpt: createdPost.excerpt,
+          Ispublished: createdPost.published,
+        },
+      },
+    });
+
     return createdPost;
   }
 
   async update(
     postData: Partial<Post>,
     dto: UpdatePostDto,
-    author: Partial<User>,
+    author: JwtPayload,
   ) {
     if (Object.keys(dto).length === 0) {
       throw new BadRequestException('Dados não enviados');
     }
 
     const post = await this.findOneOwnedOrFail(postData, author);
+
+    const before: Partial<Post> = {
+      title: post.title,
+      content: post.content,
+      excerpt: post.excerpt,
+      published: post.published,
+    };
 
     post.title = dto.title ?? post.title;
     post.content = dto.content ?? post.content;
@@ -140,15 +166,75 @@ export class PostService {
       post.coverImage = image;
     }
 
-    return this.postRepository.save(post);
+    const updatedPost = await this.postRepository.save(post);
+
+    const after: Partial<Post> = {
+      title: updatedPost.title,
+      content: updatedPost.content,
+      excerpt: updatedPost.excerpt,
+      published: updatedPost.published,
+    };
+
+    await this.logService.create({
+      user: { id: author.sub } as User,
+      action: ActionType.CREATED,
+      entityId: author.sub,
+      entityType: EntityType.POST,
+      metadata: {
+        before,
+        after,
+      },
+    });
+
+    return updatedPost;
   }
 
-  async remove(postData: Partial<Post>, author: Partial<User>) {
-    const post = await this.findOneOrFail(postData);
-    await this.postRepository.delete({
-      id: postData.id,
-      author: { id: author.id },
+  async removeSelf(targetId: string, user: JwtPayload) {
+    return this.executeSoftRemove(targetId, user);
+  }
+
+  async removeByAdmin(targetId: string, admin: JwtPayload) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    return this.executeSoftRemove(targetId, admin, { isAdminAction: true });
+  }
+
+  private async executeSoftRemove(
+    targetId: string,
+    user: JwtPayload,
+    options: { isAdminAction?: boolean } = {},
+  ) {
+    const postToDelete = await this.findOneOrFail({ id: targetId });
+
+    const isOwnPost = postToDelete.author.id === user.sub;
+
+    if (!isOwnPost && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esse post',
+      );
+    }
+
+    const removedPost = await this.postRepository.softRemove(postToDelete);
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      action: ActionType.DELETED,
+      entityId: targetId,
+      entityType: EntityType.POST,
+      metadata: {
+        selfDelete: !options.isAdminAction,
+        targetSnapshot: {
+          title: removedPost.title,
+          wasPublished: removedPost.published,
+          author: removedPost.author.name,
+          email: removedPost.author.email,
+        },
+      },
     });
-    return post;
+
+    return removedPost;
   }
 }
