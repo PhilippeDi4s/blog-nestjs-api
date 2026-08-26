@@ -19,6 +19,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FiltersUserDto } from './dto/filters-user.dto';
+import { ConfirmPasswordDto } from './dto/confirm-password.dto';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -46,6 +47,30 @@ export class AdminUserController {
       targetId,
       dto,
     );
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/promote')
+  async promote(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmPasswordDto,
+  ) {
+    const updatedUser = await this.userService.promoteToAdmin(
+      req.user,
+      dto,
+      targetId,
+    );
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/demote')
+  async demote(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmPasswordDto,
+  ) {
+    const updatedUser = await this.userService.demote(req.user, dto, targetId);
     return new UserResponseDto(updatedUser);
   }
 

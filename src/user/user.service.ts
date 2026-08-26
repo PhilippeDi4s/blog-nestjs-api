@@ -25,6 +25,7 @@ import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { UserRole } from './enum/user-role.enum';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { FiltersUserDto } from './dto/filters-user.dto';
+import { ConfirmPasswordDto } from './dto/confirm-password.dto';
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,32 @@ export class UserService {
     private readonly hashingService: HashingService,
     private readonly logService: ActivityLogsService,
   ) {}
+
+  private async assertPasswordMatches(
+    plainPassword: string,
+    passwordHash: string,
+  ): Promise<void> {
+    const isValid = await this.hashingService.compare(
+      plainPassword,
+      passwordHash,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException('Senha incorreta!');
+    }
+  }
+
+  private async assertNotLastAdmin(): Promise<void> {
+    const adminCount = await this.userRepository.count({
+      where: { role: UserRole.ADMIN },
+    });
+
+    if (adminCount <= 1) {
+      throw new ConflictException(
+        'Não é possível remover o último administrador do sistema.',
+      );
+    }
+  }
 
   async failIfEmailExists(email: string) {
     const exists = await this.userRepository.existsBy({
@@ -207,14 +234,7 @@ export class UserService {
   async updatePassword(id: string, dto: UpdatePasswordDto) {
     const user = await this.findOneByOrFail(id);
 
-    const isCurrentPasswordValid = await this.hashingService.compare(
-      dto.currentPassword,
-      user.passwordHash,
-    );
-
-    if (!isCurrentPasswordValid) {
-      throw new UnauthorizedException('Senha atual inválida');
-    }
+    await this.assertPasswordMatches(dto.currentPassword, user.passwordHash);
 
     const isNewPasswordEqual = await this.hashingService.compare(
       dto.newPassword,
@@ -241,6 +261,93 @@ export class UserService {
     });
 
     return updatedUser;
+  }
+
+  async promoteToAdmin(
+    adminToken: JwtPayload,
+    dto: ConfirmPasswordDto,
+    targetId: string,
+  ) {
+    if (adminToken.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    const admin = await this.findOneByOrFail(adminToken.sub);
+
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+    if (user.role === UserRole.ADMIN) {
+      throw new ConflictException('Usuário já é administrador.');
+    }
+
+    const formerRole = user.role;
+    user.role = UserRole.ADMIN;
+    await this.userRepository.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.PROMOTE,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        previousRole: formerRole,
+        newRole: user.role,
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+    });
+
+    return user;
+  }
+
+  async demote(
+    adminToken: JwtPayload,
+    dto: ConfirmPasswordDto,
+    targetId: string,
+  ) {
+    if (adminToken.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+
+    if (adminToken.sub === targetId) {
+      throw new ForbiddenException(
+        'Você não pode remover seu próprio acesso de administrador.',
+      );
+    }
+
+    const admin = await this.findOneByOrFail(adminToken.sub);
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (user.role === UserRole.USER) {
+      throw new ConflictException('Usuário já possui esse cargo atualmente.');
+    }
+
+    await this.assertNotLastAdmin();
+
+    const formerRole = user.role;
+    user.role = UserRole.USER;
+    await this.userRepository.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.DEMOTE,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        previousRole: formerRole,
+        newRole: user.role,
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+    });
+
+    return user;
   }
 
   async restore(targetId: string) {
@@ -282,16 +389,7 @@ export class UserService {
   ) {
     const userToDelete = await this.findOneByOrFail(targetId);
 
-    if (userToDelete.role === UserRole.ADMIN) {
-      const adminCount = await this.userRepository.count({
-        where: { role: UserRole.ADMIN },
-      });
-      if (adminCount <= 1) {
-        throw new BadRequestException(
-          'Não é possível excluir o único administrador do sistema',
-        );
-      }
-    }
+    await this.assertNotLastAdmin();
 
     const removedUser = await this.userRepository.softRemove(userToDelete);
 
