@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { parseCorsWhitelist } from './commoun/utils/parseCorsWhitelist';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
+    cookieParser(),
   );
 
   const corsWhiteList = parseCorsWhitelist(process.env.CORS_WHITELIST ?? '');
