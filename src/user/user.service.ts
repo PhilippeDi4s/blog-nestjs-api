@@ -243,6 +243,25 @@ export class UserService {
     return updatedUser;
   }
 
+  async restore(targetId: string) {
+    const userToRestore = await this.userRepository.findOne({
+      where: { id: targetId },
+      withDeleted: true,
+    });
+
+    if (!userToRestore) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    if (!userToRestore.deletedAt) {
+      throw new ConflictException('Este usuário já está ativo');
+    }
+
+    await this.userRepository.restore(targetId);
+
+    return this.findOneByOrFail(targetId);
+  }
+
   async removeSelf(user: JwtPayload) {
     return this.executeSoftRemove(user.sub, user);
   }

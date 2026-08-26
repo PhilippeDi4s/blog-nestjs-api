@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -223,6 +224,26 @@ export class PostService {
     });
 
     return updatedPost;
+  }
+
+  async restore(targetId: string) {
+    const postToRestore = await this.postRepository.findOne({
+      where: { id: targetId },
+      withDeleted: true,
+      relations: { author: true },
+    });
+
+    if (!postToRestore) {
+      throw new NotFoundException('Post não encontrado');
+    }
+
+    if (!postToRestore.deletedAt) {
+      throw new ConflictException('Este post já está ativo');
+    }
+
+    await this.postRepository.restore(targetId);
+
+    return this.findOneOrFail({ id: targetId });
   }
 
   async removeSelf(targetId: string, user: JwtPayload) {

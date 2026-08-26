@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -102,6 +103,26 @@ export class ImagesService {
       });
 
     return savedUrl;
+  }
+
+  async restore(targetId: string) {
+    const imageToRestore = await this.imagesRepository.findOne({
+      where: { image_id: targetId },
+      withDeleted: true,
+      relations: { uploaded_by: true },
+    });
+
+    if (!imageToRestore) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    if (!imageToRestore.deletedAt) {
+      throw new ConflictException('Esta imagem já está ativa');
+    }
+
+    await this.imagesRepository.restore(targetId);
+
+    return this.findOneOrFail({ image_id: targetId });
   }
 
   async selfRemove(user: JwtPayload, targetId: string) {

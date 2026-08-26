@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -25,6 +26,12 @@ export class AdminImageController {
   async findAll() {
     const images = await this.imageService.findAll();
     return images.map((image) => new ImageResponseDto(image));
+  }
+
+  @Patch(':id/restore')
+  async restore(@Param('id', ParseUUIDPipe) targetId: string) {
+    const restoredImage = await this.imageService.restore(targetId);
+    return new ImageResponseDto(restoredImage);
   }
 
   @Delete(':id')

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -27,6 +28,14 @@ export class AdminPostController {
     return posts.map((post) => {
       new PostResponseDto(post);
     });
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/restore')
+  async restore(@Param('id', ParseUUIDPipe) id: string) {
+    const restoredPost = await this.postService.restore(id);
+    return new PostResponseDto(restoredPost);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

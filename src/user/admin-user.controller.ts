@@ -49,6 +49,12 @@ export class AdminUserController {
     return new UserResponseDto(updatedUser);
   }
 
+  @Patch(':id/restore')
+  async restore(@Param('id', ParseUUIDPipe) targetId: string) {
+    const restoredUser = await this.userService.restore(targetId);
+    return new UserResponseDto(restoredUser);
+  }
+
   @Delete(':id')
   async softRemove(
     @Req() req: AuthenticatedRequest,
