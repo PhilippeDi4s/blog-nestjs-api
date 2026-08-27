@@ -1,12 +1,14 @@
-# the-blog-API
+# nest-test
 
 ## 1. Visão Geral
 
-**Nome do projeto:** `the-blog-API`
+**Nome do projeto:** `nest-test` (conforme `package.json`)
 
-API REST construída com NestJS que serve como backend para meu projeto "The blog". Expõe recursos de autenticação, gerenciamento de usuários, CRUD de posts e upload de imagens de capa. O frontend consumidor é uma aplicação React/Next.js, configurada na whitelist de CORS.
+**Descrição:** API REST construída com NestJS para um sistema de blog. Expõe endpoints de autenticação, gestão de usuários, publicação de posts, upload de imagens e operações administrativas. Utiliza PostgreSQL como persistência e Cloudinary como armazenamento de mídia.
 
-**Motivação:** Centralizar a lógica de negócio, persistência e autenticação do blog em um serviço dedicado, separado do frontend Next.js. Isso permite controle de acesso via JWT, publicação seletiva de posts e armazenamento de mídia no próprio servidor.
+**Motivação:** Centralizar a lógica de backend de um blog — cadastro de autores, criação e publicação de conteúdo, upload seguro de imagens e moderação administrativa — em uma API tipada, validada e auditável por logs de atividade.
+
+**Status do projeto:** Em desenvolvimento (`version: 0.0.1`, sem suíte de testes implementada).
 
 ---
 
@@ -14,118 +16,143 @@ API REST construída com NestJS que serve como backend para meu projeto "The blo
 
 ### Backend
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| [NestJS](https://nestjs.com/) (`@nestjs/core`, `@nestjs/common`, `@nestjs/platform-express`) | ^11.0.1 | Framework HTTP e injeção de dependências |
-| [TypeScript](https://www.typescriptlang.org/) | ^5.7.3 | Linguagem principal |
-| [Express](https://expressjs.com/) (via `@nestjs/platform-express`) | ^11.0.1 | Servidor HTTP subjacente |
-| [Passport](https://www.passportjs.org/) + `@nestjs/passport` | ^0.7.0 / ^11.0.5 | Estratégia de autenticação |
-| [passport-jwt](https://github.com/michaeljsmith/passport-jwt) | ^4.0.1 | Extração e validação de tokens JWT |
-| [@nestjs/jwt](https://docs.nestjs.com/security/authentication) | ^11.0.2 | Emissão de tokens JWT |
-| [bcryptjs](https://github.com/dcodeIO/bcrypt.js) | ^3.0.3 | Hash de senhas |
-| [class-validator](https://github.com/typestack/class-validator) | ^0.15.1 | Validação de DTOs |
-| [class-transformer](https://github.com/typestack/class-transformer) | ^0.5.1 | Transformação de objetos |
-| [@nestjs/mapped-types](https://docs.nestjs.com/openapi/mapped-types) | ^2.1.1 | DTOs derivados (`PartialType`, `PickType`) |
-| [@nestjs/config](https://docs.nestjs.com/techniques/configuration) | ^4.0.4 | Carregamento de variáveis de ambiente |
-| [Helmet](https://helmetjs.github.io/) | ^8.3.0 | Headers de segurança HTTP |
-| [@nestjs/throttler](https://docs.nestjs.com/security/rate-limiting) | ^6.5.0 | Rate limiting global (10 req / 10 s) |
-| [@nestjs/serve-static](https://docs.nestjs.com/recipes/serve-static) | ^5.0.5 | Servir arquivos de upload em `/uploads` |
-| [Multer](https://github.com/expressjs/multer) (via `@types/multer`) | ^2.2.0 | Upload multipart em memória |
-| [file-type](https://github.com/sindresorhus/file-type) | ^22.0.1 | Validação de MIME type por magic bytes |
-| [RxJS](https://rxjs.dev/) | ^7.8.1 | Programação reativa (dependência NestJS) |
+| Tecnologia | Versão |
+|---|---|
+| Node.js / TypeScript | TypeScript `^5.7.3` |
+| NestJS (`@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`) | `^11.0.1` |
+| `@nestjs/config` | `^4.0.4` |
+| `@nestjs/jwt` | `^11.0.2` |
+| `@nestjs/passport` | `^11.0.5` |
+| `@nestjs/typeorm` | `^11.0.3` |
+| `@nestjs/throttler` | `^6.5.0` |
+| `@nestjs/serve-static` | `^5.0.5` |
+| `@nestjs/mapped-types` | `^2.1.1` |
+| Passport + `passport-jwt` | `^0.7.0` / `^4.0.1` |
+| TypeORM | `^1.1.0` |
+| class-validator / class-transformer | `^0.15.1` / `^0.5.1` |
+| bcryptjs | `^3.0.3` |
+| cookie-parser | `^1.4.7` |
+| helmet | `^8.3.0` |
+| sharp | `^0.35.3` |
+| file-type | `^22.0.1` |
+| rxjs | `^7.8.1` |
+| reflect-metadata | `^0.2.2` |
 
 ### Banco de Dados
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| [PostgreSQL](https://www.postgresql.org/) | — | Banco relacional |
-| [TypeORM](https://typeorm.io/) | ^1.1.0 | ORM e mapeamento de entidades |
-| [@nestjs/typeorm](https://docs.nestjs.com/techniques/database) | ^11.0.3 | Integração TypeORM com NestJS |
-| [pg](https://node-postgres.com/) | ^8.22.0 | Driver PostgreSQL |
+| Tecnologia | Versão |
+|---|---|
+| PostgreSQL (driver `pg`) | `^8.22.0` |
+
+### Armazenamento de Mídia
+
+| Tecnologia | Versão |
+|---|---|
+| Cloudinary | `^2.10.0` |
+
+### DevOps / Ferramentas
+
+| Tecnologia | Versão |
+|---|---|
+| Nest CLI (`@nestjs/cli`) | `^11.0.0` |
+| ESLint | `^9.18.0` |
+| Prettier | `^3.4.2` |
+| ts-node / ts-loader | `^10.9.2` / `^9.5.2` |
+
+### Testes
+
+| Tecnologia | Versão |
+|---|---|
+| Jest | `^30.0.0` |
+| ts-jest | `^29.2.5` |
+| Supertest | `^7.0.0` |
+| `@nestjs/testing` | `^11.0.1` |
+
+> **Nota:** A configuração de testes existe em `package.json`, porém não há arquivos `*.spec.ts` ou diretório `test/` no repositório.
 
 ### Frontend
 
-Este repositório contém apenas a API. O frontend está disponível em https://blog.diasphilippe.dev.br/.
+Não aplicável — este repositório contém apenas a API backend.
+
 ---
 
 ## 3. Estrutura de Diretórios
 
-```
-nest-test/
-├── dev/                              # Arquivos auxiliares para testes manuais
-│   └── images/                       # Imagens de exemplo usadas no rest-client
+```text
+blog-nestjs-api/
+├── dev/                              # Arquivos estáticos para testes locais de upload
+│   └── images/                       # Imagens de exemplo (png, jpeg, webp, gif)
 ├── rest-client/
 │   └── requests.http                 # Coleção de requisições HTTP para testes manuais
 ├── src/
-│   ├── main.ts                       # Bootstrap: CORS, Helmet, ValidationPipe, porta
-│   ├── app.module.ts                 # Módulo raiz: TypeORM, Throttler, filtros globais
-│   ├── auth/                         # Autenticação JWT
-│   │   ├── auth.controller.ts        # POST /auth/login
-│   │   ├── auth.service.ts           # Validação de credenciais e emissão de token
-│   │   ├── auth.module.ts            # Registro do JwtModule e JwtStrategy
-│   │   ├── jwt.strategy.ts           # Validação do payload JWT e checagem de forceLogout
-│   │   ├── guards/
-│   │   │   └── jwt-auth.guard.ts     # Guard de rotas protegidas
+│   ├── main.ts                       # Bootstrap da aplicação (CORS, Helmet, pipes globais)
+│   ├── app.module.ts                 # Módulo raiz (TypeORM, Throttler, filtros globais)
+│   ├── auth/                         # Autenticação JWT, login/logout e guards
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.module.ts
 │   │   ├── dto/
-│   │   │   └── login.dto.ts          # DTO de login (email, password)
-│   │   └── types/
-│   │       ├── jwt-payload.type.ts   # Formato do payload JWT (sub, email)
-│   │       └── authenticated-request.ts  # Tipagem de req.user
-│   ├── user/                         # Gerenciamento de usuários
-│   │   ├── user.controller.ts        # CRUD do usuário autenticado + registro público
-│   │   ├── user.service.ts           # Lógica de negócio e acesso ao repositório
+│   │   ├── guards/                   # JwtAuthGuard, RolesGuard, JwtStrategy
+│   │   ├── decorators/               # @Roles()
+│   │   └── types/                    # JwtPayload, AuthenticatedRequest
+│   ├── user/                         # CRUD de usuários e rotas administrativas
+│   │   ├── user.controller.ts        # Rotas públicas/autenticadas (/user)
+│   │   ├── admin-user.controller.ts  # Rotas admin (/admin/users)
+│   │   ├── user.service.ts
 │   │   ├── user.module.ts
-│   │   ├── entities/
-│   │   │   └── user.entity.ts        # Entidade TypeORM (users)
-│   │   └── dto/
-│   │       ├── create-user.dto.ts
-│   │       ├── update-user.dto.ts
-│   │       ├── update-password.dto.ts
-│   │       └── user-response.dto.ts  # Resposta sem expor passwordHash
-│   ├── post/                         # Gerenciamento de posts do blog
-│   │   ├── post.controller.ts        # Rotas públicas (publicados) e privadas (/me)
-│   │   ├── post.service.ts           # CRUD com ownership e geração de slug
+│   │   ├── entities/user.entity.ts
+│   │   ├── dto/
+│   │   └── enum/user-role.enum.ts    # user | admin
+│   ├── post/                         # Posts do blog (públicos e do autor)
+│   │   ├── post.controller.ts        # Rotas /post
+│   │   ├── admin-post.controller.ts  # Rotas /admin/posts
+│   │   ├── post.service.ts
 │   │   ├── post.module.ts
-│   │   ├── entities/
-│   │   │   └── post.entity.ts        # Entidade TypeORM com relação ManyToOne → User
+│   │   ├── entities/post.entity.ts
 │   │   └── dto/
-│   │       ├── create-post.dto.ts
-│   │       ├── update-post.dto.ts
-│   │       └── post-response.dto.ts
-│   ├── upload/                       # Upload e serviço estático de imagens
-│   │   ├── upload.controller.ts      # POST /upload (multipart, autenticado)
-│   │   ├── upload.service.ts         # Validação, persistência em disco e retorno da URL
-│   │   ├── upload.config.ts          # Configuração Multer (memória, filtro, limite 900 KB)
-│   │   └── upload.module.ts          # ServeStaticModule em /uploads
-│   └── commoun/                      # Utilitários compartilhados (typo intencional no código)
-│       ├── common.module.ts          # Provider de HashingService (bcrypt)
-│       ├── filters/
-│       │   └── all-exeptions.filter.ts  # Filtro global de exceções HTTP
-│       ├── hashing/
-│       │   ├── hashing.service.ts    # Classe abstrata de hash
-│       │   └── bcrypt-hashing.service.ts
+│   ├── images/                       # Consulta e remoção de imagens
+│   │   ├── images.controller.ts      # Rotas /images
+│   │   ├── admin-image.controller.ts # Rotas /admin/image
+│   │   ├── images.service.ts
+│   │   ├── images.module.ts
+│   │   ├── entities/image.entity.ts
+│   │   └── dto/
+│   ├── upload/                       # Upload multipart com validação e conversão WebP
+│   │   ├── upload.controller.ts
+│   │   ├── upload.service.ts
+│   │   ├── upload.config.ts          # Configuração Multer (memória, limites)
+│   │   └── upload.module.ts
+│   ├── storage/                      # Abstração de armazenamento de imagens
+│   │   ├── storage.module.ts
+│   │   ├── image-storage.interface.ts
+│   │   └── cloudinary/               # Implementação Cloudinary
+│   ├── activity-logs/                # Auditoria de ações (serviço interno, sem rotas HTTP)
+│   │   ├── activity-logs.service.ts
+│   │   ├── activity-logs.controller.ts
+│   │   ├── activity-logs.module.ts
+│   │   ├── entities/activity.entity.ts
+│   │   ├── dto/
+│   │   └── enums/                    # ActionType, EntityType
+│   └── commoun/                      # Utilitários compartilhados (hashing, filtros, pipes)
+│       ├── common.module.ts
+│       ├── hashing/                  # BcryptHashingService
+│       ├── filters/all-exeptions.filter.ts
 │       ├── pipes/
-│       │   └── custom-parse-int-pipe.pipe.ts
-│       └── utils/
-│           ├── create-slug-from-text.ts  # Gera slug único a partir do título
-│           ├── slugify.ts
-│           ├── generate-random-suffix.ts
-│           └── parseCorsWhitelist.ts     # Parse da whitelist CORS por espaços
+│       └── utils/                    # slugify, parseCorsWhitelist, etc.
 ├── env.example                       # Modelo de variáveis de ambiente
-├── nest-cli.json                     # Configuração do CLI NestJS
+├── nest-cli.json                     # Configuração do Nest CLI
 ├── tsconfig.json                     # Configuração TypeScript
-├── tsconfig.build.json               # TS config para build de produção
+├── tsconfig.build.json               # Configuração TypeScript para build
 ├── eslint.config.mjs                 # Regras ESLint
-├── .prettierrc                       # Regras Prettier
-├── package.json
-└── package-lock.json
+├── .prettierrc                       # Formatação de código
+└── package.json                      # Dependências e scripts npm
 ```
 
 ---
 
 ## 4. Variáveis de Ambiente
 
-Copie `env.example` para `.env` na raiz do projeto antes de iniciar a aplicação.
+Copie `env.example` para `.env` na raiz do projeto.
 
 | Variável | Obrigatória | Descrição |
 |---|---|---|
@@ -133,39 +160,68 @@ Copie `env.example` para `.env` na raiz do projeto antes de iniciar a aplicaçã
 | `DB_PORT` | Sim | Porta do PostgreSQL (padrão: `5432`) |
 | `DB_USERNAME` | Sim | Usuário do banco |
 | `DB_PASSWORD` | Sim | Senha do banco |
-| `DB_DATABASE` | Sim | Nome do banco de dados |
-| `DB_SYNCHRONIZE` | Sim | `1` ativa sync automático do schema TypeORM; `0` desativa (recomendado em produção) |
+| `DB_DATABASE` | Sim | Nome do banco (ex.: `the_blog`) |
+| `DB_SYNCHRONIZE` | Sim | `1` ativa sync do TypeORM; `0` desativa (recomendado em produção) |
 | `DB_AUTO_LOAD_ENTITIES` | Sim | `1` carrega entidades automaticamente |
-| `JWT_SECRET` | Sim | Chave secreta para assinar tokens JWT. A aplicação falha ao iniciar se ausente |
-| `JWT_EXPIRATION` | Não | Expiração do token em segundos (padrão: `86400` — 24 h) |
-| `APP_PORT` | Não | Porta HTTP da API (padrão: `3001`) |
-| `NODE_ENV` | Não | Ambiente de execução (`development`, `production`, etc.) |
-| `CORS_WHITELIST` | Não | Origens permitidas separadas por espaço (padrão implícito: lista vazia) |
-| `DB_TYPE` | Não | Documentada em `env.example`, mas **não utilizada** — o TypeORM está fixo em `postgres` |
+| `JWT_SECRET` | Sim | Chave secreta para assinatura dos tokens JWT |
+| `JWT_EXPIRATION` | Sim | Expiração do JWT em segundos (ex.: `86400`) |
+| `JWT_EXPIRES_IN_MS` | Sim | Expiração do cookie de login em milissegundos (ex.: `86400000`) |
+| `COOKIE_NAME` | Sim | Nome do cookie HTTP-only definido no login |
+| `CLOUDINARY_CLOUD_NAME` | Sim | Cloud name da conta Cloudinary |
+| `CLOUDINARY_API_KEY` | Sim | API key do Cloudinary |
+| `CLOUDINARY_API_SECRET` | Sim | API secret do Cloudinary |
+| `APP_PORT` | Não | Porta da aplicação (padrão: `3001`) |
+| `CORS_WHITELIST` | Não | Origens permitidas no CORS, separadas por espaço |
+| `IMAGE_MAX_UPLOAD_SIZE` | Não | Tamanho máximo de upload em bytes (padrão: `921600`) |
+| `ALLOWED_IMAGE_TYPES` | Sim* | MIME types permitidos, separados por vírgula |
+| `MAX_INPUT_PIXELS` | Não | Limite de pixels na decodificação Sharp (padrão: `25000000`) |
+| `DB_TYPE` | Não | Presente em `env.example`, mas **não utilizada** no código (PostgreSQL é fixo) |
 
-### Exemplo `.env`
+> \* Se `ALLOWED_IMAGE_TYPES` estiver vazia, o upload retorna erro interno.
 
-```bash
+> **Atenção:** O arquivo `env.example` define `LOGIN_COOKIE_NAME`, porém o código utiliza `COOKIE_NAME`. Use `COOKIE_NAME` no `.env`.
+
+### Exemplo de `.env.example`
+
+```env
+# ==========================
 # Banco de Dados - PostgreSQL
-DB_TYPE=postgres
+# ==========================
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=changeme
-DB_DATABASE=changeme
+DB_DATABASE=the_blog
 DB_SYNCHRONIZE=0
 DB_AUTO_LOAD_ENTITIES=1
 
-# JWT
-JWT_SECRET=replace_with_a_long_random_secret
+# ==========================
+# Upload de Imagens
+# ==========================
+IMAGE_MAX_UPLOAD_SIZE=921600
+ALLOWED_IMAGE_TYPES=image/png,image/jpeg,image/webp,image/gif
+MAX_INPUT_PIXELS=25000000
+
+# ==========================
+# Cloudinary
+# ==========================
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# ==========================
+# JWT / Autenticação
+# ==========================
+JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=86400
+JWT_EXPIRES_IN_MS=86400000
+COOKIE_NAME=loginSesion
 
+# ==========================
 # Aplicação
+# ==========================
 APP_PORT=3001
-NODE_ENV=development
-
-# CORS (frontend Next.js)
-CORS_WHITELIST="http://localhost:3000"
+CORS_WHITELIST=http://localhost:3000 https://your-domain.com
 ```
 
 ---
@@ -174,45 +230,34 @@ CORS_WHITELIST="http://localhost:3000"
 
 ### Padrão arquitetural
 
-A aplicação segue a **arquitetura modular do NestJS**, organizada por domínio de negócio (`auth`, `user`, `post`, `upload`). Cada módulo encapsula controller, service, DTOs e entidades. A camada de persistência usa o padrão **Repository** via TypeORM.
+A aplicação segue a **arquitetura modular do NestJS**, organizada por domínio de negócio (`auth`, `user`, `post`, `images`, `upload`, `activity-logs`). Cada módulo expõe controllers, encapsula regras em services e persiste dados via repositórios TypeORM — equivalente a uma **arquitetura em camadas** (Controller → Service → Repository).
 
-```
-┌─────────────┐     HTTP      ┌──────────────┐
-│  Next.js    │ ────────────► │  NestJS API  │
-│  (frontend) │ ◄──────────── │  (nest-test) │
-└─────────────┘   JSON/JWT    └──────┬───────┘
-                                     │
-                              ┌──────▼───────┐
-                              │  PostgreSQL  │
-                              └──────────────┘
-```
-
-### Decisões de design
+### Decisões principais
 
 | Decisão | Motivo |
 |---|---|
-| **JWT Bearer Token** | Autenticação stateless, compatível com SPA/Next.js |
-| **`forceLogout` no User** | Invalida tokens existentes após troca de e-mail ou senha, sem blacklist de tokens |
-| **Posts públicos vs. `/me`** | Rotas sem autenticação retornam apenas posts com `published: true`; rotas `/me` exigem JWT e filtram por autor |
-| **Slug gerado automaticamente** | Criado a partir do título + sufixo aleatório; usado na rota pública `GET /post/:slug` |
-| **`UserResponseDto` / `PostResponseDto`** | Excluem campos sensíveis (`passwordHash`, `forceLogout`) das respostas |
-| **HashingService abstrato** | Permite trocar algoritmo de hash sem alterar services de domínio |
-| **Upload em memória + validação por magic bytes** | Multer armazena em buffer; `file-type` valida o MIME real (png, jpeg, webp, gif), não apenas o header enviado |
-| **Arquivos em `uploads/YYYY-MM-DD/`** | Organização por data; servidos estaticamente em `/uploads` via `@nestjs/serve-static` |
-| **`DB_SYNCHRONIZE` controlado por env** | Facilita desenvolvimento local; desativado por padrão no exemplo para evitar alterações acidentais em produção |
-| **ThrottlerGuard global** | Limita a 10 requisições por 10 segundos por IP, com bloqueio de 5 segundos |
-| **AllExceptionsFilter global** | Padroniza respostas de erro no formato `{ message, error, statusCode }` |
-| **Helmet + CORS whitelist** | Headers de segurança e restrição de origens do frontend |
+| **Módulos por feature** | Isola responsabilidades (usuários, posts, imagens) e facilita manutenção |
+| **TypeORM + PostgreSQL** | ORM integrado ao NestJS; suporte a soft delete, enums e relações |
+| **JWT via Bearer token** | Autenticação stateless; validação em `JwtStrategy` com verificação de bloqueio e `forceLogout` |
+| **Cookie HTTP-only no login** | Token também gravado em cookie seguro além do header `Authorization` |
+| **Guards de roles (`USER` / `ADMIN`)** | Separa rotas públicas, autenticadas e administrativas |
+| **Provider de storage (`IMAGE_STORAGE_PROVIDER`)** | Abstrai Cloudinary; permite trocar implementação sem alterar `UploadService` |
+| **Processamento com Sharp** | Converte uploads para WebP, redimensiona (máx. 1920×1080) e valida dimensões |
+| **Activity logs internos** | Registra login, logout, CRUD e ações admin sem expor endpoint público |
+| **Soft delete** | Entidades `User`, `Post` e `Images` usam `@DeleteDateColumn` |
+| **Throttler global** | Limite de 10 requisições a cada 10 segundos por IP |
+| **ValidationPipe global** | `whitelist`, `forbidNonWhitelisted` e `transform` em todos os endpoints |
+| **AllExceptionsFilter global** | Resposta de erro padronizada `{ message, error, statusCode }` |
 
 ### Comunicação entre serviços
 
-Este repositório contém um único serviço. O frontend Next.js consome a API via HTTP REST, enviando o token JWT no header `Authorization: Bearer <token>` para rotas protegidas.
+Monolito de serviço único. Não há microserviços nem filas. Módulos se comunicam via injeção de dependência do NestJS (ex.: `AuthService` → `UserService`, `UploadService` → `ImagesService` + `ActivityLogsService`).
 
 ---
 
 ## 6. Endpoints / Documentação da API
 
-### URLs base
+### URLs base por ambiente
 
 | Ambiente | URL base |
 |---|---|
@@ -222,38 +267,91 @@ Este repositório contém um único serviço. O frontend Next.js consome a API v
 
 ### Autenticação
 
+- Endpoints protegidos exigem header `Authorization: Bearer <token>`.
+- O login (`POST /auth/login`) também define um cookie HTTP-only com o JWT.
+- A validação JWT ocorre exclusivamente via header Bearer (`ExtractJwt.fromAuthHeaderAsBearerToken()`).
+- Rate limiting global: 10 req/10s.
+
+### Tabela de endpoints
+
+#### Autenticação (`/auth`)
+
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
-| `POST` | `/auth/login` | Autentica usuário e retorna `accessToken` | Não |
+| `POST` | `/auth/login` | Autentica usuário e define cookie de sessão | Não |
+| `POST` | `/auth/logout` | Encerra sessão do usuário autenticado | JWT |
+| `POST` | `/auth/admin/logout/:id` | Admin força logout de outro usuário | JWT (Admin) |
 
-### Usuários
+#### Usuários (`/user`)
 
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
-| `POST` | `/user` | Registra novo usuário | Não |
+| `POST` | `/user` | Cria novo usuário | Não |
 | `GET` | `/user/me` | Retorna dados do usuário autenticado | JWT |
-| `PATCH` | `/user/me` | Atualiza nome e/ou e-mail | JWT |
-| `PATCH` | `/user/me/password` | Altera senha | JWT |
-| `DELETE` | `/user/me` | Remove conta do usuário autenticado | JWT |
+| `PATCH` | `/user/me` | Atualiza nome/e-mail do usuário autenticado | JWT |
+| `PATCH` | `/user/me/password` | Altera senha (requer senha atual) | JWT |
+| `DELETE` | `/user/me` | Remove (soft delete) o próprio usuário | JWT |
 
-### Posts
-
-| Método | Rota | Descrição | Autenticação |
-|---|---|---|---|
-| `GET` | `/post` | Lista posts publicados (`published: true`) | Não |
-| `GET` | `/post/:slug` | Retorna post publicado pelo slug | Não |
-| `POST` | `/post/me` | Cria post para o usuário autenticado | JWT |
-| `GET` | `/post/me` | Lista todos os posts do usuário autenticado | JWT |
-| `GET` | `/post/me/:id` | Retorna post do usuário autenticado por UUID | JWT |
-| `PATCH` | `/post/me/:id` | Atualiza post do usuário autenticado | JWT |
-| `DELETE` | `/post/me/:id` | Remove post do usuário autenticado | JWT |
-
-### Upload
+#### Admin — Usuários (`/admin/users`)
 
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
-| `POST` | `/upload` | Envia imagem (campo `file`, max 900 KB) | JWT |
-| `GET` | `/uploads/:date/:filename` | Serve arquivo estático de upload | Não |
+| `GET` | `/admin/users` | Lista usuários com filtros e paginação | JWT (Admin) |
+| `PATCH` | `/admin/users/:id` | Atualiza dados de um usuário | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/promote` | Promove usuário a admin (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/demote` | Rebaixa admin a usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/block` | Bloqueia usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/unblock` | Desbloqueia usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/restore` | Restaura usuário removido | JWT (Admin) |
+| `DELETE` | `/admin/users/:id` | Remove usuário (soft delete, requer `reason`) | JWT (Admin) |
+
+**Query params de `/admin/users`:** `id`, `name`, `email`, `forceLogout`, `startDate`, `endDate`, `page` (padrão 1), `limit` (padrão 20, máx. 100).
+
+#### Posts (`/post`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/post/me` | Cria post do autor autenticado | JWT |
+| `GET` | `/post/me` | Lista posts do autor autenticado | JWT |
+| `GET` | `/post/me/:id` | Retorna post do autor por UUID | JWT |
+| `PATCH` | `/post/me/:id` | Atualiza post do autor | JWT |
+| `DELETE` | `/post/me/:id` | Remove post do autor (soft delete) | JWT |
+| `GET` | `/post` | Lista posts publicados | Não |
+| `GET` | `/post/:slug` | Retorna post publicado por slug | Não |
+
+#### Admin — Posts (`/admin/posts`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/admin/posts` | Lista todos os posts | JWT (Admin) |
+| `PATCH` | `/admin/posts/:id/restore` | Restaura post removido | JWT (Admin) |
+| `DELETE` | `/admin/posts/:id` | Remove post (soft delete, requer `reason`) | JWT (Admin) |
+
+#### Upload (`/upload`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/upload` | Upload de imagem (`multipart/form-data`, campo `file`) | JWT |
+
+#### Imagens (`/images`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/images/:id` | Retorna imagem por UUID | JWT |
+| `GET` | `/images/me` | Lista imagens do usuário autenticado | JWT |
+| `DELETE` | `/images/:id` | Remove imagem do usuário (soft delete) | JWT |
+
+#### Admin — Imagens (`/admin/image`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/admin/image` | Lista todas as imagens | JWT (Admin) |
+| `PATCH` | `/admin/image/:id/restore` | Restaura imagem removida | JWT (Admin) |
+| `DELETE` | `/admin/image/:id` | Remove imagem (soft delete, requer `reason`) | JWT (Admin) |
+
+#### Activity Logs
+
+O módulo `activity-logs` registra eventos internamente, mas **não expõe rotas HTTP** (`ActivityLogsController` está vazio).
 
 ---
 
@@ -263,122 +361,146 @@ Este repositório contém um único serviço. O frontend Next.js consome a API v
 
 **Requisição:**
 
-```json
+```http
+POST /auth/login
+Content-Type: application/json
+
 {
-  "email": "julia@email.com",
-  "password": "123458"
+  "email": "joao@example.com",
+  "password": "123456"
 }
 ```
 
-**Resposta `200`:**
+**Resposta (`200`):**
 
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "message": "Login realizado com sucesso"
 }
 ```
 
----
+> O token JWT é retornado no cookie HTTP-only (`COOKIE_NAME`) e deve ser enviado nas requisições protegidas via header `Authorization: Bearer <token>`.
 
-#### `POST /user` — Registro
+#### `POST /user`
 
 **Requisição:**
 
-```json
+```http
+POST /user
+Content-Type: application/json
+
 {
-  "name": "Júlia",
-  "email": "julia@email.com",
-  "passwordHash": "123458"
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "password": "123456"
 }
 ```
 
-**Resposta `201`:**
+**Resposta (`201`):**
 
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "name": "Júlia",
-  "email": "julia@email.com",
-  "createdAt": "2026-07-28T12:00:00.000Z",
-  "updatedAt": "2026-07-28T12:00:00.000Z"
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "createdAt": "2026-08-27T12:00:00.000Z",
+  "updatedAt": "2026-08-27T12:00:00.000Z"
 }
 ```
 
----
+#### `POST /post/me`
 
-#### `POST /post/me` — Criar post
+**Requisição:**
 
-**Requisição** (header: `Authorization: Bearer <token>`):
+```http
+POST /post/me
+Authorization: Bearer <token>
+Content-Type: application/json
 
-```json
 {
-  "title": "Título do post",
-  "excerpt": "Excerto Excerto Excerto Excerto",
-  "content": "Conteúdo",
-  "coverImageUrl": "http://localhost:3001/uploads/2026-07-28/1234567890-abc123.png"
+  "title": "Título do post de exemplo",
+  "excerpt": "Resumo breve do conteúdo publicado neste post.",
+  "content": "Conteúdo completo do artigo do blog.",
+  "coverImage": "https://res.cloudinary.com/example/image/upload/v123/sample.webp",
+  "published": false
 }
 ```
 
-**Resposta `201`:**
+**Resposta (`201`):**
 
 ```json
 {
-  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "title": "Título do post",
-  "slug": "titulo-do-post-x7k2m9",
-  "content": "Conteúdo",
-  "excerpt": "Excerto Excerto Excerto Excerto",
-  "coverImageUrl": "http://localhost:3001/uploads/2026-07-28/1234567890-abc123.png",
+  "id": "660e8400-e29b-41d4-a716-446655440001",
+  "title": "Título do post de exemplo",
+  "slug": "titulo-do-post-de-exemplo",
+  "content": "Conteúdo completo do artigo do blog.",
+  "excerpt": "Resumo breve do conteúdo publicado neste post.",
+  "coverImage": {
+    "url": "https://res.cloudinary.com/example/image/upload/v123/sample.webp"
+  },
   "published": false,
-  "createdAt": "2026-07-28T12:00:00.000Z",
-  "updatedAt": "2026-07-28T12:00:00.000Z",
+  "createdAt": "2026-08-27T12:00:00.000Z",
+  "updatedAt": "2026-08-27T12:00:00.000Z",
   "author": {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "name": "Júlia",
-    "email": "julia@email.com"
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "João Silva",
+    "email": "joao@example.com"
   }
 }
 ```
 
----
+#### `GET /post/:slug` (público)
 
-#### `GET /post/:slug` — Post público
+**Requisição:**
 
-**Resposta `200`:** mesmo formato de `PostResponseDto` acima, apenas para posts com `published: true`.
-
----
-
-#### `POST /upload` — Upload de imagem
-
-**Requisição** (header: `Authorization: Bearer <token>`, `Content-Type: multipart/form-data`):
-
-```
-file: <arquivo de imagem (.png, .jpeg, .webp, .gif)>
+```http
+GET /post/titulo-do-post-de-exemplo
 ```
 
-**Resposta `201`:**
+**Resposta (`200`):** mesmo formato de `PostResponseDto` acima (apenas posts com `published: true`).
+
+#### `POST /upload`
+
+**Requisição:**
+
+```http
+POST /upload
+Authorization: Bearer <token>
+Content-Type: multipart/form-data; boundary=----boundary
+
+------boundary
+Content-Disposition: form-data; name="file"; filename="foto.png"
+Content-Type: image/png
+
+<binary>
+------boundary--
+```
+
+**Resposta (`201`):**
 
 ```json
 {
-  "url": "/uploads/2026-07-28/1784916297891-lxrozz.jpg"
+  "image_id": "770e8400-e29b-41d4-a716-446655440002",
+  "publicId": "1724755200000-abc123",
+  "url": "https://res.cloudinary.com/example/image/upload/v123/2026-08-27/joao-silva-550e8400/1724755200000-abc123.webp",
+  "folder": "2026-08-27/joao-silva-550e8400",
+  "created_at": "2026-08-27T12:00:00.000Z"
+}
+```
+
+#### Formato de erro padrão
+
+```json
+{
+  "message": ["E-mail inválido"],
+  "error": "Bad Request",
+  "statusCode": 400
 }
 ```
 
 ---
 
-#### Formato padrão de erro
-
-```json
-{
-  "message": ["Usuário ou senha inválidos"],
-  "error": "Unauthorized",
-  "statusCode": 401
-}
-```
-
----
-
-## Execução local
+## Como executar
 
 ```bash
 # Instalar dependências
@@ -386,8 +508,9 @@ npm install
 
 # Configurar variáveis de ambiente
 cp env.example .env
+# Edite .env com credenciais reais
 
-# Desenvolvimento com hot-reload
+# Desenvolvimento (hot reload)
 npm run start:dev
 
 # Produção
@@ -395,6 +518,4 @@ npm run build
 npm run start:prod
 ```
 
-A API estará disponível em `http://localhost:3001` (ou na porta definida em `APP_PORT`).
-
-Para testes manuais, utilize a coleção em `rest-client/requests.http`.
+Requisições de exemplo estão disponíveis em `rest-client/requests.http`.

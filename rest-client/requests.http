@@ -10,6 +10,8 @@
 
 @adminEmailForTesting = admin@example.com
 @adminPasswordForTesting = admin123
+@targetUserEmailForTesting = target@example.com
+@targetUserPasswordForTesting = targetpass
 
 # Tokens - derived from login requests below when possible
 # NOTE: the backend sets an httpOnly cookie on /auth/login. If /auth/login does not return an accessToken in the response body,
@@ -18,11 +20,15 @@
 @adminToken = {{authAdminLogin.response.body.accessToken}}
 
 # Resource variables (populated by preparatory requests)
+@userId = {{readOneUser.response.body.id}}
 @postUuid = {{createPostOwned.response.body.id}}
 @postSlug = {{createPostOwned.response.body.slug}}
+@targetPostId = {{createPostOwned.response.body.id}}
 @imagePath = {{uploadImage.response.body.url}}
 @imageUrl = {{baseUrl}}{{imagePath}}
-@imageUuid = {{uploadImage.response.body.id}}
+@imageUuid = {{uploadImage.response.body.image_id}}
+@targetImageId = {{uploadImage.response.body.image_id}}
+@targetUserId = {{prepareCreateTargetUser.response.body.id}}
 
 
 # ==================================================
@@ -360,8 +366,8 @@ Content-Type: application/json
 
 {
   "name": "Target User",
-  "email": "target+{{random}}@example.com",
-  "password": "targetpass"
+  "email": "{{targetUserEmailForTesting}}",
+  "password": "{{targetUserPasswordForTesting}}"
 }
 
 ### Prepare: login created target user (if needed)
@@ -370,12 +376,9 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "target+{{random}}@example.com",
-  "password": "targetpass"
+  "email": "{{targetUserEmailForTesting}}",
+  "password": "{{targetUserPasswordForTesting}}"
 }
-
-
-# ==================================================
 # Notes
 # - Destructive requests (delete/block/unblock) are placed in ADMIN/DESTRUCTIVE sections and should be executed last.
 # - The REST Client supports referencing previous response bodies by name ({{requestName.response.body.field}}).
