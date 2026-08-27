@@ -350,6 +350,80 @@ export class UserService {
     return user;
   }
 
+  async block(
+    adminToken: JwtPayload,
+    dto: ConfirmPasswordDto,
+    targetId: string,
+  ) {
+    const admin = await this.findOneByOrFail(adminToken.sub);
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (user.isBlocked) {
+      throw new ConflictException('Usuário já está bloqueado.');
+    }
+
+    if (user.role === UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para bloquear outro administrador',
+      );
+    }
+
+    user.isBlocked = true;
+    await this.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.BLOCK_USER,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+    });
+
+    return user;
+  }
+
+  async unblock(
+    adminToken: JwtPayload,
+    dto: ConfirmPasswordDto,
+    targetId: string,
+  ) {
+    const admin = await this.findOneByOrFail(adminToken.sub);
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (!user.isBlocked) {
+      throw new ConflictException('Usuário não está bloqueado.');
+    }
+
+    if (user.role === UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para desbloquear outro administrador',
+      );
+    }
+
+    user.isBlocked = false;
+    await this.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.UNBLOCK_USER,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+    });
+
+    return user;
+  }
+
   async restore(targetId: string) {
     const userToRestore = await this.userRepository.findOne({
       where: { id: targetId },

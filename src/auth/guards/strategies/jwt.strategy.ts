@@ -31,6 +31,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Usuário não encontrado');
     }
 
+    if (user.isBlocked) {
+      throw new UnauthorizedException('Usuário bloqueado.');
+    }
+
     if (user.forceLogout) {
       throw new UnauthorizedException('Sessão encerrada. Faça login novamente');
     }

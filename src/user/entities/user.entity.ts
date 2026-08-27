@@ -25,6 +25,9 @@ export class User {
   @Column({ default: false })
   forceLogout: boolean;
 
+  @Column({ default: false })
+  isBlocked: boolean;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
 

@@ -74,6 +74,26 @@ export class AdminUserController {
     return new UserResponseDto(updatedUser);
   }
 
+  @Patch(':id/block')
+  async block(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmPasswordDto,
+  ) {
+    const updatedUser = await this.userService.block(req.user, dto, targetId);
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/unblock')
+  async unblock(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmPasswordDto,
+  ) {
+    const updatedUser = await this.userService.unblock(req.user, dto, targetId);
+    return new UserResponseDto(updatedUser);
+  }
+
   @Patch(':id/restore')
   async restore(@Param('id', ParseUUIDPipe) targetId: string) {
     const restoredUser = await this.userService.restore(targetId);

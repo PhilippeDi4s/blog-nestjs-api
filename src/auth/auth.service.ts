@@ -25,6 +25,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.userService.findByEmail(loginDto.email);
+
     const error = new UnauthorizedException('Usuário ou senha inválidos');
 
     if (!user) {
@@ -38,6 +39,10 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw error;
+    }
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('Usuário bloqueado.');
     }
 
     const JwtPayload: JwtPayload = {
