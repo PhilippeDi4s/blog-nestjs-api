@@ -250,19 +250,22 @@ export class PostService {
     return this.executeSoftRemove(targetId, user);
   }
 
-  async removeByAdmin(targetId: string, admin: JwtPayload) {
+  async removeByAdmin(targetId: string, admin: JwtPayload, reason?: string) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem executar esta ação.',
       );
     }
-    return this.executeSoftRemove(targetId, admin, { isAdminAction: true });
+    return this.executeSoftRemove(targetId, admin, {
+      isAdminAction: true,
+      reason,
+    });
   }
 
   private async executeSoftRemove(
     targetId: string,
     user: JwtPayload,
-    options: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const postToDelete = await this.findOneOrFail({ id: targetId });
 
@@ -290,6 +293,7 @@ export class PostService {
           email: removedPost.author.email,
         },
       },
+      reason: options.reason ?? null,
     });
 
     return removedPost;

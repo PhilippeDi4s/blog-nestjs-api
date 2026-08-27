@@ -18,6 +18,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
@@ -185,7 +186,7 @@ export class UserService {
     targetId: string,
     requestingUser: JwtPayload,
     dto: UpdateUserDto,
-    options: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const userToUpdate = await this.findOneByOrFail(targetId);
 
@@ -226,6 +227,7 @@ export class UserService {
         before,
         after,
       },
+      reason: options.reason ?? null,
     });
 
     return updatedUser;
@@ -447,19 +449,19 @@ export class UserService {
     return this.executeSoftRemove(user.sub, user);
   }
 
-  async removeByAdmin(targetId: string, admin: JwtPayload) {
+  async removeByAdmin(targetId: string, admin: JwtPayload, reason?: string) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem executar esta ação.',
       );
     }
-    return this.executeSoftRemove(targetId, admin, { isAdminAction: true });
+    return this.executeSoftRemove(targetId, admin, { isAdminAction: true, reason });
   }
 
   private async executeSoftRemove(
     targetId: string,
     requestingUser: JwtPayload,
-    options: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const userToDelete = await this.findOneByOrFail(targetId);
 
@@ -480,6 +482,7 @@ export class UserService {
           role: removedUser.role,
         },
       },
+      reason: options.reason ?? null,
     });
 
     return removedUser;
