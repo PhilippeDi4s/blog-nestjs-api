@@ -20,6 +20,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FiltersUserDto } from './dto/filters-user.dto';
 import { ConfirmPasswordDto } from './dto/confirm-password.dto';
+import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -104,10 +105,12 @@ export class AdminUserController {
   async softRemove(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: AdminActionReasonDto,
   ) {
     const removedUser = await this.userService.removeByAdmin(
       targetId,
       req.user,
+      dto.reason,
     );
     return new UserResponseDto(removedUser);
   }

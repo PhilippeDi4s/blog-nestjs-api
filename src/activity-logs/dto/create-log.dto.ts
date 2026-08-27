@@ -8,4 +8,5 @@ export class CreateActivityLogDto {
   entityId: string;
   action: ActionType;
   metadata: Record<string, unknown>;
+  reason?: string | null;
 }

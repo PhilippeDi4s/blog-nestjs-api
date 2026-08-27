@@ -29,6 +29,9 @@ export class ActivityLog {
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, unknown>;
 
+  @Column({ type: 'text', nullable: true })
+  reason: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 }

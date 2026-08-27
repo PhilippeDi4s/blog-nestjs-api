@@ -130,7 +130,7 @@ export class ImagesService {
     return deletedImage;
   }
 
-  async removeByAdmin(admin: JwtPayload, targetId: string) {
+  async removeByAdmin(admin: JwtPayload, targetId: string, reason?: string) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem realizar essa ação',
@@ -138,6 +138,7 @@ export class ImagesService {
     }
     const deletedImage = await this.executeSoftRemove(admin, targetId, {
       isAdminAction: true,
+      reason,
     });
     return deletedImage;
   }
@@ -145,7 +146,7 @@ export class ImagesService {
   private async executeSoftRemove(
     user: JwtPayload,
     targetId: string,
-    options: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const imageToDelete = await this.findOneOrFail({ image_id: targetId });
 
@@ -179,6 +180,7 @@ export class ImagesService {
           },
         },
       },
+      reason: options.reason ?? null,
     });
 
     return deletedImage;

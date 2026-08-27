@@ -7,6 +7,7 @@ import {
   Patch,
   Req,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { PostResponseDto } from './dto/post-response.dto';
@@ -15,6 +16,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { UserRole } from 'src/user/enum/user-role.enum';
+import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
 
 @Controller('admin/posts')
 export class AdminPostController {
@@ -44,8 +46,9 @@ export class AdminPostController {
   async removeByAdmin(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: AuthenticatedRequest,
+    @Body() dto: AdminActionReasonDto,
   ) {
-    const post = await this.postService.removeByAdmin(id, req.user);
+    const post = await this.postService.removeByAdmin(id, req.user, dto.reason);
     return new PostResponseDto(post);
   }
 }
