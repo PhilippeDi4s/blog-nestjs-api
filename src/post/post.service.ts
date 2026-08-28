@@ -19,6 +19,7 @@ import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { UserRole } from 'src/user/enum/user-role.enum';
+import { FiltersPostDto } from './dto/filters-post.dto';
 
 @Injectable()
 export class PostService {
@@ -107,6 +108,87 @@ export class PostService {
     return posts;
   }
 
+  async findMany(filters: FiltersPostDto) {
+    const {
+      id,
+      title,
+      slug,
+      published,
+      authorId,
+      authorEmail,
+      authorName,
+      startDate,
+      endDate,
+      limit = 20,
+      page = 1,
+    } = filters;
+
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'user')
+      .select([
+        'post.id',
+        'post.title',
+        'post.slug',
+        'post.published',
+        'post.createdAt',
+        'user.id',
+        'user.name',
+        'user.email',
+      ]);
+
+    if (id) query.andWhere('post.id = :id', { id });
+
+    if (title) {
+      query.andWhere('post.title ILIKE :title', { title: `%${title}%` });
+    }
+    if (slug) {
+      query.andWhere('post.slug ILIKE :slug', { slug: `%${slug}%` });
+    }
+    if (published !== undefined) {
+      query.andWhere('post.published = :published', { published });
+    }
+
+    if (startDate && endDate) {
+      query.andWhere('post.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+    } else if (startDate) {
+      query.andWhere('post.createdAt >= :startDate', { startDate });
+    } else if (endDate) {
+      query.andWhere('post.createdAt <= :endDate', { endDate });
+    }
+
+    if (authorId) {
+      query.andWhere('user.id = :authorId', { authorId });
+    } else {
+      if (authorName) {
+        query.andWhere('user.name ILIKE  :authorName', {
+          authorName: `%${authorName}%`,
+        });
+      }
+      if (authorEmail) {
+        query.andWhere('user.email ILIKE  :authorEmail', {
+          authorEmail: `%${authorEmail}%`,
+        });
+      }
+    }
+
+    const [posts, count] = await query
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data: posts,
+      total: count,
+      page,
+      limit,
+    };
+  }
+
   async create(dto: CreatePostDto, authorToken: JwtPayload) {
     const image = await this.imageService.findOneOrFail({
       url: dto.coverImage,
@@ -116,7 +198,7 @@ export class PostService {
       author: { id: authorToken.sub } as User,
       content: dto.content,
       excerpt: dto.excerpt,
-      coverImage: image,
+      coverImage: image.url,
       title: dto.title,
       published: dto.published ?? false,
     });
@@ -199,7 +281,7 @@ export class PostService {
         url: dto.coverImage,
       });
 
-      post.coverImage = image;
+      post.coverImage = image.url;
     }
 
     const updatedPost = await this.postRepository.save(post);

@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 import {
   Between,
   FindOptionsWhere,
+  ILike,
   LessThanOrEqual,
   MoreThanOrEqual,
   Repository,
@@ -173,24 +174,26 @@ export class UserService {
 
     if (id) {
       where.id = id;
-    }
-    if (name) {
-      where.name = name;
-    }
-    if (email) {
-      where.email = email;
-    }
+    } else {
+      if (name) {
+        where.name = ILike(name);
+      }
 
-    if (forceLogout) {
-      where.forceLogout = forceLogout;
-    }
+      if (email) {
+        where.email = ILike(email);
+      }
 
-    if (startDate && endDate) {
-      where.createdAt = Between(startDate, endDate);
-    } else if (startDate) {
-      where.createdAt = MoreThanOrEqual(startDate);
-    } else if (endDate) {
-      where.createdAt = LessThanOrEqual(endDate);
+      if (forceLogout !== undefined) {
+        where.forceLogout = forceLogout;
+      }
+
+      if (startDate && endDate) {
+        where.createdAt = Between(startDate, endDate);
+      } else if (startDate) {
+        where.createdAt = MoreThanOrEqual(startDate);
+      } else if (endDate) {
+        where.createdAt = LessThanOrEqual(endDate);
+      }
     }
 
     const [logs, total] = await this.userRepository.findAndCount({
