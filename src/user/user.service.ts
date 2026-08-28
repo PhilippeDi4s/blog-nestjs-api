@@ -18,7 +18,6 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdateUserByAdminDto } from './dto/update-user-by-admin.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
@@ -72,8 +71,19 @@ export class UserService {
     }
   }
 
-  async findOneByOrFail(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
+  async findOneByOrFail(
+    id: string,
+    options: { includePassword?: boolean } = {},
+  ) {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id });
+
+    if (options.includePassword) {
+      query.addSelect('user.passwordHash');
+    }
+
+    const user = await query.getOne();
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -104,8 +114,18 @@ export class UserService {
     return created;
   }
 
-  findByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+  findByEmail(email: string, options: { includePassword?: boolean } = {}) {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email });
+
+    if (options.includePassword) {
+      query.addSelect('user.passwordHash');
+    }
+
+    const user = query.getOne();
+
+    return user;
   }
 
   findById(id: string) {
@@ -234,7 +254,7 @@ export class UserService {
   }
 
   async updatePassword(id: string, dto: UpdatePasswordDto) {
-    const user = await this.findOneByOrFail(id);
+    const user = await this.findOneByOrFail(id, { includePassword: true });
 
     await this.assertPasswordMatches(dto.currentPassword, user.passwordHash);
 
@@ -275,7 +295,9 @@ export class UserService {
         'Apenas administradores podem executar esta ação.',
       );
     }
-    const admin = await this.findOneByOrFail(adminToken.sub);
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
 
     await this.assertPasswordMatches(dto.password, admin.passwordHash);
 
@@ -321,7 +343,9 @@ export class UserService {
       );
     }
 
-    const admin = await this.findOneByOrFail(adminToken.sub);
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
     await this.assertPasswordMatches(dto.password, admin.passwordHash);
 
     const user = await this.findOneByOrFail(targetId);
@@ -357,7 +381,9 @@ export class UserService {
     dto: ConfirmPasswordDto,
     targetId: string,
   ) {
-    const admin = await this.findOneByOrFail(adminToken.sub);
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
     await this.assertPasswordMatches(dto.password, admin.passwordHash);
 
     const user = await this.findOneByOrFail(targetId);
@@ -394,7 +420,9 @@ export class UserService {
     dto: ConfirmPasswordDto,
     targetId: string,
   ) {
-    const admin = await this.findOneByOrFail(adminToken.sub);
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
     await this.assertPasswordMatches(dto.password, admin.passwordHash);
 
     const user = await this.findOneByOrFail(targetId);
@@ -455,7 +483,10 @@ export class UserService {
         'Apenas administradores podem executar esta ação.',
       );
     }
-    return this.executeSoftRemove(targetId, admin, { isAdminAction: true, reason });
+    return this.executeSoftRemove(targetId, admin, {
+      isAdminAction: true,
+      reason,
+    });
   }
 
   private async executeSoftRemove(

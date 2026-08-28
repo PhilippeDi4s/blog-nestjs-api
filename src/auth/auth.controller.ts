@@ -34,7 +34,7 @@ export class AuthController {
       maxAge: Number(process.env.JWT_EXPIRES_IN_MS),
     });
     return {
-      message: 'Login realizado com sucesso',
+      accessToken,
     };
   }
 

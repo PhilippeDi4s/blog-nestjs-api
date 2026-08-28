@@ -18,7 +18,7 @@ import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request'
 import { ImageResponseDto } from './dto/image-response.dto';
 import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
 
-@Controller('admin/image')
+@Controller('admin/images')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminImageController {

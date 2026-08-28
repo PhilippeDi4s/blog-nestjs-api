@@ -71,8 +71,8 @@ export class PostService {
     return posts;
   }
 
-  async findOneOwnedOrFail(postData: Partial<Post>, author: Partial<User>) {
-    const post = await this.findOneOwned(postData, author);
+  async findOneOwnedOrFail(postData: Partial<Post>, author: JwtPayload) {
+    const post = await this.findOneOwned(postData, author.sub);
 
     if (!post) {
       throw new NotFoundException('Post não encontrado');
@@ -81,11 +81,11 @@ export class PostService {
     return post;
   }
 
-  async findOneOwned(postData: Partial<Post>, author: Partial<User>) {
+  async findOneOwned(postData: Partial<Post>, authorId: string) {
     const post = await this.postRepository.findOne({
       where: {
         ...(postData as FindOptionsWhere<Post>),
-        author: { id: author.id },
+        author: { id: authorId },
       },
       relations: { author: true },
     });
@@ -93,10 +93,10 @@ export class PostService {
     return post;
   }
 
-  async findAllOwned(author: Partial<User>) {
+  async findAllOwned(author: JwtPayload) {
     const posts = await this.postRepository.find({
       where: {
-        author: { id: author.id },
+        author: { id: author.sub },
       },
       order: {
         createdAt: 'DESC',
@@ -107,13 +107,13 @@ export class PostService {
     return posts;
   }
 
-  async create(dto: CreatePostDto, author: Partial<User>) {
+  async create(dto: CreatePostDto, authorToken: JwtPayload) {
     const image = await this.imageService.findOneOrFail({
       url: dto.coverImage,
     });
     const post = this.postRepository.create({
       slug: createSlugFromText(dto.title),
-      author,
+      author: { id: authorToken.sub } as User,
       content: dto.content,
       excerpt: dto.excerpt,
       coverImage: image,
@@ -131,7 +131,7 @@ export class PostService {
       });
 
     await this.logService.create({
-      user: { id: author.id } as User,
+      user: { id: authorToken.sub } as User,
       action: ActionType.CREATED,
       entityId: createdPost.id,
       entityType: EntityType.POST,

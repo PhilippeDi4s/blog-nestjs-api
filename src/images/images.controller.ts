@@ -17,19 +17,17 @@ export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findAllOwned(@Req() req: AuthenticatedRequest) {
+    const images = await this.imagesService.findAllOwned(req.user);
+    return images.map((image) => new ImageResponseDto(image));
+  }
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) image_id: string) {
     const image = await this.imagesService.findOneOrFail({ image_id });
 
     return new ImageResponseDto(image);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async findAllOwned(@Req() req: AuthenticatedRequest) {
-    const images = await this.imagesService.findAllOwned(req.user);
-
-    return images.map((image) => new ImageResponseDto(image));
   }
 
   @UseGuards(JwtAuthGuard)

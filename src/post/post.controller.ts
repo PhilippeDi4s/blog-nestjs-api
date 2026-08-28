@@ -21,11 +21,24 @@ import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request'
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Get()
+  async findAllPublished() {
+    const posts = await this.postService.findAllPublic();
+    return posts.map((post) => new PostResponseDto(post));
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('me')
   async create(@Req() req: AuthenticatedRequest, @Body() dto: CreatePostDto) {
     const post = await this.postService.create(dto, req.user);
     return new PostResponseDto(post);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findAllOwned(@Req() req: AuthenticatedRequest) {
+    const posts = await this.postService.findAllOwned(req.user);
+    return posts.map((post) => new PostResponseDto(post));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -36,13 +49,6 @@ export class PostController {
   ) {
     const post = await this.postService.findOneOwnedOrFail({ id }, req.user);
     return new PostResponseDto(post);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('me')
-  async findAllOwned(@Req() req: AuthenticatedRequest) {
-    const posts = await this.postService.findAllOwned(req.user);
-    return posts.map((post) => new PostResponseDto(post));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -77,11 +83,5 @@ export class PostController {
       published: true,
     });
     return new PostResponseDto(post);
-  }
-
-  @Get()
-  async findAllPublished() {
-    const posts = await this.postService.findAllPublic();
-    return posts.map((post) => new PostResponseDto(post));
   }
 }

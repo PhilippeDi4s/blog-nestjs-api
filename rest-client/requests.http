@@ -3,8 +3,8 @@
 ########################################
 # Global test credentials (editable)
 ########################################
-@userNameForTesting = João Silva
-@userEmailForTesting = joao@example.com
+@userNameForTesting = Pedro Juniro
+@userEmailForTesting = pedro@example.com
 @userPasswordForTesting = 123456
 @userNewPasswordForTesting = 1234589
 
@@ -115,8 +115,8 @@ Content-Type: application/json
 Authorization: Bearer {{userToken}}
 
 {
-  "currentPasswordHash": "{{userPasswordForTesting}}",
-  "newPasswordHash": "{{userNewPasswordForTesting}}"
+  "currentPassword": "{{userPasswordForTesting}}",
+  "newPassword": "{{userNewPasswordForTesting}}"
 }
 
 ### Update password (invalid current password)
@@ -126,8 +126,8 @@ Content-Type: application/json
 Authorization: Bearer {{userToken}}
 
 {
-  "currentPasswordHash": "wrongpass",
-  "newPasswordHash": "{{userNewPasswordForTesting}}"
+  "currentPassword": "{{userNewPasswordForTesting}}",
+  "newPassword": "{{userNewPasswordForTesting}}"
 }
 
 ### Delete current user (destructive - run last)
@@ -150,7 +150,7 @@ Authorization: Bearer {{userToken}}
   "title": "Título do post",
   "excerpt": "Excerto para testes",
   "content": "Conteúdo de teste",
-  "coverImage": "https://res.cloudinary.com/dqixnu2tr/image/upload/v1786474915/2026-08-11/1786474934393-72ka8x.webp"
+  "coverImage": "https://res.cloudinary.com/dqixnu2tr/image/upload/v1787872615/2026-08-27/joao-silva-edited-855f328d-0e00-4d30-96e0-afd0a0c5fc03/1787872618051-kqqae0.webp"
 }
 
 ### Create post (invalid body - missing title)
@@ -237,7 +237,7 @@ Authorization: Bearer {{userToken}}
 
 ### Find all images (public - requires auth in this project)
 # @name findAllImages
-GET {{baseUrl}}/images
+GET {{baseUrl}}/admin/images
 Authorization: Bearer {{userToken}}
 
 ### Find all images owned

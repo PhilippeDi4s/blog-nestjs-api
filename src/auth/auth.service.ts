@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
@@ -16,6 +17,7 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(ActivityLogsService.name);
   constructor(
     private readonly userService: UserService,
     private readonly hashingService: HashingService,
@@ -24,7 +26,9 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto) {
-    const user = await this.userService.findByEmail(loginDto.email);
+    const user = await this.userService.findByEmail(loginDto.email, {
+      includePassword: true,
+    });
 
     const error = new UnauthorizedException('Usuário ou senha inválidos');
 

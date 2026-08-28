@@ -44,10 +44,10 @@ export class ImagesService {
     return images;
   }
 
-  async findAllOwned(author: Partial<User>) {
+  async findAllOwned(author: JwtPayload) {
     const images = this.imagesRepository.find({
       where: {
-        uploaded_by: { id: author.id },
+        uploaded_by: { id: author.sub },
       },
       relations: {
         uploaded_by: true,
