@@ -114,6 +114,31 @@ export class UserService {
     return created;
   }
 
+  async createWithRole(userData: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+  }) {
+    const { name, email, password, role } = userData;
+
+    const passwordHash = await this.hashingService.hash(password);
+
+    const user = this.userRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        name,
+        email,
+        passwordHash,
+        role,
+      })
+      .execute();
+
+    return user;
+  }
+
   findByEmail(email: string, options: { includePassword?: boolean } = {}) {
     const query = this.userRepository
       .createQueryBuilder('user')
