@@ -2,7 +2,6 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
-  IsEmail,
   IsInt,
   IsOptional,
   IsUUID,
@@ -19,12 +18,15 @@ export class FiltersUserDto {
   name?: string;
 
   @IsOptional()
-  @IsEmail()
   email?: string;
 
   @IsOptional()
   @IsBoolean()
   forceLogout?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isBlocked?: boolean;
 
   @IsOptional()
   @Type(() => Date)

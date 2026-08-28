@@ -163,6 +163,7 @@ export class UserService {
       id,
       name,
       email,
+      isBlocked,
       forceLogout,
       startDate,
       endDate,
@@ -185,6 +186,10 @@ export class UserService {
 
       if (forceLogout !== undefined) {
         where.forceLogout = forceLogout;
+      }
+
+      if (isBlocked !== undefined) {
+        where.isBlocked = isBlocked;
       }
 
       if (startDate && endDate) {

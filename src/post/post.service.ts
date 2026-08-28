@@ -125,17 +125,8 @@ export class PostService {
 
     const query = this.postRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.author', 'user')
-      .select([
-        'post.id',
-        'post.title',
-        'post.slug',
-        'post.published',
-        'post.createdAt',
-        'user.id',
-        'user.name',
-        'user.email',
-      ]);
+      .leftJoin('post.author', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email']);
 
     if (id) query.andWhere('post.id = :id', { id });
 

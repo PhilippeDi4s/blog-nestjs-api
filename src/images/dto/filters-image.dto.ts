@@ -1,38 +1,23 @@
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsInt,
-  IsOptional,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsDate, IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
-export class FiltersPostDto {
+export class FiltersImagetDto {
   @IsOptional()
   @IsUUID()
   id?: string;
 
   @IsOptional()
-  title?: string;
-
-  @IsOptional()
-  slug?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  published?: boolean;
+  url?: string;
 
   @IsOptional()
   @IsUUID()
-  authorId?: string;
+  userId?: string;
 
   @IsOptional()
-  authorName?: string;
+  userName?: string;
 
   @IsOptional()
-  authorEmail?: string;
+  userEmail?: string;
 
   @IsOptional()
   @Type(() => Date)

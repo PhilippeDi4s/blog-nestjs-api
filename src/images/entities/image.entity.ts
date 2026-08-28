@@ -11,7 +11,7 @@ import {
 @Entity()
 export class Images {
   @PrimaryGeneratedColumn('uuid')
-  image_id: string;
+  id: string;
 
   @Column()
   publicId: string;
@@ -23,10 +23,10 @@ export class Images {
   folder: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
-  uploaded_by: User;
+  uploadedBy: User;
 
   @DeleteDateColumn()
   deletedAt: Date | null;

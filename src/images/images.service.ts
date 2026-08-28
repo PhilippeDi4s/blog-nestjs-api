@@ -19,6 +19,7 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { FiltersImagetDto } from './dto/filters-image.dto';
 
 @Injectable()
 export class ImagesService {
@@ -34,23 +35,75 @@ export class ImagesService {
     private readonly logService: ActivityLogsService,
   ) {}
 
-  async findAll() {
-    const images = await this.imagesRepository.find({
-      relations: {
-        uploaded_by: true,
-      },
-    });
+  async findMany(filters: FiltersImagetDto) {
+    const {
+      id,
+      url,
+      userId,
+      userEmail,
+      userName,
+      startDate,
+      endDate,
+      limit = 20,
+      page = 1,
+    } = filters;
 
-    return images;
+    const query = this.imagesRepository
+      .createQueryBuilder('image')
+      .leftJoin('image.uploadedBy', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email']);
+
+    if (id) query.andWhere('image.id = :id', { id });
+
+    if (url) query.andWhere('image.url = :url', { url });
+
+    if (startDate && endDate) {
+      query.andWhere('image.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+    } else if (startDate) {
+      query.andWhere('image.createdAt >= :startDate', { startDate });
+    } else if (endDate) {
+      query.andWhere('image.createdAt <= :endDate', { endDate });
+    }
+
+    if (userId) {
+      query.andWhere('user.id = :userId', { userId });
+    } else {
+      if (userName) {
+        query.andWhere('user.name ILIKE  :userName', {
+          userName: `%${userName}%`,
+        });
+      }
+      if (userEmail) {
+        query.andWhere('user.email ILIKE  :userEmail', {
+          userEmail: `%${userEmail}%`,
+        });
+      }
+    }
+
+    const [images, count] = await query
+      .orderBy('image.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data: images,
+      total: count,
+      page,
+      limit,
+    };
   }
 
   async findAllOwned(author: JwtPayload) {
     const images = this.imagesRepository.find({
       where: {
-        uploaded_by: { id: author.sub },
+        uploadedBy: { id: author.sub },
       },
       relations: {
-        uploaded_by: true,
+        uploadedBy: true,
       },
     });
     return images;
@@ -59,7 +112,7 @@ export class ImagesService {
   async findOne(imageData: Partial<Images>) {
     const image = await this.imagesRepository.findOne({
       where: imageData as FindOptionsWhere<Images>,
-      relations: { uploaded_by: true },
+      relations: { uploadedBy: true },
     });
 
     return image;
@@ -85,7 +138,7 @@ export class ImagesService {
       url: publicUrl,
       folder,
       publicId,
-      uploaded_by: {
+      uploadedBy: {
         id: userId,
       },
     });
@@ -107,9 +160,9 @@ export class ImagesService {
 
   async restore(targetId: string) {
     const imageToRestore = await this.imagesRepository.findOne({
-      where: { image_id: targetId },
+      where: { id: targetId },
       withDeleted: true,
-      relations: { uploaded_by: true },
+      relations: { uploadedBy: true },
     });
 
     if (!imageToRestore) {
@@ -122,7 +175,7 @@ export class ImagesService {
 
     await this.imagesRepository.restore(targetId);
 
-    return this.findOneOrFail({ image_id: targetId });
+    return this.findOneOrFail({ id: targetId });
   }
 
   async selfRemove(user: JwtPayload, targetId: string) {
@@ -148,9 +201,9 @@ export class ImagesService {
     targetId: string,
     options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
-    const imageToDelete = await this.findOneOrFail({ image_id: targetId });
+    const imageToDelete = await this.findOneOrFail({ id: targetId });
 
-    const isImageOwner = user.sub === imageToDelete.uploaded_by.id;
+    const isImageOwner = user.sub === imageToDelete.uploadedBy.id;
 
     if (!isImageOwner && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
@@ -165,18 +218,18 @@ export class ImagesService {
     await this.logService.create({
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
-      entityId: deletedImage.image_id,
+      entityId: deletedImage.id,
       entityType: EntityType.IMAGE,
       metadata: {
         selfDelete: !options.isAdminAction,
         targetSnapshot: {
           url: deletedImage.url,
           folder: deletedImage.folder,
-          uploadedAt: deletedImage.created_at,
+          uploadedAt: deletedImage.createdAt,
           uploadedBy: {
-            id: deletedImage.uploaded_by.id,
-            name: deletedImage.uploaded_by.name,
-            email: deletedImage.uploaded_by.email,
+            id: deletedImage.uploadedBy.id,
+            name: deletedImage.uploadedBy.name,
+            email: deletedImage.uploadedBy.email,
           },
         },
       },
