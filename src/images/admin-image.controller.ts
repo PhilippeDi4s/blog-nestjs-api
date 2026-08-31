@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   Body,
+  Query,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -17,6 +18,7 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { ImageResponseDto } from './dto/image-response.dto';
 import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+import { FiltersImagetDto } from './dto/filters-image.dto';
 
 @Controller('admin/images')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -25,9 +27,12 @@ export class AdminImageController {
   constructor(private readonly imageService: ImagesService) {}
 
   @Get()
-  async findAll() {
-    const images = await this.imageService.findAll();
-    return images.map((image) => new ImageResponseDto(image));
+  async findMany(@Query() filters: FiltersImagetDto) {
+    const images = await this.imageService.findMany(filters);
+    return {
+      ...images,
+      data: images.data.map((image) => new ImageResponseDto(image)),
+    };
   }
 
   @Patch(':id/restore')

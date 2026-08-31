@@ -6,9 +6,7 @@ export class PostResponseDto {
   readonly slug: string;
   readonly content: string;
   readonly excerpt: string;
-  readonly coverImage: {
-    url: string;
-  };
+  readonly coverImage: string;
   readonly published: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;

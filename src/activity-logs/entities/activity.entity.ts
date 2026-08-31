@@ -27,7 +27,7 @@ export class ActivityLog {
   action: ActionType;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, unknown>;
+  metadata: Record<string, unknown> | null;
 
   @Column({ type: 'text', nullable: true })
   reason: string | null;

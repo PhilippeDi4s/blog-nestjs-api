@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   Body,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { PostResponseDto } from './dto/post-response.dto';
@@ -17,31 +18,29 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+import { FiltersPostDto } from './dto/filters-post.dto';
 
 @Controller('admin/posts')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
 export class AdminPostController {
   constructor(private readonly postService: PostService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Get()
-  async findAll() {
-    const posts = await this.postService.findAll();
-    return posts.map((post) => {
-      new PostResponseDto(post);
-    });
+  async findMany(@Query() filters: FiltersPostDto) {
+    const posts = await this.postService.findMany(filters);
+    return {
+      ...posts,
+      data: posts.data.map((post) => new PostResponseDto(post)),
+    };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Patch(':id/restore')
   async restore(@Param('id', ParseUUIDPipe) id: string) {
     const restoredPost = await this.postService.restore(id);
     return new PostResponseDto(restoredPost);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Delete(':id')
   async removeByAdmin(
     @Param('id', ParseUUIDPipe) id: string,
