@@ -107,7 +107,7 @@ export class UploadService {
     await this.logService.create({
       user: { id: userId } as User,
       action: ActionType.CREATED,
-      entityId: savedImage.image_id,
+      entityId: savedImage.id,
       entityType: EntityType.IMAGE,
       metadata: {
         after: {

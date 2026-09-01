@@ -1,23 +1,23 @@
 import { Images } from '../entities/image.entity';
 
 export class ImageResponseDto {
-  readonly image_id: string;
+  readonly id: string;
   readonly url: string;
-  readonly created_at: Date;
-  readonly uploaded_by: {
+  readonly createdAt: Date;
+  readonly uploadedBy: {
     id: string;
     name: string;
     email: string;
   };
 
   constructor(images: Images) {
-    this.image_id = images.image_id;
+    this.id = images.id;
     this.url = images.url;
-    this.created_at = images.created_at;
-    this.uploaded_by = {
-      id: images.uploaded_by.id,
-      name: images.uploaded_by.name,
-      email: images.uploaded_by.email,
+    this.createdAt = images.createdAt;
+    this.uploadedBy = {
+      id: images.uploadedBy.id,
+      name: images.uploadedBy.name,
+      email: images.uploadedBy.email,
     };
   }
 }

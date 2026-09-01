@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Images } from './entities/image.entity';
 import { StorageModule } from 'src/storage/storage.module';
 import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Images]),
     StorageModule,
     ActivityLogsModule,
+    UserModule,
   ],
   controllers: [ImagesController, AdminImageController],
   providers: [ImagesService],

@@ -17,10 +17,9 @@ import { UserRole } from './enum/user-role.enum';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserResponseDto } from './dto/user-response.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { FiltersUserDto } from './dto/filters-user.dto';
-import { ConfirmPasswordDto } from './dto/confirm-password.dto';
-import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
+import { ConfirmAdminActionDto } from '../commoun/dto/confirm-admin-action.dto';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -41,7 +40,7 @@ export class AdminUserController {
   async updateUser(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdateUserAdminDto,
   ) {
     const updatedUser = await this.userService.updateByAdmin(
       req.user,
@@ -55,7 +54,7 @@ export class AdminUserController {
   async promote(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: ConfirmPasswordDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const updatedUser = await this.userService.promoteToAdmin(
       req.user,
@@ -69,7 +68,7 @@ export class AdminUserController {
   async demote(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: ConfirmPasswordDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const updatedUser = await this.userService.demote(req.user, dto, targetId);
     return new UserResponseDto(updatedUser);
@@ -79,7 +78,7 @@ export class AdminUserController {
   async block(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: ConfirmPasswordDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const updatedUser = await this.userService.block(req.user, dto, targetId);
     return new UserResponseDto(updatedUser);
@@ -89,15 +88,23 @@ export class AdminUserController {
   async unblock(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: ConfirmPasswordDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const updatedUser = await this.userService.unblock(req.user, dto, targetId);
     return new UserResponseDto(updatedUser);
   }
 
   @Patch(':id/restore')
-  async restore(@Param('id', ParseUUIDPipe) targetId: string) {
-    const restoredUser = await this.userService.restore(targetId);
+  async restore(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredUser = await this.userService.restore(
+      req.user,
+      targetId,
+      dto.reason,
+    );
     return new UserResponseDto(restoredUser);
   }
 
@@ -105,7 +112,7 @@ export class AdminUserController {
   async softRemove(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: AdminActionReasonDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const removedUser = await this.userService.removeByAdmin(
       targetId,

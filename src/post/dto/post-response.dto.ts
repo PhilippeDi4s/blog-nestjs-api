@@ -6,10 +6,14 @@ export class PostResponseDto {
   readonly slug: string;
   readonly content: string;
   readonly excerpt: string;
-  readonly coverImage: string;
   readonly published: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly coverImage: {
+    id: string;
+    uploadedBy: string;
+    url: string;
+  };
   readonly author: {
     id: string;
     name: string;
@@ -22,10 +26,14 @@ export class PostResponseDto {
     this.slug = post.slug;
     this.content = post.content;
     this.excerpt = post.excerpt;
-    this.coverImage = post.coverImage;
     this.published = post.published;
     this.createdAt = post.createdAt;
     this.updatedAt = post.updatedAt;
+    this.coverImage = {
+      id: post.coverImage.id,
+      uploadedBy: post.coverImage.uploadedBy.id,
+      url: post.coverImage.url,
+    };
     this.author = {
       id: post.author.id,
       name: post.author.name,

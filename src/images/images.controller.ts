@@ -24,8 +24,8 @@ export class ImagesController {
   }
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) image_id: string) {
-    const image = await this.imagesService.findOneOrFail({ image_id });
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const image = await this.imagesService.findOneOrFail({ id });
 
     return new ImageResponseDto(image);
   }

@@ -17,8 +17,8 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { ImageResponseDto } from './dto/image-response.dto';
-import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
 import { FiltersImagetDto } from './dto/filters-image.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 
 @Controller('admin/images')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -36,21 +36,29 @@ export class AdminImageController {
   }
 
   @Patch(':id/restore')
-  async restore(@Param('id', ParseUUIDPipe) targetId: string) {
-    const restoredImage = await this.imageService.restore(targetId);
+  async restore(
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredImage = await this.imageService.restore(
+      req.user,
+      targetId,
+      dto,
+    );
     return new ImageResponseDto(restoredImage);
   }
 
   @Delete(':id')
   async softRemove(
-    @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
-    @Body() dto: AdminActionReasonDto,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
     const deletedImage = await this.imageService.removeByAdmin(
       req.user,
       targetId,
-      dto.reason,
+      dto,
     );
     return new ImageResponseDto(deletedImage);
   }

@@ -26,7 +26,8 @@ import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { UserRole } from './enum/user-role.enum';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { FiltersUserDto } from './dto/filters-user.dto';
-import { ConfirmPasswordDto } from './dto/confirm-password.dto';
+import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
+import { ConfirmAdminActionDto } from '../commoun/dto/confirm-admin-action.dto';
 
 @Injectable()
 export class UserService {
@@ -48,6 +49,24 @@ export class UserService {
     if (!isValid) {
       throw new UnauthorizedException('Senha incorreta!');
     }
+  }
+
+  async assertPasswordMatchesByUserId(
+    userId: string,
+    password: string,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: {
+        passwordHash: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    await this.assertPasswordMatches(password, user.passwordHash);
   }
 
   private async assertNotLastAdmin(): Promise<void> {
@@ -223,15 +242,26 @@ export class UserService {
     return updatedUser;
   }
 
-  async updateByAdmin(admin: JwtPayload, targetId: string, dto: UpdateUserDto) {
+  async updateByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: UpdateUserAdminDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Você não tem permissão para atualizar este usuário',
       );
     }
-    const updatedUser = await this.executeUpdate(targetId, admin, dto, {
-      isAdminAction: true,
-    });
+    const { reason, ...dtoWithoutReason } = dto;
+    const updatedUser = await this.executeUpdate(
+      targetId,
+      admin,
+      dtoWithoutReason,
+      {
+        isAdminAction: true,
+        reason,
+      },
+    );
     return updatedUser;
   }
 
@@ -320,7 +350,7 @@ export class UserService {
 
   async promoteToAdmin(
     adminToken: JwtPayload,
-    dto: ConfirmPasswordDto,
+    dto: ConfirmAdminActionDto,
     targetId: string,
   ) {
     if (adminToken.role !== UserRole.ADMIN) {
@@ -354,6 +384,7 @@ export class UserService {
         targetEmail: user.email,
         performedByEmail: admin.email,
       },
+      reason: dto.reason,
     });
 
     return user;
@@ -361,7 +392,7 @@ export class UserService {
 
   async demote(
     adminToken: JwtPayload,
-    dto: ConfirmPasswordDto,
+    dto: ConfirmAdminActionDto,
     targetId: string,
   ) {
     if (adminToken.role !== UserRole.ADMIN) {
@@ -404,6 +435,7 @@ export class UserService {
         targetEmail: user.email,
         performedByEmail: admin.email,
       },
+      reason: dto.reason,
     });
 
     return user;
@@ -411,7 +443,7 @@ export class UserService {
 
   async block(
     adminToken: JwtPayload,
-    dto: ConfirmPasswordDto,
+    dto: ConfirmAdminActionDto,
     targetId: string,
   ) {
     const admin = await this.findOneByOrFail(adminToken.sub, {
@@ -443,6 +475,7 @@ export class UserService {
         targetEmail: user.email,
         performedByEmail: admin.email,
       },
+      reason: dto.reason,
     });
 
     return user;
@@ -450,7 +483,7 @@ export class UserService {
 
   async unblock(
     adminToken: JwtPayload,
-    dto: ConfirmPasswordDto,
+    dto: ConfirmAdminActionDto,
     targetId: string,
   ) {
     const admin = await this.findOneByOrFail(adminToken.sub, {
@@ -482,12 +515,13 @@ export class UserService {
         targetEmail: user.email,
         performedByEmail: admin.email,
       },
+      reason: dto.reason,
     });
 
     return user;
   }
 
-  async restore(targetId: string) {
+  async restore(admin: JwtPayload, targetId: string, adminReason: string) {
     const userToRestore = await this.userRepository.findOne({
       where: { id: targetId },
       withDeleted: true,
@@ -501,9 +535,22 @@ export class UserService {
       throw new ConflictException('Este usuário já está ativo');
     }
 
-    await this.userRepository.restore(targetId);
+    const deletedAt = userToRestore.deletedAt;
 
-    return this.findOneByOrFail(targetId);
+    await this.userRepository.restore(userToRestore.id);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: userToRestore.id,
+      entityType: EntityType.USER,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: adminReason,
+    });
+
+    return userToRestore;
   }
 
   async removeSelf(user: JwtPayload) {
@@ -529,7 +576,9 @@ export class UserService {
   ) {
     const userToDelete = await this.findOneByOrFail(targetId);
 
-    await this.assertNotLastAdmin();
+    if (userToDelete.role === UserRole.ADMIN) {
+      await this.assertNotLastAdmin();
+    }
 
     const removedUser = await this.userRepository.softRemove(userToDelete);
 

@@ -20,6 +20,8 @@ import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { FiltersImagetDto } from './dto/filters-image.dto';
+import { UserService } from 'src/user/user.service';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 
 @Injectable()
 export class ImagesService {
@@ -33,6 +35,7 @@ export class ImagesService {
     private readonly imagesRepository: Repository<Images>,
 
     private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
   ) {}
 
   async findMany(filters: FiltersImagetDto) {
@@ -158,7 +161,15 @@ export class ImagesService {
     return savedUrl;
   }
 
-  async restore(targetId: string) {
+  async restore(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
     const imageToRestore = await this.imagesRepository.findOne({
       where: { id: targetId },
       withDeleted: true,
@@ -173,9 +184,22 @@ export class ImagesService {
       throw new ConflictException('Esta imagem já está ativa');
     }
 
+    const deletedAt = imageToRestore.deletedAt;
+
     await this.imagesRepository.restore(targetId);
 
-    return this.findOneOrFail({ id: targetId });
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: imageToRestore.id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: dto.reason,
+    });
+
+    return imageToRestore;
   }
 
   async selfRemove(user: JwtPayload, targetId: string) {
@@ -183,15 +207,23 @@ export class ImagesService {
     return deletedImage;
   }
 
-  async removeByAdmin(admin: JwtPayload, targetId: string, reason?: string) {
+  async removeByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem realizar essa ação',
       );
     }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
     const deletedImage = await this.executeSoftRemove(admin, targetId, {
       isAdminAction: true,
-      reason,
+      reason: dto.reason,
     });
     return deletedImage;
   }

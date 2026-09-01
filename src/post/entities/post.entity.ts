@@ -37,7 +37,7 @@ export class Post {
   updatedAt: Date;
 
   @ManyToOne(() => Images)
-  coverImage: string;
+  coverImage: Images;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   author: User;

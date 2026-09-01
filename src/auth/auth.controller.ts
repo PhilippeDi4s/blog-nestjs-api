@@ -15,6 +15,7 @@ import type { AuthenticatedRequest } from './types/authenticated-request';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -60,15 +61,31 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Post('admin/logout/:id')
+  @Post('admin/:id/logout')
   async logoutByAdmin(
     @Req() req: AuthenticatedRequest,
     @Param('id') targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
-    await this.authService.forceLogout(req.user, targetId);
+    await this.authService.forceLogout(req.user, targetId, dto);
 
     return {
       message: 'Logout realizado com sucesso',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('admin/:id/revoke-logout')
+  async revokeLogoutByAdmin(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    await this.authService.revokeForceLogout(req.user, targetId, dto);
+
+    return {
+      message: 'Acesso do usuário restaurado com sucesso',
     };
   }
 }

@@ -20,6 +20,9 @@ import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { FiltersPostDto } from './dto/filters-post.dto';
+import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class PostService {
@@ -28,6 +31,7 @@ export class PostService {
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly imageService: ImagesService,
     private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
   ) {}
 
   async findOneOrFail(postData: Partial<Post>) {
@@ -43,7 +47,7 @@ export class PostService {
   async findOne(postData: Partial<Post>) {
     const post = await this.postRepository.findOne({
       where: postData as FindOptionsWhere<Post>,
-      relations: { author: true },
+      relations: { coverImage: { uploadedBy: true }, author: true },
     });
 
     return post;
@@ -189,7 +193,7 @@ export class PostService {
       author: { id: authorToken.sub } as User,
       content: dto.content,
       excerpt: dto.excerpt,
-      coverImage: image.url,
+      coverImage: image,
       title: dto.title,
       published: dto.published ?? false,
     });
@@ -225,13 +229,23 @@ export class PostService {
     return updatedPost;
   }
 
-  async updateByAdmin(admin: JwtPayload, targetId: string, dto: UpdatePostDto) {
+  async updateByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: UpdatePostAdminDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem executar esta ação.',
       );
     }
-    const updatedPost = await this.executeUpdate(admin, targetId, dto);
+    const { reason, ...dtoWithoutReason } = dto;
+    const updatedPost = await this.executeUpdate(
+      admin,
+      targetId,
+      dtoWithoutReason,
+      { isAdminAction: true, reason },
+    );
     return updatedPost;
   }
 
@@ -239,7 +253,7 @@ export class PostService {
     user: JwtPayload,
     targetId: string,
     dto: UpdatePostDto,
-    options: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     if (Object.keys(dto).length === 0) {
       throw new BadRequestException('Dados não enviados');
@@ -272,7 +286,7 @@ export class PostService {
         url: dto.coverImage,
       });
 
-      post.coverImage = image.url;
+      post.coverImage = image;
     }
 
     const updatedPost = await this.postRepository.save(post);
@@ -289,6 +303,7 @@ export class PostService {
       action: ActionType.UPDATED,
       entityId: updatedPost.id,
       entityType: EntityType.POST,
+      reason: options.reason ?? null,
       metadata: {
         selfUpdate: !options.isAdminAction,
         before,
@@ -299,7 +314,15 @@ export class PostService {
     return updatedPost;
   }
 
-  async restore(targetId: string) {
+  async restore(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
     const postToRestore = await this.postRepository.findOne({
       where: { id: targetId },
       withDeleted: true,
@@ -314,24 +337,45 @@ export class PostService {
       throw new ConflictException('Este post já está ativo');
     }
 
-    await this.postRepository.restore(targetId);
+    const deletedAt = postToRestore.deletedAt;
 
-    return this.findOneOrFail({ id: targetId });
+    await this.postRepository.restore(postToRestore.id);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: postToRestore.id,
+      entityType: EntityType.POST,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: dto.reason,
+    });
+
+    return postToRestore;
   }
 
   async removeSelf(targetId: string, user: JwtPayload) {
     return this.executeSoftRemove(targetId, user);
   }
 
-  async removeByAdmin(targetId: string, admin: JwtPayload, reason?: string) {
+  async removeByAdmin(
+    targetId: string,
+    admin: JwtPayload,
+    dto: ConfirmAdminActionDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem executar esta ação.',
       );
     }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
     return this.executeSoftRemove(targetId, admin, {
       isAdminAction: true,
-      reason,
+      reason: dto.reason,
     });
   }
 

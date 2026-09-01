@@ -17,8 +17,9 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { UserRole } from 'src/user/enum/user-role.enum';
-import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
 import { FiltersPostDto } from './dto/filters-post.dto';
+import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 
 @Controller('admin/posts')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -35,9 +36,23 @@ export class AdminPostController {
     };
   }
 
+  @Patch(':id/update')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdatePostAdminDto,
+  ) {
+    const updatedPost = await this.postService.updateByAdmin(req.user, id, dto);
+    return new PostResponseDto(updatedPost);
+  }
+
   @Patch(':id/restore')
-  async restore(@Param('id', ParseUUIDPipe) id: string) {
-    const restoredPost = await this.postService.restore(id);
+  async restore(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredPost = await this.postService.restore(req.user, id, dto);
     return new PostResponseDto(restoredPost);
   }
 
@@ -45,9 +60,9 @@ export class AdminPostController {
   async removeByAdmin(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: AuthenticatedRequest,
-    @Body() dto: AdminActionReasonDto,
+    @Body() dto: ConfirmAdminActionDto,
   ) {
-    const post = await this.postService.removeByAdmin(id, req.user, dto.reason);
+    const post = await this.postService.removeByAdmin(id, req.user, dto);
     return new PostResponseDto(post);
   }
 }

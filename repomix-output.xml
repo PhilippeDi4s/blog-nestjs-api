@@ -1,0 +1,6038 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+.prettierrc
+dev/images/image.gif
+dev/images/image.jpeg
+dev/images/image.png
+dev/images/image.webp
+env.example
+eslint.config.mjs
+nest-cli.json
+package.json
+README.md
+rest-client/requests.http
+src/activity-logs/activity-logs.controller.ts
+src/activity-logs/activity-logs.module.ts
+src/activity-logs/activity-logs.service.ts
+src/activity-logs/dto/admin-action-reason.dto.ts
+src/activity-logs/dto/create-log.dto.ts
+src/activity-logs/dto/filters-log.dto.ts
+src/activity-logs/dto/log-response.dto.ts
+src/activity-logs/entities/activity.entity.ts
+src/activity-logs/enums/action-type.enum.ts
+src/activity-logs/enums/entity-type.enum.ts
+src/app.module.ts
+src/auth/auth.controller.ts
+src/auth/auth.module.ts
+src/auth/auth.service.ts
+src/auth/decorators/roles.decorator.ts
+src/auth/dto/login.dto.ts
+src/auth/guards/jwt-auth.guard.ts
+src/auth/guards/roles.guard.ts
+src/auth/guards/strategies/jwt.strategy.ts
+src/auth/types/authenticated-request.ts
+src/auth/types/jwt-payload.type.ts
+src/commoun/common.module.ts
+src/commoun/dto/confirm-admin-action.dto.ts
+src/commoun/filters/all-exeptions.filter.ts
+src/commoun/hashing/bcrypt-hashing.service.ts
+src/commoun/hashing/hashing.service.ts
+src/commoun/pipes/custom-parse-int-pipe.pipe.ts
+src/commoun/utils/create-slug-from-text.ts
+src/commoun/utils/generate-random-suffix.ts
+src/commoun/utils/parseCorsWhitelist.ts
+src/commoun/utils/slugify.ts
+src/database/seeds/create-admin.seed.ts
+src/images/admin-image.controller.ts
+src/images/dto/filters-image.dto.ts
+src/images/dto/image-response.dto.ts
+src/images/entities/image.entity.ts
+src/images/images.controller.ts
+src/images/images.module.ts
+src/images/images.service.ts
+src/main.ts
+src/post/admin-post.controller.ts
+src/post/dto/create-post.dto.ts
+src/post/dto/filters-post.dto.ts
+src/post/dto/post-response.dto.ts
+src/post/dto/update-post-admin.dto.ts
+src/post/dto/update-post.dto.ts
+src/post/entities/post.entity.ts
+src/post/post.controller.ts
+src/post/post.module.ts
+src/post/post.service.ts
+src/storage/cloudinary/cloudinary-storage.provider.ts
+src/storage/cloudinary/cloudinary.provider.ts
+src/storage/image-storage.interface.ts
+src/storage/storage.module.ts
+src/upload/upload.config.ts
+src/upload/upload.controller.ts
+src/upload/upload.module.ts
+src/upload/upload.service.ts
+src/user/admin-user.controller.ts
+src/user/dto/create-user.dto.ts
+src/user/dto/filters-user.dto.ts
+src/user/dto/update-password.dto.ts
+src/user/dto/update-user-admin.dto.ts
+src/user/dto/update-user.dto.ts
+src/user/dto/user-response.dto.ts
+src/user/entities/user.entity.ts
+src/user/enum/user-role.enum.ts
+src/user/user.controller.ts
+src/user/user.module.ts
+src/user/user.service.ts
+tsconfig.build.json
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/commoun/dto/confirm-admin-action.dto.ts">
+import { IsNotEmpty, IsString } from 'class-validator';
+import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+
+export class ConfirmAdminActionDto extends AdminActionReasonDto {
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+</file>
+
+<file path="src/post/dto/update-post-admin.dto.ts">
+import { IntersectionType } from '@nestjs/mapped-types';
+import { UpdatePostDto } from './update-post.dto';
+import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+
+export class UpdatePostAdminDto extends IntersectionType(
+  UpdatePostDto,
+  AdminActionReasonDto,
+) {}
+</file>
+
+<file path="src/user/dto/update-user-admin.dto.ts">
+import { AdminActionReasonDto } from 'src/activity-logs/dto/admin-action-reason.dto';
+import { UpdateUserDto } from './update-user.dto';
+import { IntersectionType } from '@nestjs/mapped-types';
+
+export class UpdateUserAdminDto extends IntersectionType(
+  UpdateUserDto,
+  AdminActionReasonDto,
+) {}
+</file>
+
+<file path=".prettierrc">
+{
+  "singleQuote": true,
+  "trailingComma": "all"
+}
+</file>
+
+<file path="eslint.config.mjs">
+// @ts-check
+import eslint from '@eslint/js';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  {
+    ignores: ['eslint.config.mjs'],
+  },
+  eslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  eslintPluginPrettierRecommended,
+  {
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+      sourceType: 'commonjs',
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+    },
+  },
+);
+</file>
+
+<file path="nest-cli.json">
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "deleteOutDir": true
+  }
+}
+</file>
+
+<file path="src/activity-logs/dto/admin-action-reason.dto.ts">
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+
+export class AdminActionReasonDto {
+  @IsString({ message: 'O motivo deve ser uma string' })
+  @IsNotEmpty({ message: 'O motivo não pode estar vazio' })
+  @MinLength(10, { message: 'O motivo deve conter no mínimo 10 caracteres' })
+  @MaxLength(250, { message: 'O motivo deve conter no máximo 250 caracteres' })
+  reason: string;
+}
+</file>
+
+<file path="src/activity-logs/dto/filters-log.dto.ts">
+import { Type } from 'class-transformer';
+import {
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
+import { ActionType } from '../enums/action-type.enum';
+import { EntityType } from '../enums/entity-type.enum';
+
+export class FiltersLogDto {
+  @IsOptional()
+  @IsEnum(ActionType)
+  action?: ActionType;
+
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
+
+  @IsOptional()
+  @IsEnum(EntityType)
+  entityType?: EntityType;
+
+  @IsOptional()
+  @IsUUID()
+  entityId?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  startDate?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  endDate?: Date;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+}
+</file>
+
+<file path="src/activity-logs/dto/log-response.dto.ts">
+import { ActivityLog } from '../entities/activity.entity';
+import { ActionType } from '../enums/action-type.enum';
+import { EntityType } from '../enums/entity-type.enum';
+
+export class LogResponseDto {
+  readonly activityLogId: string;
+  readonly user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  readonly action: ActionType;
+  readonly entityType: EntityType;
+  readonly entityId: string;
+  readonly metadata: Record<string, unknown> | null;
+  readonly reason: string | null;
+  readonly createdAt: Date;
+
+  constructor(log: ActivityLog) {
+    this.activityLogId = log.activityLogId;
+    this.user = {
+      id: log.user.id,
+      name: log.user.name,
+      email: log.user.email,
+    };
+    this.action = log.action;
+    this.entityType = log.entityType;
+    this.entityId = log.entityId;
+    this.metadata = log.metadata;
+    this.reason = log.reason;
+    this.createdAt = log.createdAt;
+  }
+}
+</file>
+
+<file path="src/auth/decorators/roles.decorator.ts">
+import { SetMetadata } from '@nestjs/common';
+import { UserRole } from 'src/user/enum/user-role.enum';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
+</file>
+
+<file path="src/auth/guards/jwt-auth.guard.ts">
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { JsonWebTokenError } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
+
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  handleRequest<TUser = any>(
+    err: any,
+    user: any,
+    info: any,
+    context: ExecutionContext,
+    status?: any,
+  ): TUser {
+    if (!user || info instanceof JsonWebTokenError) {
+      throw new UnauthorizedException('Você precisa fazer login');
+    }
+
+    return super.handleRequest(err, user, info, context, status);
+  }
+}
+</file>
+
+<file path="src/auth/guards/roles.guard.ts">
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { ROLES_KEY } from '../decorators/roles.decorator';
+import { AuthenticatedRequest } from '../types/authenticated-request';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    if (!requiredRoles) {
+      return true;
+    }
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const user = request.user;
+
+    return requiredRoles.includes(user.role);
+  }
+}
+</file>
+
+<file path="src/commoun/common.module.ts">
+import { Module } from '@nestjs/common';
+import { HashingService } from './hashing/hashing.service';
+import { BcryptHashingService } from './hashing/bcrypt-hashing.service';
+
+@Module({
+  providers: [
+    {
+      provide: HashingService,
+      useClass: BcryptHashingService,
+    },
+  ],
+  exports: [HashingService],
+})
+export class CommonModule {}
+</file>
+
+<file path="src/commoun/hashing/bcrypt-hashing.service.ts">
+import { HashingService } from './hashing.service';
+import * as bcrypt from 'bcryptjs';
+
+export class BcryptHashingService extends HashingService {
+  async hash(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
+  }
+
+  async compare(password: string, hash: string): Promise<boolean> {
+    const isValid = await bcrypt.compare(password, hash);
+    return isValid;
+  }
+}
+</file>
+
+<file path="src/commoun/hashing/hashing.service.ts">
+export abstract class HashingService {
+  abstract hash(password: string): Promise<string>;
+  abstract compare(password: string, hash: string): Promise<boolean>;
+}
+</file>
+
+<file path="src/commoun/utils/create-slug-from-text.ts">
+import { generateRandomSuffix } from './generate-random-suffix';
+import { slugify } from './slugify';
+
+export function createSlugFromText(text: string) {
+  const slug = slugify(text);
+  return `${slug}-${generateRandomSuffix()}`;
+}
+</file>
+
+<file path="src/commoun/utils/generate-random-suffix.ts">
+export function generateRandomSuffix() {
+  return Math.random().toString(36).substring(2, 8);
+}
+</file>
+
+<file path="src/commoun/utils/slugify.ts">
+export function slugify(text: string): string {
+  return text
+    .normalize('NFKD') // separa acentos de letras (ex: á → a + ́)
+    .toLocaleLowerCase() // tudo minúsculo
+    .replace(/[\u0300-\u036f]/g, '') // remove acentos (marcadores Unicode)
+    .replace(/[^a-z0-9]+/g, ' ') // troca tudo que não for letra/número por espaço
+    .trim() // remove espaços no início/fim
+    .replace(/\s+/g, '-'); // espaço → hífen
+}
+</file>
+
+<file path="src/database/seeds/create-admin.seed.ts">
+import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { UserService } from 'src/user/user.service';
+
+async function bootstrap() {
+  const logger = new Logger(bootstrap.name);
+  const app = await NestFactory.createApplicationContext(AppModule);
+
+  try {
+    const userService = app.get(UserService);
+
+    const name = process.env.ADMIN_NAME!;
+    const email = process.env.ADMIN_EMAIL!;
+    const password = process.env.ADMIN_PASSWORD!;
+
+    const existing = await userService.findByEmail(email);
+    if (existing) {
+      logger.log('Admin já existe, pulando seed.');
+      return;
+    }
+
+    await userService.createWithRole({
+      name,
+      email,
+      password,
+      role: UserRole.ADMIN,
+    });
+    logger.log('Admin criado com sucesso.');
+  } catch (error) {
+    logger.error('Falha ao criar admin', error);
+    process.exitCode = 1;
+  } finally {
+    await app.close();
+  }
+}
+
+void bootstrap();
+</file>
+
+<file path="src/images/dto/filters-image.dto.ts">
+import { Type } from 'class-transformer';
+import { IsDate, IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
+
+export class FiltersImagetDto {
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @IsOptional()
+  url?: string;
+
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
+
+  @IsOptional()
+  userName?: string;
+
+  @IsOptional()
+  userEmail?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  startDate?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  endDate?: Date;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+}
+</file>
+
+<file path="src/storage/cloudinary/cloudinary-storage.provider.ts">
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { v2 as CloudinaryType } from 'cloudinary';
+import { CLOUDINARY } from '../cloudinary/cloudinary.provider';
+import {
+  ImageStorageProvider,
+  UploadImageOptions,
+  UploadImageResult,
+} from '../image-storage.interface';
+
+@Injectable()
+export class CloudinaryStorageProvider implements ImageStorageProvider {
+  @Inject(CLOUDINARY) private readonly cloudinary: typeof CloudinaryType;
+
+  async upload(
+    buffer: Buffer,
+    options: UploadImageOptions,
+  ): Promise<UploadImageResult> {
+    const result = await new Promise<{ secure_url: string; public_id: string }>(
+      (resolve, reject) => {
+        const uploadStream = this.cloudinary.uploader.upload_stream(
+          {
+            resource_type: 'image',
+            folder: options.folder,
+            public_id: options.publicId,
+            context: { uploaded_by: options.uploadedBy },
+          },
+          (error, result) => {
+            if (error || !result) {
+              reject(
+                new InternalServerErrorException(
+                  'Não foi possível enviar a imagem ao servidor',
+                ),
+              );
+              return;
+            }
+            resolve({
+              secure_url: result.secure_url,
+              public_id: result.public_id,
+            });
+          },
+        );
+
+        uploadStream.end(buffer);
+      },
+    );
+
+    return { url: result.secure_url, id: result.public_id };
+  }
+
+  async delete(id: string): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+      void this.cloudinary.uploader.destroy(
+        id,
+        { resource_type: 'image' },
+        (error, result) => {
+          if (error || !result) {
+            reject(
+              new InternalServerErrorException(
+                'Não foi possível excluir a imagem do servidor',
+              ),
+            );
+            return;
+          }
+
+          resolve();
+        },
+      );
+    });
+  }
+}
+</file>
+
+<file path="src/storage/cloudinary/cloudinary.provider.ts">
+// cloudinary/cloudinary.provider.ts
+import { v2 as cloudinary } from 'cloudinary';
+import { ConfigService } from '@nestjs/config';
+import { Provider } from '@nestjs/common';
+
+export const CLOUDINARY = 'CLOUDINARY';
+
+export const CloudinaryProvider: Provider = {
+  provide: CLOUDINARY,
+  useFactory: (configService: ConfigService) => {
+    cloudinary.config({
+      cloud_name: configService.get<string>('CLOUDINARY_CLOUD_NAME'),
+      api_key: configService.get<string>('CLOUDINARY_API_KEY'),
+      api_secret: configService.get<string>('CLOUDINARY_API_SECRET'),
+    });
+    return cloudinary;
+  },
+  inject: [ConfigService],
+};
+</file>
+
+<file path="src/storage/image-storage.interface.ts">
+export interface UploadImageOptions {
+  folder: string;
+  publicId: string;
+  uploadedBy: string;
+}
+
+export interface UploadImageResult {
+  url: string;
+  id: string;
+}
+
+export interface ImageStorageProvider {
+  upload(
+    buffer: Buffer,
+    options: UploadImageOptions,
+  ): Promise<UploadImageResult>;
+  delete(id: string): Promise<void>;
+}
+
+export const IMAGE_STORAGE_PROVIDER = Symbol('IMAGE_STORAGE_PROVIDER');
+</file>
+
+<file path="src/storage/storage.module.ts">
+import { Module } from '@nestjs/common';
+import { IMAGE_STORAGE_PROVIDER } from 'src/storage/image-storage.interface';
+import { CloudinaryStorageProvider } from './cloudinary/cloudinary-storage.provider';
+import { CloudinaryProvider } from './cloudinary/cloudinary.provider';
+
+@Module({
+  providers: [
+    CloudinaryProvider,
+    {
+      provide: IMAGE_STORAGE_PROVIDER,
+      useClass: CloudinaryStorageProvider,
+    },
+  ],
+  exports: [IMAGE_STORAGE_PROVIDER],
+})
+export class StorageModule {}
+</file>
+
+<file path="src/user/dto/user-response.dto.ts">
+import { User } from '../entities/user.entity';
+
+export class UserResponseDto {
+  readonly id: string;
+  readonly name: string;
+  readonly email: string;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+
+  constructor(user: User) {
+    this.id = user.id;
+    this.name = user.name;
+    this.email = user.email;
+    this.createdAt = user.createdAt;
+    this.updatedAt = user.updatedAt;
+  }
+}
+</file>
+
+<file path="src/user/enum/user-role.enum.ts">
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+</file>
+
+<file path="tsconfig.build.json">
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2023",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+</file>
+
+<file path="env.example">
+# ==========================
+# Banco de Dados - PostgreSQL (padrão)
+# ==========================
+DB_TYPE=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=changeme
+DB_DATABASE=the_blog
+
+# ⚠️ IMPORTANTE: em produção, DB_SYNCHRONIZE deve ser "0" (desativado)
+# Evita que o TypeORM apague ou modifique suas tabelas automaticamente
+DB_SYNCHRONIZE=0
+
+# Carrega as entidades automaticamente
+DB_AUTO_LOAD_ENTITIES=1
+
+# Tamanho máximo permitido para o upload de imagens (em bytes)
+IMAGE_MAX_UPLOAD_SIZE=921600
+
+# Tipos MIME de imagem permitidos no upload
+ALLOWED_IMAGE_TYPES=image/png,image/jpeg,image/webp,image/gif
+
+# ==========================
+# Cloudinary (armazenamento de imagens)
+# ==========================
+# Informações do painel do usuário no Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# ==========================
+# JWT (Autenticação)
+# ==========================
+# Chave secreta usada para assinar os tokens JWT.
+# Em produção, use uma string longa e aleatória.
+JWT_SECRET=your_jwt_secret
+
+# Tempo de expiração dos tokens (em segundos)
+JWT_EXPIRATION=86400
+
+# ==========================
+# Porta da aplicação
+# ==========================
+# Porta usada pelo NestJS no ambiente local
+APP_PORT=3001
+
+# ==========================
+# Whitelist para o CORS separado por espaço
+# ==========================
+CORS_WHITELIST="http://localhost:3000 https://your-domain.com"
+
+# Nome do cookie de sessão de login
+LOGIN_COOKIE_NAME="loginSesion"
+
+# Tempo de expiração dos tokens (em milissegundos)
+JWT_EXPIRES_IN_MS=86400000
+</file>
+
+<file path="src/activity-logs/activity-logs.controller.ts">
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ActivityLogsService } from './activity-logs.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { FiltersImagetDto } from 'src/images/dto/filters-image.dto';
+import { LogResponseDto } from './dto/log-response.dto';
+
+@Controller('activity-logs')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+export class ActivityLogsController {
+  constructor(private readonly activityLogsService: ActivityLogsService) {}
+
+  @Get()
+  async findMany(@Query() filters: FiltersImagetDto) {
+    const logs = await this.activityLogsService.findMany(filters);
+    return {
+      ...logs,
+      data: logs.data.map((log) => new LogResponseDto(log)),
+    };
+  }
+}
+</file>
+
+<file path="src/activity-logs/activity-logs.module.ts">
+import { Module } from '@nestjs/common';
+import { ActivityLogsService } from './activity-logs.service';
+import { ActivityLogsController } from './activity-logs.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ActivityLog } from './entities/activity.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([ActivityLog])],
+  controllers: [ActivityLogsController],
+  providers: [ActivityLogsService],
+  exports: [ActivityLogsService],
+})
+export class ActivityLogsModule {}
+</file>
+
+<file path="src/activity-logs/dto/create-log.dto.ts">
+import { User } from 'src/user/entities/user.entity';
+import { EntityType } from '../enums/entity-type.enum';
+import { ActionType } from '../enums/action-type.enum';
+
+export class CreateActivityLogDto {
+  user: User;
+  entityType: EntityType;
+  entityId: string;
+  action: ActionType;
+  metadata: Record<string, unknown>;
+  reason?: string | null;
+}
+</file>
+
+<file path="src/activity-logs/enums/entity-type.enum.ts">
+export enum EntityType {
+  USER = 'USER',
+  POST = 'POST',
+  IMAGE = 'IMAGE',
+  UPLOAD = 'UPLOAD',
+}
+</file>
+
+<file path="src/auth/dto/login.dto.ts">
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
+export class LoginDto {
+  @IsNotEmpty({ message: 'E-mail não pode estar vazio' })
+  @IsEmail({}, { message: 'E-mail inválido' })
+  email: string;
+
+  @IsString({ message: 'Senha precisa ser uma string' })
+  @IsNotEmpty({ message: 'Senha não pode estar vazia' })
+  password: string;
+}
+</file>
+
+<file path="src/auth/types/authenticated-request.ts">
+import { Request } from 'express';
+import { JwtPayload } from './jwt-payload.type';
+
+export interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
+}
+</file>
+
+<file path="src/commoun/filters/all-exeptions.filter.ts">
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
+import { Response } from 'express';
+
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+  catch(exception: unknown, host: ArgumentsHost) {
+    const response = host.switchToHttp().getResponse<Response>();
+
+    const isHttpException = exception instanceof HttpException;
+
+    const status = isHttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    const defaultMessage = 'Internal Server Error';
+    const defaultError = 'Internal Server Error';
+
+    let messages: string[] = [defaultMessage];
+    let errorName = defaultError;
+
+    if (isHttpException) {
+      const responseData = exception.getResponse();
+
+      if (typeof responseData === 'string') {
+        messages = [responseData];
+      }
+
+      if (typeof responseData === 'object' && responseData !== null) {
+        const { message, error } = responseData as Record<string, any>;
+
+        if (Array.isArray(message)) {
+          messages = message as string[];
+        } else if (typeof message === 'string') {
+          messages = [message];
+        }
+
+        if (typeof error === 'string') {
+          errorName = error;
+        }
+      }
+    }
+
+    if (!(exception instanceof HttpException)) {
+      this.logger.error(
+        `Erro interno inesperado`,
+        (exception as Error).stack || 'sem stack',
+      );
+    } else {
+      this.logger.warn(`${status} - ${errorName}: ${messages.join(' | ')}`);
+    }
+
+    return response.status(status).json({
+      message: messages,
+      error: errorName,
+      statusCode: status,
+    });
+  }
+}
+</file>
+
+<file path="src/commoun/pipes/custom-parse-int-pipe.pipe.ts">
+import { BadRequestException, ParseIntPipe } from '@nestjs/common';
+
+export class CustomParseIntPipe extends ParseIntPipe {
+  constructor() {
+    super({
+      exceptionFactory: () =>
+        new BadRequestException('Parâmetro precisa ser um número'),
+    });
+  }
+}
+</file>
+
+<file path="src/commoun/utils/parseCorsWhitelist.ts">
+export function parseCorsWhitelist(raw: string): string[] {
+  return raw
+    .split(/\s+/g)
+    .map((url) => url.replace(/\/+$/, ''))
+    .filter(Boolean);
+}
+</file>
+
+<file path="src/images/dto/image-response.dto.ts">
+import { Images } from '../entities/image.entity';
+
+export class ImageResponseDto {
+  readonly id: string;
+  readonly url: string;
+  readonly createdAt: Date;
+  readonly uploadedBy: {
+    id: string;
+    name: string;
+    email: string;
+  };
+
+  constructor(images: Images) {
+    this.id = images.id;
+    this.url = images.url;
+    this.createdAt = images.createdAt;
+    this.uploadedBy = {
+      id: images.uploadedBy.id,
+      name: images.uploadedBy.name,
+      email: images.uploadedBy.email,
+    };
+  }
+}
+</file>
+
+<file path="src/post/dto/filters-post.dto.ts">
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
+
+export class FiltersPostDto {
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @IsOptional()
+  title?: string;
+
+  @IsOptional()
+  slug?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  published?: boolean;
+
+  @IsOptional()
+  @IsUUID()
+  authorId?: string;
+
+  @IsOptional()
+  authorName?: string;
+
+  @IsOptional()
+  authorEmail?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  startDate?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  endDate?: Date;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+}
+</file>
+
+<file path="src/upload/upload.config.ts">
+import { memoryStorage } from 'multer';
+import { BadRequestException } from '@nestjs/common';
+
+export const storage = memoryStorage();
+
+export const fileFilter = (
+  req: any,
+  file: Express.Multer.File,
+  cb: (error: Error | null, acceptFile: boolean) => void,
+) => {
+  if (!file.mimetype.startsWith('image/')) {
+    return cb(
+      new BadRequestException('Somente imagens são permitidas!'),
+      false,
+    );
+  }
+  cb(null, true);
+};
+
+export const limits = {
+  fileSize: 900 * 1024,
+};
+</file>
+
+<file path="src/user/dto/filters-user.dto.ts">
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
+
+export class FiltersUserDto {
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
+  email?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  forceLogout?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isBlocked?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  startDate?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  endDate?: Date;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+}
+</file>
+
+<file path="src/user/dto/update-password.dto.ts">
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+
+export class UpdatePasswordDto {
+  @IsString({ message: 'Senha precisa ser uma string' })
+  @IsNotEmpty({ message: 'Senha não pode estar vazia' })
+  currentPassword: string;
+
+  @IsString({ message: 'Nova senha precisa ser uma string' })
+  @IsNotEmpty({ message: 'Nova senha não pode estar vazia' })
+  @MinLength(6, { message: 'Nova senha deve ter no mínimo 6 caracteres' })
+  newPassword: string;
+}
+</file>
+
+<file path="src/user/dto/update-user.dto.ts">
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
+
+export class UpdateUserDto extends PartialType(
+  OmitType(CreateUserDto, ['password']),
+) {}
+</file>
+
+<file path="README.md">
+# nest-test
+
+## 1. Visão Geral
+
+**Nome do projeto:** `nest-test` (conforme `package.json`)
+
+**Descrição:** API REST construída com NestJS para um sistema de blog. Expõe endpoints de autenticação, gestão de usuários, publicação de posts, upload de imagens e operações administrativas. Utiliza PostgreSQL como persistência e Cloudinary como armazenamento de mídia.
+
+**Motivação:** Centralizar a lógica de backend de um blog — cadastro de autores, criação e publicação de conteúdo, upload seguro de imagens e moderação administrativa — em uma API tipada, validada e auditável por logs de atividade.
+
+**Status do projeto:** Em desenvolvimento (`version: 0.0.1`, sem suíte de testes implementada).
+
+---
+
+## 2. Tecnologias Utilizadas
+
+### Backend
+
+| Tecnologia | Versão |
+|---|---|
+| Node.js / TypeScript | TypeScript `^5.7.3` |
+| NestJS (`@nestjs/common`, `@nestjs/core`, `@nestjs/platform-express`) | `^11.0.1` |
+| `@nestjs/config` | `^4.0.4` |
+| `@nestjs/jwt` | `^11.0.2` |
+| `@nestjs/passport` | `^11.0.5` |
+| `@nestjs/typeorm` | `^11.0.3` |
+| `@nestjs/throttler` | `^6.5.0` |
+| `@nestjs/serve-static` | `^5.0.5` |
+| `@nestjs/mapped-types` | `^2.1.1` |
+| Passport + `passport-jwt` | `^0.7.0` / `^4.0.1` |
+| TypeORM | `^1.1.0` |
+| class-validator / class-transformer | `^0.15.1` / `^0.5.1` |
+| bcryptjs | `^3.0.3` |
+| cookie-parser | `^1.4.7` |
+| helmet | `^8.3.0` |
+| sharp | `^0.35.3` |
+| file-type | `^22.0.1` |
+| rxjs | `^7.8.1` |
+| reflect-metadata | `^0.2.2` |
+
+### Banco de Dados
+
+| Tecnologia | Versão |
+|---|---|
+| PostgreSQL (driver `pg`) | `^8.22.0` |
+
+### Armazenamento de Mídia
+
+| Tecnologia | Versão |
+|---|---|
+| Cloudinary | `^2.10.0` |
+
+### DevOps / Ferramentas
+
+| Tecnologia | Versão |
+|---|---|
+| Nest CLI (`@nestjs/cli`) | `^11.0.0` |
+| ESLint | `^9.18.0` |
+| Prettier | `^3.4.2` |
+| ts-node / ts-loader | `^10.9.2` / `^9.5.2` |
+
+### Testes
+
+| Tecnologia | Versão |
+|---|---|
+| Jest | `^30.0.0` |
+| ts-jest | `^29.2.5` |
+| Supertest | `^7.0.0` |
+| `@nestjs/testing` | `^11.0.1` |
+
+> **Nota:** A configuração de testes existe em `package.json`, porém não há arquivos `*.spec.ts` ou diretório `test/` no repositório.
+
+### Frontend
+
+Não aplicável — este repositório contém apenas a API backend.
+
+---
+
+## 3. Estrutura de Diretórios
+
+```text
+blog-nestjs-api/
+├── dev/                              # Arquivos estáticos para testes locais de upload
+│   └── images/                       # Imagens de exemplo (png, jpeg, webp, gif)
+├── rest-client/
+│   └── requests.http                 # Coleção de requisições HTTP para testes manuais
+├── src/
+│   ├── main.ts                       # Bootstrap da aplicação (CORS, Helmet, pipes globais)
+│   ├── app.module.ts                 # Módulo raiz (TypeORM, Throttler, filtros globais)
+│   ├── auth/                         # Autenticação JWT, login/logout e guards
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.module.ts
+│   │   ├── dto/
+│   │   ├── guards/                   # JwtAuthGuard, RolesGuard, JwtStrategy
+│   │   ├── decorators/               # @Roles()
+│   │   └── types/                    # JwtPayload, AuthenticatedRequest
+│   ├── user/                         # CRUD de usuários e rotas administrativas
+│   │   ├── user.controller.ts        # Rotas públicas/autenticadas (/user)
+│   │   ├── admin-user.controller.ts  # Rotas admin (/admin/users)
+│   │   ├── user.service.ts
+│   │   ├── user.module.ts
+│   │   ├── entities/user.entity.ts
+│   │   ├── dto/
+│   │   └── enum/user-role.enum.ts    # user | admin
+│   ├── post/                         # Posts do blog (públicos e do autor)
+│   │   ├── post.controller.ts        # Rotas /post
+│   │   ├── admin-post.controller.ts  # Rotas /admin/posts
+│   │   ├── post.service.ts
+│   │   ├── post.module.ts
+│   │   ├── entities/post.entity.ts
+│   │   └── dto/
+│   ├── images/                       # Consulta e remoção de imagens
+│   │   ├── images.controller.ts      # Rotas /images
+│   │   ├── admin-image.controller.ts # Rotas /admin/image
+│   │   ├── images.service.ts
+│   │   ├── images.module.ts
+│   │   ├── entities/image.entity.ts
+│   │   └── dto/
+│   ├── upload/                       # Upload multipart com validação e conversão WebP
+│   │   ├── upload.controller.ts
+│   │   ├── upload.service.ts
+│   │   ├── upload.config.ts          # Configuração Multer (memória, limites)
+│   │   └── upload.module.ts
+│   ├── storage/                      # Abstração de armazenamento de imagens
+│   │   ├── storage.module.ts
+│   │   ├── image-storage.interface.ts
+│   │   └── cloudinary/               # Implementação Cloudinary
+│   ├── activity-logs/                # Auditoria de ações (serviço interno, sem rotas HTTP)
+│   │   ├── activity-logs.service.ts
+│   │   ├── activity-logs.controller.ts
+│   │   ├── activity-logs.module.ts
+│   │   ├── entities/activity.entity.ts
+│   │   ├── dto/
+│   │   └── enums/                    # ActionType, EntityType
+│   └── commoun/                      # Utilitários compartilhados (hashing, filtros, pipes)
+│       ├── common.module.ts
+│       ├── hashing/                  # BcryptHashingService
+│       ├── filters/all-exeptions.filter.ts
+│       ├── pipes/
+│       └── utils/                    # slugify, parseCorsWhitelist, etc.
+├── env.example                       # Modelo de variáveis de ambiente
+├── nest-cli.json                     # Configuração do Nest CLI
+├── tsconfig.json                     # Configuração TypeScript
+├── tsconfig.build.json               # Configuração TypeScript para build
+├── eslint.config.mjs                 # Regras ESLint
+├── .prettierrc                       # Formatação de código
+└── package.json                      # Dependências e scripts npm
+```
+
+---
+
+## 4. Variáveis de Ambiente
+
+Copie `env.example` para `.env` na raiz do projeto.
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `DB_HOST` | Sim | Host do PostgreSQL |
+| `DB_PORT` | Sim | Porta do PostgreSQL (padrão: `5432`) |
+| `DB_USERNAME` | Sim | Usuário do banco |
+| `DB_PASSWORD` | Sim | Senha do banco |
+| `DB_DATABASE` | Sim | Nome do banco (ex.: `the_blog`) |
+| `DB_SYNCHRONIZE` | Sim | `1` ativa sync do TypeORM; `0` desativa (recomendado em produção) |
+| `DB_AUTO_LOAD_ENTITIES` | Sim | `1` carrega entidades automaticamente |
+| `JWT_SECRET` | Sim | Chave secreta para assinatura dos tokens JWT |
+| `JWT_EXPIRATION` | Sim | Expiração do JWT em segundos (ex.: `86400`) |
+| `JWT_EXPIRES_IN_MS` | Sim | Expiração do cookie de login em milissegundos (ex.: `86400000`) |
+| `COOKIE_NAME` | Sim | Nome do cookie HTTP-only definido no login |
+| `CLOUDINARY_CLOUD_NAME` | Sim | Cloud name da conta Cloudinary |
+| `CLOUDINARY_API_KEY` | Sim | API key do Cloudinary |
+| `CLOUDINARY_API_SECRET` | Sim | API secret do Cloudinary |
+| `APP_PORT` | Não | Porta da aplicação (padrão: `3001`) |
+| `CORS_WHITELIST` | Não | Origens permitidas no CORS, separadas por espaço |
+| `IMAGE_MAX_UPLOAD_SIZE` | Não | Tamanho máximo de upload em bytes (padrão: `921600`) |
+| `ALLOWED_IMAGE_TYPES` | Sim* | MIME types permitidos, separados por vírgula |
+| `MAX_INPUT_PIXELS` | Não | Limite de pixels na decodificação Sharp (padrão: `25000000`) |
+| `DB_TYPE` | Não | Presente em `env.example`, mas **não utilizada** no código (PostgreSQL é fixo) |
+
+> \* Se `ALLOWED_IMAGE_TYPES` estiver vazia, o upload retorna erro interno.
+
+> **Atenção:** O arquivo `env.example` define `LOGIN_COOKIE_NAME`, porém o código utiliza `COOKIE_NAME`. Use `COOKIE_NAME` no `.env`.
+
+### Exemplo de `.env.example`
+
+```env
+# ==========================
+# Banco de Dados - PostgreSQL
+# ==========================
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=changeme
+DB_DATABASE=the_blog
+DB_SYNCHRONIZE=0
+DB_AUTO_LOAD_ENTITIES=1
+
+# ==========================
+# Upload de Imagens
+# ==========================
+IMAGE_MAX_UPLOAD_SIZE=921600
+ALLOWED_IMAGE_TYPES=image/png,image/jpeg,image/webp,image/gif
+MAX_INPUT_PIXELS=25000000
+
+# ==========================
+# Cloudinary
+# ==========================
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# ==========================
+# JWT / Autenticação
+# ==========================
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRATION=86400
+JWT_EXPIRES_IN_MS=86400000
+COOKIE_NAME=loginSesion
+
+# ==========================
+# Aplicação
+# ==========================
+APP_PORT=3001
+CORS_WHITELIST=http://localhost:3000 https://your-domain.com
+```
+
+---
+
+## 5. Arquitetura e Decisões Técnicas
+
+### Padrão arquitetural
+
+A aplicação segue a **arquitetura modular do NestJS**, organizada por domínio de negócio (`auth`, `user`, `post`, `images`, `upload`, `activity-logs`). Cada módulo expõe controllers, encapsula regras em services e persiste dados via repositórios TypeORM — equivalente a uma **arquitetura em camadas** (Controller → Service → Repository).
+
+### Decisões principais
+
+| Decisão | Motivo |
+|---|---|
+| **Módulos por feature** | Isola responsabilidades (usuários, posts, imagens) e facilita manutenção |
+| **TypeORM + PostgreSQL** | ORM integrado ao NestJS; suporte a soft delete, enums e relações |
+| **JWT via Bearer token** | Autenticação stateless; validação em `JwtStrategy` com verificação de bloqueio e `forceLogout` |
+| **Cookie HTTP-only no login** | Token também gravado em cookie seguro além do header `Authorization` |
+| **Guards de roles (`USER` / `ADMIN`)** | Separa rotas públicas, autenticadas e administrativas |
+| **Provider de storage (`IMAGE_STORAGE_PROVIDER`)** | Abstrai Cloudinary; permite trocar implementação sem alterar `UploadService` |
+| **Processamento com Sharp** | Converte uploads para WebP, redimensiona (máx. 1920×1080) e valida dimensões |
+| **Activity logs internos** | Registra login, logout, CRUD e ações admin sem expor endpoint público |
+| **Soft delete** | Entidades `User`, `Post` e `Images` usam `@DeleteDateColumn` |
+| **Throttler global** | Limite de 10 requisições a cada 10 segundos por IP |
+| **ValidationPipe global** | `whitelist`, `forbidNonWhitelisted` e `transform` em todos os endpoints |
+| **AllExceptionsFilter global** | Resposta de erro padronizada `{ message, error, statusCode }` |
+
+### Comunicação entre serviços
+
+Monolito de serviço único. Não há microserviços nem filas. Módulos se comunicam via injeção de dependência do NestJS (ex.: `AuthService` → `UserService`, `UploadService` → `ImagesService` + `ActivityLogsService`).
+
+---
+
+## 6. Endpoints / Documentação da API
+
+### URLs base por ambiente
+
+| Ambiente | URL base |
+|---|---|
+| Desenvolvimento | `http://localhost:3001` |
+| Staging | [DESCRIÇÃO] |
+| Produção | [DESCRIÇÃO] |
+
+### Autenticação
+
+- Endpoints protegidos exigem header `Authorization: Bearer <token>`.
+- O login (`POST /auth/login`) também define um cookie HTTP-only com o JWT.
+- A validação JWT ocorre exclusivamente via header Bearer (`ExtractJwt.fromAuthHeaderAsBearerToken()`).
+- Rate limiting global: 10 req/10s.
+
+### Tabela de endpoints
+
+#### Autenticação (`/auth`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/auth/login` | Autentica usuário e define cookie de sessão | Não |
+| `POST` | `/auth/logout` | Encerra sessão do usuário autenticado | JWT |
+| `POST` | `/auth/admin/logout/:id` | Admin força logout de outro usuário | JWT (Admin) |
+
+#### Usuários (`/user`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/user` | Cria novo usuário | Não |
+| `GET` | `/user/me` | Retorna dados do usuário autenticado | JWT |
+| `PATCH` | `/user/me` | Atualiza nome/e-mail do usuário autenticado | JWT |
+| `PATCH` | `/user/me/password` | Altera senha (requer senha atual) | JWT |
+| `DELETE` | `/user/me` | Remove (soft delete) o próprio usuário | JWT |
+
+#### Admin — Usuários (`/admin/users`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/admin/users` | Lista usuários com filtros e paginação | JWT (Admin) |
+| `PATCH` | `/admin/users/:id` | Atualiza dados de um usuário | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/promote` | Promove usuário a admin (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/demote` | Rebaixa admin a usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/block` | Bloqueia usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/unblock` | Desbloqueia usuário (confirma senha admin) | JWT (Admin) |
+| `PATCH` | `/admin/users/:id/restore` | Restaura usuário removido | JWT (Admin) |
+| `DELETE` | `/admin/users/:id` | Remove usuário (soft delete, requer `reason`) | JWT (Admin) |
+
+**Query params de `/admin/users`:** `id`, `name`, `email`, `forceLogout`, `startDate`, `endDate`, `page` (padrão 1), `limit` (padrão 20, máx. 100).
+
+#### Posts (`/post`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/post/me` | Cria post do autor autenticado | JWT |
+| `GET` | `/post/me` | Lista posts do autor autenticado | JWT |
+| `GET` | `/post/me/:id` | Retorna post do autor por UUID | JWT |
+| `PATCH` | `/post/me/:id` | Atualiza post do autor | JWT |
+| `DELETE` | `/post/me/:id` | Remove post do autor (soft delete) | JWT |
+| `GET` | `/post` | Lista posts publicados | Não |
+| `GET` | `/post/:slug` | Retorna post publicado por slug | Não |
+
+#### Admin — Posts (`/admin/posts`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/admin/posts` | Lista todos os posts | JWT (Admin) |
+| `PATCH` | `/admin/posts/:id/restore` | Restaura post removido | JWT (Admin) |
+| `DELETE` | `/admin/posts/:id` | Remove post (soft delete, requer `reason`) | JWT (Admin) |
+
+#### Upload (`/upload`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `POST` | `/upload` | Upload de imagem (`multipart/form-data`, campo `file`) | JWT |
+
+#### Imagens (`/images`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/images/:id` | Retorna imagem por UUID | JWT |
+| `GET` | `/images/me` | Lista imagens do usuário autenticado | JWT |
+| `DELETE` | `/images/:id` | Remove imagem do usuário (soft delete) | JWT |
+
+#### Admin — Imagens (`/admin/image`)
+
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| `GET` | `/admin/image` | Lista todas as imagens | JWT (Admin) |
+| `PATCH` | `/admin/image/:id/restore` | Restaura imagem removida | JWT (Admin) |
+| `DELETE` | `/admin/image/:id` | Remove imagem (soft delete, requer `reason`) | JWT (Admin) |
+
+#### Activity Logs
+
+O módulo `activity-logs` registra eventos internamente, mas **não expõe rotas HTTP** (`ActivityLogsController` está vazio).
+
+---
+
+### Exemplos de requisição e resposta
+
+#### `POST /auth/login`
+
+**Requisição:**
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@example.com",
+  "password": "123456"
+}
+```
+
+**Resposta (`200`):**
+
+```json
+{
+  "message": "Login realizado com sucesso"
+}
+```
+
+> O token JWT é retornado no cookie HTTP-only (`COOKIE_NAME`) e deve ser enviado nas requisições protegidas via header `Authorization: Bearer <token>`.
+
+#### `POST /user`
+
+**Requisição:**
+
+```http
+POST /user
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "password": "123456"
+}
+```
+
+**Resposta (`201`):**
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "João Silva",
+  "email": "joao@example.com",
+  "createdAt": "2026-08-27T12:00:00.000Z",
+  "updatedAt": "2026-08-27T12:00:00.000Z"
+}
+```
+
+#### `POST /post/me`
+
+**Requisição:**
+
+```http
+POST /post/me
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Título do post de exemplo",
+  "excerpt": "Resumo breve do conteúdo publicado neste post.",
+  "content": "Conteúdo completo do artigo do blog.",
+  "coverImage": "https://res.cloudinary.com/example/image/upload/v123/sample.webp",
+  "published": false
+}
+```
+
+**Resposta (`201`):**
+
+```json
+{
+  "id": "660e8400-e29b-41d4-a716-446655440001",
+  "title": "Título do post de exemplo",
+  "slug": "titulo-do-post-de-exemplo",
+  "content": "Conteúdo completo do artigo do blog.",
+  "excerpt": "Resumo breve do conteúdo publicado neste post.",
+  "coverImage": {
+    "url": "https://res.cloudinary.com/example/image/upload/v123/sample.webp"
+  },
+  "published": false,
+  "createdAt": "2026-08-27T12:00:00.000Z",
+  "updatedAt": "2026-08-27T12:00:00.000Z",
+  "author": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "João Silva",
+    "email": "joao@example.com"
+  }
+}
+```
+
+#### `GET /post/:slug` (público)
+
+**Requisição:**
+
+```http
+GET /post/titulo-do-post-de-exemplo
+```
+
+**Resposta (`200`):** mesmo formato de `PostResponseDto` acima (apenas posts com `published: true`).
+
+#### `POST /upload`
+
+**Requisição:**
+
+```http
+POST /upload
+Authorization: Bearer <token>
+Content-Type: multipart/form-data; boundary=----boundary
+
+------boundary
+Content-Disposition: form-data; name="file"; filename="foto.png"
+Content-Type: image/png
+
+<binary>
+------boundary--
+```
+
+**Resposta (`201`):**
+
+```json
+{
+  "image_id": "770e8400-e29b-41d4-a716-446655440002",
+  "publicId": "1724755200000-abc123",
+  "url": "https://res.cloudinary.com/example/image/upload/v123/2026-08-27/joao-silva-550e8400/1724755200000-abc123.webp",
+  "folder": "2026-08-27/joao-silva-550e8400",
+  "created_at": "2026-08-27T12:00:00.000Z"
+}
+```
+
+#### Formato de erro padrão
+
+```json
+{
+  "message": ["E-mail inválido"],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+---
+
+## Como executar
+
+```bash
+# Instalar dependências
+npm install
+
+# Configurar variáveis de ambiente
+cp env.example .env
+# Edite .env com credenciais reais
+
+# Desenvolvimento (hot reload)
+npm run start:dev
+
+# Produção
+npm run build
+npm run start:prod
+```
+
+Requisições de exemplo estão disponíveis em `rest-client/requests.http`.
+</file>
+
+<file path="src/activity-logs/activity-logs.service.ts">
+import { Injectable, Logger } from '@nestjs/common';
+import { ActivityLog } from './entities/activity.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  Between,
+  FindOptionsWhere,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
+import { CreateActivityLogDto } from './dto/create-log.dto';
+import { FiltersLogDto } from './dto/filters-log.dto';
+
+@Injectable()
+export class ActivityLogsService {
+  private readonly logger = new Logger(ActivityLogsService.name);
+
+  constructor(
+    @InjectRepository(ActivityLog)
+    private readonly activityLogRepository: Repository<ActivityLog>,
+  ) {}
+
+  async create(logData: CreateActivityLogDto): Promise<void> {
+    try {
+      const log = this.activityLogRepository.create(logData);
+      await this.activityLogRepository.save(log);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Falha ao gravar log: ${message}`);
+    }
+  }
+
+  async findMany(filters: FiltersLogDto) {
+    const {
+      action,
+      userId,
+      entityType,
+      entityId,
+      startDate,
+      endDate,
+      limit = 20,
+      page = 1,
+    } = filters;
+
+    const where: FindOptionsWhere<ActivityLog> = {};
+
+    if (action) {
+      where.action = action;
+    }
+
+    if (userId) {
+      where.user = {
+        id: userId,
+      };
+    }
+
+    if (entityType) {
+      where.entityType = entityType;
+    }
+
+    if (entityId) {
+      where.entityId = entityId;
+    }
+
+    if (startDate && endDate) {
+      where.createdAt = Between(startDate, endDate);
+    } else if (startDate) {
+      where.createdAt = MoreThanOrEqual(startDate);
+    } else if (endDate) {
+      where.createdAt = LessThanOrEqual(endDate);
+    }
+
+    const [logs, total] = await this.activityLogRepository.findAndCount({
+      where,
+      relations: {
+        user: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: logs,
+      total,
+      page,
+      limit,
+    };
+  }
+}
+</file>
+
+<file path="src/auth/guards/strategies/jwt.strategy.ts">
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { JwtPayload } from '../../types/jwt-payload.type';
+import { UserService } from 'src/user/user.service';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private readonly userService: UserService) {
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      throw new InternalServerErrorException('JWT_SECRET not found in .env');
+    }
+
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: secret,
+    });
+  }
+
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
+    const user = await this.userService.findById(payload.sub);
+
+    if (!user) {
+      throw new UnauthorizedException('Usuário não encontrado');
+    }
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('Usuário bloqueado.');
+    }
+
+    if (user.forceLogout) {
+      throw new UnauthorizedException('Sessão encerrada. Faça login novamente');
+    }
+
+    return { sub: user.id, role: user.role };
+  }
+}
+</file>
+
+<file path="src/auth/types/jwt-payload.type.ts">
+import { UserRole } from 'src/user/enum/user-role.enum';
+
+export type JwtPayload = {
+  sub: string;
+  role: UserRole;
+};
+</file>
+
+<file path="src/images/entities/image.entity.ts">
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+@Entity()
+export class Images {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  publicId: string;
+
+  @Column()
+  url: string;
+
+  @Column()
+  folder: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  uploadedBy: User;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
+}
+</file>
+
+<file path="src/post/dto/update-post.dto.ts">
+import { PartialType, PickType } from '@nestjs/mapped-types';
+import { CreatePostDto } from './create-post.dto';
+
+export class UpdatePostDto extends PartialType(
+  PickType(CreatePostDto, [
+    'title',
+    'coverImage',
+    'excerpt',
+    'content',
+    'published',
+  ]),
+) {}
+</file>
+
+<file path="src/upload/upload.controller.ts">
+import {
+  Controller,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { storage, limits, fileFilter } from './upload.config';
+import { UploadService } from './upload.service';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+
+@Controller('upload')
+export class UploadController {
+  constructor(private readonly uploadService: UploadService) {}
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file', { storage, limits, fileFilter }))
+  uploadFile(
+    @Req() req: AuthenticatedRequest,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.uploadService.handleUpload(req.user.sub, file);
+  }
+}
+</file>
+
+<file path=".gitignore">
+# compiled output
+/dist
+/node_modules
+/build
+
+
+uploads
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# temp directory
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+</file>
+
+<file path="src/activity-logs/entities/activity.entity.ts">
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ActionType } from '../enums/action-type.enum';
+import { EntityType } from '../enums/entity-type.enum';
+
+@Entity('activity_logs')
+export class ActivityLog {
+  @PrimaryGeneratedColumn('uuid')
+  activityLogId: string;
+
+  @ManyToOne(() => User)
+  user: User;
+
+  @Column({ type: 'enum', enum: EntityType })
+  entityType: EntityType;
+
+  @Column()
+  entityId: string;
+
+  @Column({ type: 'enum', enum: ActionType })
+  action: ActionType;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata: Record<string, unknown> | null;
+
+  @Column({ type: 'text', nullable: true })
+  reason: string | null;
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+</file>
+
+<file path="src/activity-logs/enums/action-type.enum.ts">
+export enum ActionType {
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  DELETED = 'DELETED',
+  RESTORED = 'RESTORED',
+  LOGIN = 'LOGIN',
+  LOGOUT = 'LOGOUT',
+  REVOKE_FORCE_LOGOUT = 'REVOKE_FORCE_LOGOUT',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  PASSWORD_CHANGE = 'PASSWORD_CHANGE',
+  PROMOTE = 'PROMOTE',
+  DEMOTE = 'DEMOTE',
+  BLOCK_USER = 'BLOCK_USER',
+  UNBLOCK_USER = 'UNBLOCK_USER',
+}
+</file>
+
+<file path="src/auth/auth.controller.ts">
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import type { Response } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import type { AuthenticatedRequest } from './types/authenticated-request';
+import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+  @Post('login')
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken } = await this.authService.login(loginDto);
+
+    res.cookie(`${process.env.COOKIE_NAME}`, accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: Number(process.env.JWT_EXPIRES_IN_MS),
+    });
+    return {
+      accessToken,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logOut(
+    @Req() req: AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    await this.authService.logout(req.user);
+
+    res.clearCookie(process.env.COOKIE_NAME!, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return {
+      message: 'Logout realizado com sucesso',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('admin/:id/logout')
+  async logoutByAdmin(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    await this.authService.forceLogout(req.user, targetId, dto);
+
+    return {
+      message: 'Logout realizado com sucesso',
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('admin/:id/revoke-logout')
+  async revokeLogoutByAdmin(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    await this.authService.revokeForceLogout(req.user, targetId, dto);
+
+    return {
+      message: 'Acesso do usuário restaurado com sucesso',
+    };
+  }
+}
+</file>
+
+<file path="src/auth/auth.module.ts">
+import { InternalServerErrorException, Module } from '@nestjs/common';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { CommonModule } from 'src/commoun/common.module';
+import { JwtModule } from '@nestjs/jwt';
+import { UserModule } from 'src/user/user.module';
+import { JwtStrategy } from './guards/strategies/jwt.strategy';
+import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+
+@Module({
+  imports: [
+    UserModule,
+    CommonModule,
+    ActivityLogsModule,
+    JwtModule.registerAsync({
+      useFactory: () => {
+        const secret = process.env.JWT_SECRET;
+
+        if (!secret) {
+          throw new InternalServerErrorException(
+            'JWT_SECRET not found in .env',
+          );
+        }
+
+        return {
+          secret,
+          signOptions: {
+            expiresIn: Number(process.env.JWT_EXPIRATION) || 86400,
+          },
+        };
+      },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
+  exports: [],
+})
+export class AuthModule {}
+</file>
+
+<file path="src/images/images.module.ts">
+import { Module } from '@nestjs/common';
+import { ImagesService } from './images.service';
+import { ImagesController } from './images.controller';
+import { AdminImageController } from './admin-image.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Images } from './entities/image.entity';
+import { StorageModule } from 'src/storage/storage.module';
+import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+import { UserModule } from 'src/user/user.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Images]),
+    StorageModule,
+    ActivityLogsModule,
+    UserModule,
+  ],
+  controllers: [ImagesController, AdminImageController],
+  providers: [ImagesService],
+  exports: [ImagesService],
+})
+export class ImagesModule {}
+</file>
+
+<file path="src/post/dto/create-post.dto.ts">
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+} from 'class-validator';
+
+export class CreatePostDto {
+  @IsString({ message: 'Título precisa ser uma string' })
+  @Length(10, 150, { message: 'Título precisa ter entre 10 e 150 caracteres' })
+  title: string;
+
+  @IsString({ message: 'Excerto precisa ser uma string' })
+  @Length(10, 200, { message: 'Excerto precisa ter entre 10 e 200 caracteres' })
+  excerpt: string;
+
+  @IsString({ message: 'Conteúdo precisa ser uma string' })
+  @IsNotEmpty({ message: 'Conteúdo não pode ficar vazio' })
+  content: string;
+
+  @IsUrl(
+    { require_tld: false },
+    { message: 'URL da imagem precisa ser uma URL vàlida' },
+  )
+  coverImage: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'Campo de publicar post precisa ser boolean' })
+  published?: boolean;
+}
+</file>
+
+<file path="src/post/dto/post-response.dto.ts">
+import { Post } from '../entities/post.entity';
+
+export class PostResponseDto {
+  readonly id: string;
+  readonly title: string;
+  readonly slug: string;
+  readonly content: string;
+  readonly excerpt: string;
+  readonly published: boolean;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly coverImage: {
+    id: string;
+    uploadedBy: string;
+    url: string;
+  };
+  readonly author: {
+    id: string;
+    name: string;
+    email: string;
+  };
+
+  constructor(post: Post) {
+    this.id = post.id;
+    this.title = post.title;
+    this.slug = post.slug;
+    this.content = post.content;
+    this.excerpt = post.excerpt;
+    this.published = post.published;
+    this.createdAt = post.createdAt;
+    this.updatedAt = post.updatedAt;
+    this.coverImage = {
+      id: post.coverImage.id,
+      uploadedBy: post.coverImage.uploadedBy.id,
+      url: post.coverImage.url,
+    };
+    this.author = {
+      id: post.author.id,
+      name: post.author.name,
+      email: post.author.email,
+    };
+  }
+}
+</file>
+
+<file path="src/images/admin-image.controller.ts">
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Req,
+  UseGuards,
+  Body,
+  Query,
+} from '@nestjs/common';
+import { ImagesService } from './images.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { ImageResponseDto } from './dto/image-response.dto';
+import { FiltersImagetDto } from './dto/filters-image.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+
+@Controller('admin/images')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+export class AdminImageController {
+  constructor(private readonly imageService: ImagesService) {}
+
+  @Get()
+  async findMany(@Query() filters: FiltersImagetDto) {
+    const images = await this.imageService.findMany(filters);
+    return {
+      ...images,
+      data: images.data.map((image) => new ImageResponseDto(image)),
+    };
+  }
+
+  @Patch(':id/restore')
+  async restore(
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredImage = await this.imageService.restore(
+      req.user,
+      targetId,
+      dto,
+    );
+    return new ImageResponseDto(restoredImage);
+  }
+
+  @Delete(':id')
+  async softRemove(
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const deletedImage = await this.imageService.removeByAdmin(
+      req.user,
+      targetId,
+      dto,
+    );
+    return new ImageResponseDto(deletedImage);
+  }
+}
+</file>
+
+<file path="src/main.ts">
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import { parseCorsWhitelist } from './commoun/utils/parseCorsWhitelist';
+import cookieParser from 'cookie-parser';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+    cookieParser(),
+  );
+
+  const corsWhiteList = parseCorsWhitelist(process.env.CORS_WHITELIST ?? '');
+
+  app.enableCors({
+    origin: (
+      origin: string | undefined,
+      callback: (...args: any[]) => void,
+    ) => {
+      if (!origin || corsWhiteList.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'), false);
+    },
+  });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
+  await app.listen(process.env.APP_PORT ?? 3001);
+}
+void bootstrap();
+</file>
+
+<file path="src/post/admin-post.controller.ts">
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Req,
+  UseGuards,
+  Body,
+  Query,
+} from '@nestjs/common';
+import { PostService } from './post.service';
+import { PostResponseDto } from './dto/post-response.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { FiltersPostDto } from './dto/filters-post.dto';
+import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+
+@Controller('admin/posts')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+export class AdminPostController {
+  constructor(private readonly postService: PostService) {}
+
+  @Get()
+  async findMany(@Query() filters: FiltersPostDto) {
+    const posts = await this.postService.findMany(filters);
+    return {
+      ...posts,
+      data: posts.data.map((post) => new PostResponseDto(post)),
+    };
+  }
+
+  @Patch(':id/update')
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdatePostAdminDto,
+  ) {
+    const updatedPost = await this.postService.updateByAdmin(req.user, id, dto);
+    return new PostResponseDto(updatedPost);
+  }
+
+  @Patch(':id/restore')
+  async restore(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredPost = await this.postService.restore(req.user, id, dto);
+    return new PostResponseDto(restoredPost);
+  }
+
+  @Delete(':id')
+  async removeByAdmin(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const post = await this.postService.removeByAdmin(id, req.user, dto);
+    return new PostResponseDto(post);
+  }
+}
+</file>
+
+<file path="src/post/post.module.ts">
+import { Module } from '@nestjs/common';
+import { PostService } from './post.service';
+import { PostController } from './post.controller';
+import { AdminPostController } from './admin-post.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Post } from './entities/post.entity';
+import { ImagesModule } from 'src/images/images.module';
+import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+import { UserModule } from 'src/user/user.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Post]),
+    ImagesModule,
+    ActivityLogsModule,
+    UserModule,
+  ],
+  controllers: [PostController, AdminPostController],
+  providers: [PostService],
+})
+export class PostModule {}
+</file>
+
+<file path="src/user/dto/create-user.dto.ts">
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+
+export class CreateUserDto {
+  @IsString({ message: 'Nome precisa ser uma string' })
+  @IsNotEmpty({ message: 'Nome não pode estar vazio' })
+  name: string;
+
+  @IsEmail({}, { message: 'E-mail inválido' })
+  email: string;
+
+  @IsString({ message: 'Senha precisa ser uma string' })
+  @IsNotEmpty({ message: 'Senha não pode estar vazia' })
+  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+  password: string;
+}
+</file>
+
+<file path="src/user/entities/user.entity.ts">
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from '../enum/user-role.enum';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ select: false })
+  passwordHash: string;
+
+  @Column({ default: false })
+  forceLogout: boolean;
+
+  @Column({ default: false })
+  isBlocked: boolean;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
+}
+</file>
+
+<file path="src/user/user.module.ts">
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { AdminUserController } from './admin-user.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { CommonModule } from 'src/commoun/common.module';
+import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([User]), CommonModule, ActivityLogsModule],
+  providers: [UserService],
+  controllers: [UserController, AdminUserController],
+  exports: [UserService],
+})
+export class UserModule {}
+</file>
+
+<file path="src/upload/upload.module.ts">
+import { Module } from '@nestjs/common';
+import { UploadController } from './upload.controller';
+import { UploadService } from './upload.service';
+import { ImagesModule } from 'src/images/images.module';
+import { StorageModule } from 'src/storage/storage.module';
+import { CloudinaryProvider } from 'src/storage/cloudinary/cloudinary.provider';
+import { ActivityLogsModule } from 'src/activity-logs/activity-logs.module';
+import { UserModule } from 'src/user/user.module';
+
+@Module({
+  imports: [ImagesModule, StorageModule, ActivityLogsModule, UserModule],
+  controllers: [UploadController],
+  providers: [UploadService, CloudinaryProvider],
+  exports: [CloudinaryProvider],
+})
+export class UploadModule {}
+</file>
+
+<file path="src/upload/upload.service.ts">
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { fileTypeFromBuffer } from 'file-type';
+import sharp from 'sharp';
+import { generateRandomSuffix } from 'src/commoun/utils/generate-random-suffix';
+import { ImagesService } from 'src/images/images.service';
+import { IMAGE_STORAGE_PROVIDER } from '../storage/image-storage.interface';
+import type { ImageStorageProvider } from '../storage/image-storage.interface';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { User } from 'src/user/entities/user.entity';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { UserService } from 'src/user/user.service';
+import { slugify } from 'src/commoun/utils/slugify';
+
+@Injectable()
+export class UploadService {
+  constructor(
+    @Inject(IMAGE_STORAGE_PROVIDER)
+    private readonly storageProvider: ImageStorageProvider,
+    private readonly imageService: ImagesService,
+    private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
+  ) {}
+
+  async handleUpload(userId: string, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Nenhum arquivo enviado.');
+    }
+
+    const maxFileSize = Number(process.env.IMAGE_MAX_UPLOAD_SIZE || 921600);
+
+    if (file.size > maxFileSize) {
+      throw new BadRequestException('Arquivo muito grande');
+    }
+
+    const fileBuffer = file.buffer;
+
+    const fileType = await fileTypeFromBuffer(fileBuffer);
+
+    const allowedTypes = process.env.ALLOWED_IMAGE_TYPES?.split(',') ?? [];
+
+    if (allowedTypes.length === 0) {
+      throw new InternalServerErrorException(
+        'ALLOWED_IMAGE_TYPES não foi configurada.',
+      );
+    }
+
+    if (!fileType || !allowedTypes.includes(fileType.mime)) {
+      throw new BadRequestException('Arquivo inválido ou tipo não permitido.');
+    }
+
+    const outputBuffer = await sharp(fileBuffer, {
+      limitInputPixels: Number(process.env.MAX_INPUT_PIXELS || 25_000_000),
+      failOn: 'warning',
+    })
+      .rotate()
+      .resize({
+        width: 1920,
+        height: 1080,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality: 85,
+      })
+      .toBuffer();
+
+    const outputMetadata = await sharp(outputBuffer).metadata();
+
+    if (outputMetadata.format !== 'webp') {
+      throw new InternalServerErrorException('Falha ao gerar imagem');
+    }
+
+    if (
+      !outputMetadata.width ||
+      !outputMetadata.height ||
+      outputMetadata.width > 1920 ||
+      outputMetadata.height > 1080
+    ) {
+      throw new InternalServerErrorException('Dimensões inválidas');
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const user = await this.userService.findOneByOrFail(userId);
+    const authorSlug = slugify(user.name);
+    const uniqueSuffix = `${Date.now()}-${generateRandomSuffix()}`;
+    const folder = `${today}/${authorSlug}-${user.id}`;
+
+    const uploadResult = await this.storageProvider.upload(outputBuffer, {
+      folder,
+      publicId: uniqueSuffix,
+      uploadedBy: userId,
+    });
+
+    const savedImage = await this.imageService.saveImageUrl(
+      userId,
+      uniqueSuffix,
+      uploadResult.url,
+      folder,
+    );
+
+    await this.logService.create({
+      user: { id: userId } as User,
+      action: ActionType.CREATED,
+      entityId: savedImage.id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        after: {
+          url: savedImage.url,
+          folder,
+        },
+      },
+    });
+
+    return savedImage;
+  }
+}
+</file>
+
+<file path="src/user/admin-user.controller.ts">
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { UserRole } from './enum/user-role.enum';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserResponseDto } from './dto/user-response.dto';
+import { FiltersUserDto } from './dto/filters-user.dto';
+import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
+import { ConfirmAdminActionDto } from '../commoun/dto/confirm-admin-action.dto';
+
+@Controller('admin/users')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN)
+export class AdminUserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  async findMany(@Query() filters: FiltersUserDto) {
+    const users = await this.userService.findMany(filters);
+    return {
+      ...users,
+      data: users.data.map((user) => new UserResponseDto(user)),
+    };
+  }
+
+  @Patch(':id')
+  async updateUser(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: UpdateUserAdminDto,
+  ) {
+    const updatedUser = await this.userService.updateByAdmin(
+      req.user,
+      targetId,
+      dto,
+    );
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/promote')
+  async promote(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const updatedUser = await this.userService.promoteToAdmin(
+      req.user,
+      dto,
+      targetId,
+    );
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/demote')
+  async demote(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const updatedUser = await this.userService.demote(req.user, dto, targetId);
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/block')
+  async block(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const updatedUser = await this.userService.block(req.user, dto, targetId);
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/unblock')
+  async unblock(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const updatedUser = await this.userService.unblock(req.user, dto, targetId);
+    return new UserResponseDto(updatedUser);
+  }
+
+  @Patch(':id/restore')
+  async restore(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const restoredUser = await this.userService.restore(
+      req.user,
+      targetId,
+      dto.reason,
+    );
+    return new UserResponseDto(restoredUser);
+  }
+
+  @Delete(':id')
+  async softRemove(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Body() dto: ConfirmAdminActionDto,
+  ) {
+    const removedUser = await this.userService.removeByAdmin(
+      targetId,
+      req.user,
+      dto.reason,
+    );
+    return new UserResponseDto(removedUser);
+  }
+}
+</file>
+
+<file path="src/post/entities/post.entity.ts">
+import { Images } from 'src/images/entities/image.entity';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  title: string;
+
+  @Column({ unique: true })
+  slug: string;
+
+  @Column('text')
+  content: string;
+
+  @Column()
+  excerpt: string;
+
+  @Column({ default: false })
+  published: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => Images)
+  coverImage: Images;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  author: User;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
+}
+</file>
+
+<file path="src/app.module.ts">
+import { Module } from '@nestjs/common';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { PostModule } from './post/post.module';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UploadModule } from './upload/upload.module';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { AllExceptionsFilter } from './commoun/filters/all-exeptions.filter';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ImagesModule } from './images/images.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+
+@Module({
+  imports: [
+    AuthModule,
+    UserModule,
+    PostModule,
+    UploadModule,
+    ImagesModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 10000,
+          limit: 10,
+          blockDuration: 5000,
+        },
+      ],
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      synchronize: process.env.DB_SYNCHRONIZE === '1',
+      autoLoadEntities: process.env.DB_AUTO_LOAD_ENTITIES === '1',
+    }),
+    ActivityLogsModule,
+  ],
+  controllers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class AppModule {}
+</file>
+
+<file path="src/auth/auth.service.ts">
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { LoginDto } from './dto/login.dto';
+import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { HashingService } from 'src/commoun/hashing/hashing.service';
+import { JwtPayload } from './types/jwt-payload.type';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { User } from 'src/user/entities/user.entity';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+
+@Injectable()
+export class AuthService {
+  private readonly logger = new Logger(ActivityLogsService.name);
+  constructor(
+    private readonly userService: UserService,
+    private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
+    private readonly logService: ActivityLogsService,
+  ) {}
+
+  async login(loginDto: LoginDto) {
+    const user = await this.userService.findByEmail(loginDto.email, {
+      includePassword: true,
+    });
+
+    const error = new UnauthorizedException('Usuário ou senha inválidos');
+
+    if (!user) {
+      throw error;
+    }
+
+    const isPasswordValid = await this.hashingService.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw error;
+    }
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('Usuário bloqueado.');
+    }
+
+    const JwtPayload: JwtPayload = {
+      sub: user.id,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(JwtPayload);
+
+    user.forceLogout = false;
+
+    await this.userService.save(user);
+
+    await this.logService.create({
+      user,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      action: ActionType.LOGIN,
+      metadata: {},
+    });
+
+    return { accessToken };
+  }
+
+  async logout(user: JwtPayload) {
+    return this.executeLogout(user, user.sub);
+  }
+
+  async forceLogout(
+    admin: JwtPayload,
+    userId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para realizar essa ação',
+      );
+    }
+
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+
+    return this.executeLogout(admin, userId, {
+      isAdminAction: true,
+      reason: dto.reason,
+    });
+  }
+
+  private async executeLogout(
+    user: JwtPayload,
+    targetId: string,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    const userToLogOut = await this.userService.findOneByOrFail(targetId);
+
+    if (userToLogOut.forceLogout === true) {
+      throw new ConflictException('Usuário já está com acesso bloqueado');
+    }
+
+    userToLogOut.forceLogout = true;
+
+    const userLoggedOut = await this.userService.save(userToLogOut);
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      entityId: userLoggedOut.id,
+      entityType: EntityType.USER,
+      action: ActionType.LOGOUT,
+      reason: options.reason ?? null,
+      metadata: {
+        selfLogOut: !options.isAdminAction,
+      },
+    });
+  }
+
+  async revokeForceLogout(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para realizar essa ação',
+      );
+    }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    const user = await this.userService.findOneByOrFail(targetId);
+
+    if (user.forceLogout === false) {
+      throw new ConflictException('Usuário já está com acesso liberado');
+    }
+
+    user.forceLogout = false;
+
+    await this.userService.save(user);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      action: ActionType.REVOKE_FORCE_LOGOUT,
+      reason: dto.reason,
+      metadata: {},
+    });
+  }
+}
+</file>
+
+<file path="src/post/post.controller.ts">
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { PostService } from './post.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CreatePostDto } from './dto/create-post.dto';
+import { PostResponseDto } from './dto/post-response.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+
+@Controller('post')
+export class PostController {
+  constructor(private readonly postService: PostService) {}
+
+  @Get()
+  async findAllPublished() {
+    const posts = await this.postService.findAllPublic();
+    return posts.map((post) => new PostResponseDto(post));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('me')
+  async create(@Req() req: AuthenticatedRequest, @Body() dto: CreatePostDto) {
+    const post = await this.postService.create(dto, req.user);
+    return new PostResponseDto(post);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findAllOwned(@Req() req: AuthenticatedRequest) {
+    const posts = await this.postService.findAllOwned(req.user);
+    return posts.map((post) => new PostResponseDto(post));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/:id')
+  async findOneOwned(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    const post = await this.postService.findOneOwnedOrFail({ id }, req.user);
+    return new PostResponseDto(post);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/:id')
+  async update(
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdatePostDto,
+  ) {
+    const updatedPost = await this.postService.updateSelf(
+      req.user,
+      targetId,
+      dto,
+    );
+    return new PostResponseDto(updatedPost);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('me/:id')
+  async removeSelf(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const post = await this.postService.removeSelf(id, req.user);
+    return new PostResponseDto(post);
+  }
+
+  @Get(':slug')
+  async findOnePublished(@Param('slug') slug: string) {
+    const post = await this.postService.findOneOrFail({
+      slug,
+      published: true,
+    });
+    return new PostResponseDto(post);
+  }
+}
+</file>
+
+<file path="src/images/images.controller.ts">
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ImagesService } from './images.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ImageResponseDto } from './dto/image-response.dto';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+
+@Controller('images')
+export class ImagesController {
+  constructor(private readonly imagesService: ImagesService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findAllOwned(@Req() req: AuthenticatedRequest) {
+    const images = await this.imagesService.findAllOwned(req.user);
+    return images.map((image) => new ImageResponseDto(image));
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const image = await this.imagesService.findOneOrFail({ id });
+
+    return new ImageResponseDto(image);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(
+    @Param('id', ParseUUIDPipe) targetId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const image = await this.imagesService.selfRemove(req.user, targetId);
+    return new ImageResponseDto(image);
+  }
+}
+</file>
+
+<file path="src/images/images.service.ts">
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { Images } from './entities/image.entity';
+import { Repository } from 'typeorm';
+import type { FindOptionsWhere } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { IMAGE_STORAGE_PROVIDER } from 'src/storage/image-storage.interface';
+import type { ImageStorageProvider } from 'src/storage/image-storage.interface';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { FiltersImagetDto } from './dto/filters-image.dto';
+import { UserService } from 'src/user/user.service';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+
+@Injectable()
+export class ImagesService {
+  private readonly logger = new Logger(ImagesService.name);
+
+  constructor(
+    @Inject(IMAGE_STORAGE_PROVIDER)
+    private readonly storageProvider: ImageStorageProvider,
+
+    @InjectRepository(Images)
+    private readonly imagesRepository: Repository<Images>,
+
+    private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
+  ) {}
+
+  async findMany(filters: FiltersImagetDto) {
+    const {
+      id,
+      url,
+      userId,
+      userEmail,
+      userName,
+      startDate,
+      endDate,
+      limit = 20,
+      page = 1,
+    } = filters;
+
+    const query = this.imagesRepository
+      .createQueryBuilder('image')
+      .leftJoin('image.uploadedBy', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email']);
+
+    if (id) query.andWhere('image.id = :id', { id });
+
+    if (url) query.andWhere('image.url = :url', { url });
+
+    if (startDate && endDate) {
+      query.andWhere('image.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+    } else if (startDate) {
+      query.andWhere('image.createdAt >= :startDate', { startDate });
+    } else if (endDate) {
+      query.andWhere('image.createdAt <= :endDate', { endDate });
+    }
+
+    if (userId) {
+      query.andWhere('user.id = :userId', { userId });
+    } else {
+      if (userName) {
+        query.andWhere('user.name ILIKE  :userName', {
+          userName: `%${userName}%`,
+        });
+      }
+      if (userEmail) {
+        query.andWhere('user.email ILIKE  :userEmail', {
+          userEmail: `%${userEmail}%`,
+        });
+      }
+    }
+
+    const [images, count] = await query
+      .orderBy('image.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data: images,
+      total: count,
+      page,
+      limit,
+    };
+  }
+
+  async findAllOwned(author: JwtPayload) {
+    const images = this.imagesRepository.find({
+      where: {
+        uploadedBy: { id: author.sub },
+      },
+      relations: {
+        uploadedBy: true,
+      },
+    });
+    return images;
+  }
+
+  async findOne(imageData: Partial<Images>) {
+    const image = await this.imagesRepository.findOne({
+      where: imageData as FindOptionsWhere<Images>,
+      relations: { uploadedBy: true },
+    });
+
+    return image;
+  }
+
+  async findOneOrFail(imageData: Partial<Images>) {
+    const image = await this.findOne(imageData);
+
+    if (!image) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    return image;
+  }
+
+  async saveImageUrl(
+    userId: string,
+    publicId: string,
+    publicUrl: string,
+    folder: string,
+  ) {
+    const url = this.imagesRepository.create({
+      url: publicUrl,
+      folder,
+      publicId,
+      uploadedBy: {
+        id: userId,
+      },
+    });
+
+    const savedUrl = await this.imagesRepository
+      .save(url)
+      .catch((err: unknown) => {
+        if (err instanceof Error) {
+          this.logger.error(
+            'Erro ao salvar a imagem no Banco de dados',
+            err.stack,
+          );
+        }
+        throw new BadRequestException('Erro ao criar o post');
+      });
+
+    return savedUrl;
+  }
+
+  async restore(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    const imageToRestore = await this.imagesRepository.findOne({
+      where: { id: targetId },
+      withDeleted: true,
+      relations: { uploadedBy: true },
+    });
+
+    if (!imageToRestore) {
+      throw new NotFoundException('Imagem não encontrada');
+    }
+
+    if (!imageToRestore.deletedAt) {
+      throw new ConflictException('Esta imagem já está ativa');
+    }
+
+    const deletedAt = imageToRestore.deletedAt;
+
+    await this.imagesRepository.restore(targetId);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: imageToRestore.id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: dto.reason,
+    });
+
+    return imageToRestore;
+  }
+
+  async selfRemove(user: JwtPayload, targetId: string) {
+    const deletedImage = await this.executeSoftRemove(user, targetId);
+    return deletedImage;
+  }
+
+  async removeByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem realizar essa ação',
+      );
+    }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    const deletedImage = await this.executeSoftRemove(admin, targetId, {
+      isAdminAction: true,
+      reason: dto.reason,
+    });
+    return deletedImage;
+  }
+
+  private async executeSoftRemove(
+    user: JwtPayload,
+    targetId: string,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    const imageToDelete = await this.findOneOrFail({ id: targetId });
+
+    const isImageOwner = user.sub === imageToDelete.uploadedBy.id;
+
+    if (!isImageOwner && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esta imagem',
+      );
+    }
+
+    const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
+
+    await this.storageProvider.delete(deletedImage.publicId);
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      action: ActionType.DELETED,
+      entityId: deletedImage.id,
+      entityType: EntityType.IMAGE,
+      metadata: {
+        selfDelete: !options.isAdminAction,
+        targetSnapshot: {
+          url: deletedImage.url,
+          folder: deletedImage.folder,
+          uploadedAt: deletedImage.createdAt,
+          uploadedBy: {
+            id: deletedImage.uploadedBy.id,
+            name: deletedImage.uploadedBy.name,
+            email: deletedImage.uploadedBy.email,
+          },
+        },
+      },
+      reason: options.reason ?? null,
+    });
+
+    return deletedImage;
+  }
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "nest-test",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:admin": "node -r ts-node/register -r tsconfig-paths/register src/database/seeds/create-admin.seed.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/mapped-types": "^2.1.1",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/serve-static": "^5.0.5",
+    "@nestjs/throttler": "^6.5.0",
+    "@nestjs/typeorm": "^11.0.3",
+    "@types/multer": "^2.2.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "cloudinary": "^2.10.0",
+    "cookie-parser": "^1.4.7",
+    "file-type": "^22.0.1",
+    "helmet": "^8.3.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.22.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "sharp": "^0.35.3",
+    "typeorm": "^1.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/supertest": "^7.0.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^17.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.4.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
+</file>
+
+<file path="src/user/user.controller.ts">
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserService } from './user.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findOne(@Req() req: AuthenticatedRequest) {
+    const user = await this.userService.findOneByOrFail(req.user.sub);
+    return new UserResponseDto(user);
+  }
+
+  @Post()
+  async create(@Body() dto: CreateUserDto) {
+    const user = await this.userService.create(dto);
+    return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('me')
+  async removeSelf(@Req() req: AuthenticatedRequest) {
+    const user = await this.userService.removeSelf(req.user);
+    return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  async update(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserDto) {
+    const user = await this.userService.updateSelf(req.user, dto);
+    return new UserResponseDto(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me/password')
+  async updatePassword(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    const user = await this.userService.updatePassword(req.user.sub, dto);
+    return new UserResponseDto(user);
+  }
+}
+</file>
+
+<file path="src/post/post.service.ts">
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { Post } from './entities/post.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreatePostDto } from './dto/create-post.dto';
+import { User } from 'src/user/entities/user.entity';
+import { createSlugFromText } from 'src/commoun/utils/create-slug-from-text';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { ImagesService } from 'src/images/images.service';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { UserRole } from 'src/user/enum/user-role.enum';
+import { FiltersPostDto } from './dto/filters-post.dto';
+import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+import { UserService } from 'src/user/user.service';
+
+@Injectable()
+export class PostService {
+  private readonly logger = new Logger(PostService.name);
+  constructor(
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    private readonly imageService: ImagesService,
+    private readonly logService: ActivityLogsService,
+    private readonly userService: UserService,
+  ) {}
+
+  async findOneOrFail(postData: Partial<Post>) {
+    const post = await this.findOne(postData);
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado');
+    }
+
+    return post;
+  }
+
+  async findOne(postData: Partial<Post>) {
+    const post = await this.postRepository.findOne({
+      where: postData as FindOptionsWhere<Post>,
+      relations: { coverImage: { uploadedBy: true }, author: true },
+    });
+
+    return post;
+  }
+
+  async findAllPublic() {
+    const posts = await this.postRepository.find({
+      where: { published: true },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: { author: true },
+    });
+
+    return posts;
+  }
+
+  async findAll() {
+    const posts = await this.postRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: { author: true },
+    });
+
+    return posts;
+  }
+
+  async findOneOwnedOrFail(postData: Partial<Post>, author: JwtPayload) {
+    const post = await this.findOneOwned(postData, author.sub);
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado');
+    }
+
+    return post;
+  }
+
+  async findOneOwned(postData: Partial<Post>, authorId: string) {
+    const post = await this.postRepository.findOne({
+      where: {
+        ...(postData as FindOptionsWhere<Post>),
+        author: { id: authorId },
+      },
+      relations: { author: true },
+    });
+
+    return post;
+  }
+
+  async findAllOwned(author: JwtPayload) {
+    const posts = await this.postRepository.find({
+      where: {
+        author: { id: author.sub },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: { author: true },
+    });
+
+    return posts;
+  }
+
+  async findMany(filters: FiltersPostDto) {
+    const {
+      id,
+      title,
+      slug,
+      published,
+      authorId,
+      authorEmail,
+      authorName,
+      startDate,
+      endDate,
+      limit = 20,
+      page = 1,
+    } = filters;
+
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.author', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email']);
+
+    if (id) query.andWhere('post.id = :id', { id });
+
+    if (title) {
+      query.andWhere('post.title ILIKE :title', { title: `%${title}%` });
+    }
+    if (slug) {
+      query.andWhere('post.slug ILIKE :slug', { slug: `%${slug}%` });
+    }
+    if (published !== undefined) {
+      query.andWhere('post.published = :published', { published });
+    }
+
+    if (startDate && endDate) {
+      query.andWhere('post.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+    } else if (startDate) {
+      query.andWhere('post.createdAt >= :startDate', { startDate });
+    } else if (endDate) {
+      query.andWhere('post.createdAt <= :endDate', { endDate });
+    }
+
+    if (authorId) {
+      query.andWhere('user.id = :authorId', { authorId });
+    } else {
+      if (authorName) {
+        query.andWhere('user.name ILIKE  :authorName', {
+          authorName: `%${authorName}%`,
+        });
+      }
+      if (authorEmail) {
+        query.andWhere('user.email ILIKE  :authorEmail', {
+          authorEmail: `%${authorEmail}%`,
+        });
+      }
+    }
+
+    const [posts, count] = await query
+      .orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    return {
+      data: posts,
+      total: count,
+      page,
+      limit,
+    };
+  }
+
+  async create(dto: CreatePostDto, authorToken: JwtPayload) {
+    const image = await this.imageService.findOneOrFail({
+      url: dto.coverImage,
+    });
+    const post = this.postRepository.create({
+      slug: createSlugFromText(dto.title),
+      author: { id: authorToken.sub } as User,
+      content: dto.content,
+      excerpt: dto.excerpt,
+      coverImage: image,
+      title: dto.title,
+      published: dto.published ?? false,
+    });
+
+    const createdPost = await this.postRepository
+      .save(post)
+      .catch((err: unknown) => {
+        if (err instanceof Error) {
+          this.logger.error('Erro ao criar post', err.stack);
+        }
+        throw new BadRequestException('Erro ao criar o post');
+      });
+
+    await this.logService.create({
+      user: { id: authorToken.sub } as User,
+      action: ActionType.CREATED,
+      entityId: createdPost.id,
+      entityType: EntityType.POST,
+      metadata: {
+        after: {
+          title: createdPost.title,
+          exerpt: createdPost.excerpt,
+          Ispublished: createdPost.published,
+        },
+      },
+    });
+
+    return createdPost;
+  }
+
+  async updateSelf(user: JwtPayload, targetId: string, dto: UpdatePostDto) {
+    const updatedPost = await this.executeUpdate(user, targetId, dto);
+    return updatedPost;
+  }
+
+  async updateByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: UpdatePostAdminDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    const { reason, ...dtoWithoutReason } = dto;
+    const updatedPost = await this.executeUpdate(
+      admin,
+      targetId,
+      dtoWithoutReason,
+      { isAdminAction: true, reason },
+    );
+    return updatedPost;
+  }
+
+  private async executeUpdate(
+    user: JwtPayload,
+    targetId: string,
+    dto: UpdatePostDto,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    if (Object.keys(dto).length === 0) {
+      throw new BadRequestException('Dados não enviados');
+    }
+
+    const post = await this.findOneOrFail({ id: targetId });
+
+    const isPostOwned = post.author?.id === user.sub;
+
+    if (!isPostOwned && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esse post',
+      );
+    }
+
+    const before: Partial<Post> = {
+      title: post.title,
+      content: post.content,
+      excerpt: post.excerpt,
+      published: post.published,
+    };
+
+    post.title = dto.title ?? post.title;
+    post.content = dto.content ?? post.content;
+    post.excerpt = dto.excerpt ?? post.excerpt;
+    post.published = dto.published ?? post.published;
+
+    if (dto.coverImage) {
+      const image = await this.imageService.findOneOrFail({
+        url: dto.coverImage,
+      });
+
+      post.coverImage = image;
+    }
+
+    const updatedPost = await this.postRepository.save(post);
+
+    const after: Partial<Post> = {
+      title: updatedPost.title,
+      content: updatedPost.content,
+      excerpt: updatedPost.excerpt,
+      published: updatedPost.published,
+    };
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      action: ActionType.UPDATED,
+      entityId: updatedPost.id,
+      entityType: EntityType.POST,
+      reason: options.reason ?? null,
+      metadata: {
+        selfUpdate: !options.isAdminAction,
+        before,
+        after,
+      },
+    });
+
+    return updatedPost;
+  }
+
+  async restore(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    const postToRestore = await this.postRepository.findOne({
+      where: { id: targetId },
+      withDeleted: true,
+      relations: { author: true },
+    });
+
+    if (!postToRestore) {
+      throw new NotFoundException('Post não encontrado');
+    }
+
+    if (!postToRestore.deletedAt) {
+      throw new ConflictException('Este post já está ativo');
+    }
+
+    const deletedAt = postToRestore.deletedAt;
+
+    await this.postRepository.restore(postToRestore.id);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: postToRestore.id,
+      entityType: EntityType.POST,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: dto.reason,
+    });
+
+    return postToRestore;
+  }
+
+  async removeSelf(targetId: string, user: JwtPayload) {
+    return this.executeSoftRemove(targetId, user);
+  }
+
+  async removeByAdmin(
+    targetId: string,
+    admin: JwtPayload,
+    dto: ConfirmAdminActionDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    return this.executeSoftRemove(targetId, admin, {
+      isAdminAction: true,
+      reason: dto.reason,
+    });
+  }
+
+  private async executeSoftRemove(
+    targetId: string,
+    user: JwtPayload,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    const postToDelete = await this.findOneOrFail({ id: targetId });
+
+    const isOwnPost = postToDelete.author.id === user.sub;
+
+    if (!isOwnPost && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para excluir esse post',
+      );
+    }
+
+    const removedPost = await this.postRepository.softRemove(postToDelete);
+
+    await this.logService.create({
+      user: { id: user.sub } as User,
+      action: ActionType.DELETED,
+      entityId: removedPost.id,
+      entityType: EntityType.POST,
+      metadata: {
+        selfDelete: !options.isAdminAction,
+        targetSnapshot: {
+          title: removedPost.title,
+          wasPublished: removedPost.published,
+          author: removedPost.author.name,
+          email: removedPost.author.email,
+        },
+      },
+      reason: options.reason ?? null,
+    });
+
+    return removedPost;
+  }
+}
+</file>
+
+<file path="rest-client/requests.http">
+@baseUrl = http://localhost:3001
+
+########################################
+# Global test credentials (editable)
+########################################
+@userNameForTesting = Pedro Juniro
+@userEmailForTesting = pedro@example.com
+@userPasswordForTesting = 123456
+@userNewPasswordForTesting = 1234589
+
+# ! Apagar antes do commit
+@adminEmailForTesting = joao.paulo@email.com
+@adminPasswordForTesting = umaSenhaForte123
+# @adminEmailForTesting = admin@example.com
+# @adminPasswordForTesting = admin123
+@targetUserEmailForTesting = target@example.com
+@targetUserPasswordForTesting = targetpass
+
+# Tokens - derived from login requests below when possible
+# NOTE: the backend sets an httpOnly cookie on /auth/login. If /auth/login does not return an accessToken in the response body,
+# set these values manually before running the requests (or adjust the backend to return the token in the response body).
+@userToken = {{authLogin.response.body.accessToken}}
+@adminToken = {{authAdminLogin.response.body.accessToken}}
+
+# Resource variables (populated by preparatory requests)
+@userId = {{readOneUser.response.body.id}}
+@postUuid = {{createPostOwned.response.body.id}}
+@postSlug = {{createPostOwned.response.body.slug}}
+@targetPostId = {{createPostOwned.response.body.id}}
+@imagePath = {{uploadImage.response.body.url}}
+@imageUrl = {{baseUrl}}{{imagePath}}
+@imageUuid = {{uploadImage.response.body.image_id}}
+@targetImageId = {{uploadImage.response.body.image_id}}
+@targetUserId = 5368bafa-3687-4b2c-915a-9ee451bb9155
+# @targetUserId = {{prepareCreateTargetUser.response.body.id}}
+
+
+# ==================================================
+# AUTH
+# ==================================================
+
+### Login (user)
+# @name authLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{userEmailForTesting}}",
+  "password": "{{userPasswordForTesting}}"
+}
+
+### Login (admin)
+# @name authAdminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmailForTesting}}",
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Logout (user)
+# @name authLogout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{userToken}}
+
+
+### Force logout (admin) - admin forces target user to logout
+# @name authAdminForceLogout
+POST {{baseUrl}}/auth/admin/logout/{{targetUserId}}
+Authorization: Bearer {{adminToken}}
+
+### Revoke Force logout (admin)
+# @name authAdminRevokeForceLogout
+POST {{baseUrl}}/auth/admin/revoke-logout/{{targetUserId}}
+Authorization: Bearer {{adminToken}}
+
+
+# ==================================================
+# USER - public and authenticated flows
+# ==================================================
+
+### Create user (success)
+# @name createUser
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "name": "{{userNameForTesting}}",
+  "email": "{{userEmailForTesting}}",
+  "password": "{{userPasswordForTesting}}"
+}
+
+### Create user (missing password) -> validation error
+# @name createUserMissingPassword
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "name": "{{userNameForTesting}}",
+  "email": "{{userEmailForTesting}}"
+}
+
+### Read current user (authenticated)
+# @name readOneUser
+GET {{baseUrl}}/user/me
+Authorization: Bearer {{userToken}}
+
+### Update current user (success)
+# @name updateUser
+PATCH {{baseUrl}}/user/me
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "name": "{{userNameForTesting}} Edited",
+  "email": "{{userEmailForTesting}}"
+}
+
+### Update password (success)
+# @name updateUserPassword
+PATCH {{baseUrl}}/user/me/password
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "currentPassword": "{{userPasswordForTesting}}",
+  "newPassword": "{{userNewPasswordForTesting}}"
+}
+
+### Update password (invalid current password)
+# @name updateUserPasswordInvalid
+PATCH {{baseUrl}}/user/me/password
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "currentPassword": "{{userNewPasswordForTesting}}",
+  "newPassword": "{{userNewPasswordForTesting}}"
+}
+
+### Delete current user (destructive - run last)
+# @name deleteOneUser
+DELETE {{baseUrl}}/user/me
+Authorization: Bearer {{userToken}}
+
+
+# ==================================================
+# POST - create / read / update / delete
+# ==================================================
+
+### Create post (success) - prepares postUuid / postSlug
+# @name createPostOwned
+POST {{baseUrl}}/post/me
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "title": "Título do post",
+  "excerpt": "Excerto para testes",
+  "content": "Conteúdo de teste",
+  "coverImage": "https://res.cloudinary.com/dqixnu2tr/image/upload/v1788273870/2026-09-01/joao-paulo-b0fc12ed-173c-4327-b3a3-10c871f907da/1788273874869-r711us.webp"
+}
+
+### Create post (invalid body - missing title)
+# @name createPostInvalid
+POST {{baseUrl}}/post/me
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "excerpt": "Excerto",
+  "content": "Conteúdo"
+}
+
+### Read all public posts
+# @name readAllPostPublic
+GET {{baseUrl}}/post/
+
+### Read one public post (by slug)
+# @name readOnePostPublic
+GET {{baseUrl}}/post/{{postSlug}}
+
+### Read all owned posts
+# @name readAllPostOwned
+GET {{baseUrl}}/post/me
+Authorization: Bearer {{userToken}}
+
+### Read one owned post (by id)
+# @name readOnePostOwned
+GET {{baseUrl}}/post/me/{{postUuid}}
+Authorization: Bearer {{userToken}}
+
+### Update owned post (success)
+# @name updateOnePostOwned
+PATCH {{baseUrl}}/post/me/{{postUuid}}
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "NOVO - Título do post",
+  "excerpt": "NOVO - Excerto",
+  "content": "NOVO - Conteúdo",
+  "published": true
+}
+
+### Update owned post (not found)
+# @name updateOnePostOwnedNotFound
+PATCH {{baseUrl}}/post/me/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "title": "NOVO",
+  "excerpt": "NOVO",
+  "content": "NOVO"
+}
+
+### Delete owned post (destructive - run after verification)
+# @name deleteOnePostOwned
+DELETE {{baseUrl}}/post/me/{{postUuid}}
+Authorization: Bearer {{userToken}}
+
+
+# ==================================================
+# UPLOAD / IMAGES
+# ==================================================
+
+### Upload Image (multipart) - prepares @imageUuid and @imagePath
+# @name uploadImage
+POST {{baseUrl}}/upload
+Authorization: Bearer {{userToken}}
+Content-Type: multipart/form-data; boundary=----RESTCLIENTBOUNDARY
+
+------RESTCLIENTBOUNDARY
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ../dev/images/image.jpeg
+------RESTCLIENTBOUNDARY--
+
+### Find one image (by id)
+# @name findOneImage
+GET {{baseUrl}}/images/{{imageUuid}}
+Authorization: Bearer {{userToken}}
+
+### Find all images (public - requires auth in this project)
+# @name findAllImages
+GET {{baseUrl}}/admin/images
+Authorization: Bearer {{adminToken}}
+
+### Find all images owned
+# @name findAllImagesOwned
+GET {{baseUrl}}/images/me
+Authorization: Bearer {{userToken}}
+
+### Delete image (owned)
+# @name deleteImage
+DELETE {{baseUrl}}/images/{{imageUuid}}
+Authorization: Bearer {{userToken}}
+
+
+# ==================================================
+# ADMIN - user management, posts, images
+# ==================================================
+
+### Admin: list users (requires admin role)
+# @name adminListUsers
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Admin: block user (success)
+# @name adminBlockUser
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/block
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Admin: unblock user (success)
+# @name adminUnblockUser
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/unblock
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Admin: block already blocked user (edge case)
+# @name adminBlockAlreadyBlocked
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/block
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Admin: promote user to admin (requires password confirm)
+# @name adminPromoteUser
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/promote
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Admin: demote admin (requires password confirm)
+# @name adminDemoteUser
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/demote
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "password": "{{adminPasswordForTesting}}"
+}
+
+### Admin: remove user (soft delete)
+# @name adminDeleteUser
+DELETE {{baseUrl}}/admin/users/{{targetUserId}}
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+
+
+### Admin: restore removed user
+# @name adminRestoreDeletedUser
+PATCH  {{baseUrl}}/admin/users/{{targetUserId}}/restore
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "reason": "Motivo pelo qual usuário está sendo restaurado"
+}
+
+
+# ==================================================
+# Validation / Authorization negative tests (examples)
+# ==================================================
+### Access protected route without token (should be 401/403)
+# @name readOneUserNoAuth
+GET {{baseUrl}}/user/me
+
+### Attempt admin action with normal user (should be 403)
+# @name normalUserTryBlock
+PATCH {{baseUrl}}/admin/users/{{targetUserId}}/block
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "password": "{{userPasswordForTesting}}"
+}
+
+### Login with wrong password (should be 401)
+# @name loginWrongPassword
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{userEmailForTesting}}",
+  "password": "wrongpassword"
+}
+
+### Login blocked user (should be 401)
+# @name loginBlockedUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "blocked@example.com",
+  "password": "whatever"
+}
+
+
+# ==================================================
+# Helpers / Preparation
+# ==================================================
+
+### Prepare: create another user to act as target (captures targetUserId)
+# @name prepareCreateTargetUser
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "name": "Target User",
+  "email": "{{targetUserEmailForTesting}}",
+  "password": "{{targetUserPasswordForTesting}}"
+}
+
+### Prepare: login created target user (if needed)
+# @name prepareLoginTarget
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{targetUserEmailForTesting}}",
+  "password": "{{targetUserPasswordForTesting}}"
+}
+# Notes
+# - Destructive requests (delete/block/unblock) are placed in ADMIN/DESTRUCTIVE sections and should be executed last.
+# - The REST Client supports referencing previous response bodies by name ({{requestName.response.body.field}}).
+# - If the backend only sets an httpOnly cookie for auth, either set @userToken/@adminToken manually or change the backend to return the token in the response body.
+# ==================================================
+
+# ==================================================
+# ADMIN - posts and images (additional tests)
+# ==================================================
+
+### Admin: list posts (requires admin role)
+# @name adminListPosts
+GET {{baseUrl}}/admin/posts
+Authorization: Bearer {{adminToken}}
+# ! PAREI AQUI
+### Admin: restore post (success)
+# @name adminRestorePost
+PATCH {{baseUrl}}/admin/posts/{{targetPostId}}/restore
+Authorization: Bearer {{adminToken}}
+
+### Admin: delete post by admin
+# @name adminDeletePost
+DELETE {{baseUrl}}/admin/posts/{{targetPostId}}
+Authorization: Bearer {{adminToken}}
+
+
+### Admin: list all images (admin)
+# @name adminListImages
+GET {{baseUrl}}/admin/image
+Authorization: Bearer {{adminToken}}
+
+### Admin: restore image
+# @name adminRestoreImage
+PATCH {{baseUrl}}/admin/image/{{targetImageId}}/restore
+Authorization: Bearer {{adminToken}}
+
+### Admin: delete image by admin
+# @name adminDeleteImage
+DELETE {{baseUrl}}/admin/image/{{targetImageId}}
+Authorization: Bearer {{adminToken}}
+
+# ==================================================
+
+# FIND MANY - FILTERS
+
+# ==================================================
+
+# ==================================================
+
+# USER - FIND MANY / FILTERS
+
+# ==================================================
+
+### Find many users - no filters
+
+# @name findManyUsers
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Find users by id
+# @name findManyUsersById
+GET {{baseUrl}}/admin/users?id={{targetUserId}}
+Authorization: Bearer {{adminToken}}
+
+### Find users by name - partial search
+# @name findManyUsersByName
+GET {{baseUrl}}/admin/users?name=Target
+Authorization: Bearer {{adminToken}}
+
+### Find users by name - case insensitive
+# @name findManyUsersByNameCaseInsensitive
+GET {{baseUrl}}/admin/users?name=target
+Authorization: Bearer {{adminToken}}
+
+### Find users by name - no results
+# @name findManyUsersByNameNotFound
+GET {{baseUrl}}/admin/users?name=UsuarioQueNaoExiste
+
+Authorization: Bearer {{adminToken}}
+
+### Find users by email - partial search
+
+# @name findManyUsersByEmail
+
+GET {{baseUrl}}/admin/users?email=target
+Authorization: Bearer {{adminToken}}
+
+### Find users by email - case insensitive
+
+# @name findManyUsersByEmailCaseInsensitive
+
+GET {{baseUrl}}/admin/users?email=TARGET
+Authorization: Bearer {{adminToken}}
+
+### Find users by email - no results
+
+# @name findManyUsersByEmailNotFound
+
+GET {{baseUrl}}/admin/users?email=naoexiste
+Authorization: Bearer {{adminToken}}
+
+### Find users with forceLogout=true
+
+# @name findManyUsersForceLogoutTrue
+
+GET {{baseUrl}}/admin/users?forceLogout=true
+Authorization: Bearer {{adminToken}}
+
+### Find users with forceLogout=false
+
+# @name findManyUsersForceLogoutFalse
+
+GET {{baseUrl}}/admin/users?forceLogout=false
+Authorization: Bearer {{adminToken}}
+
+### Find users by startDate
+
+# @name findManyUsersStartDate
+
+GET {{baseUrl}}/admin/users?startDate=2026-01-01
+Authorization: Bearer {{adminToken}}
+
+### Find users by endDate
+
+# @name findManyUsersEndDate
+
+GET {{baseUrl}}/admin/users?endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find users by date range
+
+# @name findManyUsersDateRange
+
+GET {{baseUrl}}/admin/users?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find users with limit
+
+# @name findManyUsersLimit
+
+GET {{baseUrl}}/admin/users?limit=1
+Authorization: Bearer {{adminToken}}
+
+### Find users page 1
+
+# @name findManyUsersPageOne
+
+GET {{baseUrl}}/admin/users?page=1
+Authorization: Bearer {{adminToken}}
+
+### Find users page 2
+
+# @name findManyUsersPageTwo
+
+GET {{baseUrl}}/admin/users?page=2
+Authorization: Bearer {{adminToken}}
+
+### Find users with limit and page
+
+# @name findManyUsersPagination
+
+GET {{baseUrl}}/admin/users?limit=1&page=2
+Authorization: Bearer {{adminToken}}
+
+### Find users by name with pagination
+
+# @name findManyUsersByNamePagination
+
+GET {{baseUrl}}/admin/users?name=Target&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find users by email with pagination
+
+# @name findManyUsersByEmailPagination
+
+GET {{baseUrl}}/admin/users?email=target&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find users by forceLogout with pagination
+
+# @name findManyUsersForceLogoutPagination
+
+GET {{baseUrl}}/admin/users?forceLogout=false&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find users by name and email
+
+# @name findManyUsersByNameAndEmail
+
+GET {{baseUrl}}/admin/users?name=Target&email=target
+Authorization: Bearer {{adminToken}}
+
+### Find users by name and forceLogout
+
+# @name findManyUsersByNameAndForceLogout
+
+GET {{baseUrl}}/admin/users?name=Target&forceLogout=false
+Authorization: Bearer {{adminToken}}
+
+### Find users by email and forceLogout
+
+# @name findManyUsersByEmailAndForceLogout
+
+GET {{baseUrl}}/admin/users?email=target&forceLogout=false
+Authorization: Bearer {{adminToken}}
+
+### Find users by date range and forceLogout
+
+# @name findManyUsersDateRangeAndForceLogout
+
+GET {{baseUrl}}/admin/users?startDate=2026-01-01&endDate=2026-12-31&forceLogout=false
+Authorization: Bearer {{adminToken}}
+
+### Find users by name, date range and pagination
+
+# @name findManyUsersCombinedFilters
+
+GET {{baseUrl}}/admin/users?name=Target&startDate=2026-01-01&endDate=2026-12-31&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find users - invalid page
+
+# @name findManyUsersInvalidPage
+
+GET {{baseUrl}}/admin/users?page=0
+Authorization: Bearer {{adminToken}}
+
+### Find users - invalid limit
+
+# @name findManyUsersInvalidLimit
+
+GET {{baseUrl}}/admin/users?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Find users - limit above maximum
+
+# @name findManyUsersLimitAboveMaximum
+
+GET {{baseUrl}}/admin/users?limit=101
+Authorization: Bearer {{adminToken}}
+
+# ==================================================
+
+# POST - FIND MANY / FILTERS
+
+# ==================================================
+
+### Find many posts - no filters
+
+# @name findManyPosts
+
+GET {{baseUrl}}/admin/posts
+Authorization: Bearer {{adminToken}}
+
+### Find posts by id
+
+# @name findManyPostsById
+
+GET {{baseUrl}}/admin/posts?id={{targetPostId}}
+Authorization: Bearer {{adminToken}}
+
+### Find posts by non-existent id
+
+# @name findManyPostsByIdNotFound
+
+GET {{baseUrl}}/admin/posts?id=00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminToken}}
+
+### Find posts by title
+
+# @name findManyPostsByTitle
+
+GET {{baseUrl}}/admin/posts?title=Título
+Authorization: Bearer {{adminToken}}
+
+### Find posts by partial title
+
+# @name findManyPostsByPartialTitle
+
+GET {{baseUrl}}/admin/posts?title=post
+Authorization: Bearer {{adminToken}}
+
+### Find posts by title - case insensitive
+
+# @name findManyPostsByTitleCaseInsensitive
+
+GET {{baseUrl}}/admin/posts?title=tÍtUlO
+Authorization: Bearer {{adminToken}}
+
+### Find posts by title - no results
+
+# @name findManyPostsByTitleNotFound
+
+GET {{baseUrl}}/admin/posts?title=TituloQueNaoExiste
+Authorization: Bearer {{adminToken}}
+
+### Find posts by slug
+
+# @name findManyPostsBySlug
+
+GET {{baseUrl}}/admin/posts?slug={{postSlug}}
+Authorization: Bearer {{adminToken}}
+
+### Find posts by partial slug
+
+# @name findManyPostsByPartialSlug
+
+GET {{baseUrl}}/admin/posts?slug=post
+Authorization: Bearer {{adminToken}}
+
+### Find posts by slug - no results
+
+# @name findManyPostsBySlugNotFound
+
+GET {{baseUrl}}/admin/posts?slug=slug-que-nao-existe
+Authorization: Bearer {{adminToken}}
+
+### Find published posts
+
+# @name findManyPostsPublished
+
+GET {{baseUrl}}/admin/posts?published=true
+Authorization: Bearer {{adminToken}}
+
+### Find unpublished posts
+
+# @name findManyPostsUnpublished
+
+GET {{baseUrl}}/admin/posts?published=false
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author id
+
+# @name findManyPostsByAuthorId
+
+GET {{baseUrl}}/admin/posts?authorId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author name
+
+# @name findManyPostsByAuthorName
+
+GET {{baseUrl}}/admin/posts?authorName=Pedro
+Authorization: Bearer {{adminToken}}
+
+### Find posts by partial author name
+
+# @name findManyPostsByPartialAuthorName
+
+GET {{baseUrl}}/admin/posts?authorName=ped
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author email
+
+# @name findManyPostsByAuthorEmail
+
+GET {{baseUrl}}/admin/posts?authorEmail=pedro
+Authorization: Bearer {{adminToken}}
+
+### Find posts by partial author email
+
+# @name findManyPostsByPartialAuthorEmail
+
+GET {{baseUrl}}/admin/posts?authorEmail=@example
+Authorization: Bearer {{adminToken}}
+
+### Find posts by startDate
+
+# @name findManyPostsStartDate
+
+GET {{baseUrl}}/admin/posts?startDate=2026-01-01
+Authorization: Bearer {{adminToken}}
+
+### Find posts by endDate
+
+# @name findManyPostsEndDate
+
+GET {{baseUrl}}/admin/posts?endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find posts by date range
+
+# @name findManyPostsDateRange
+
+GET {{baseUrl}}/admin/posts?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find posts with limit
+
+# @name findManyPostsLimit
+
+GET {{baseUrl}}/admin/posts?limit=1
+Authorization: Bearer {{adminToken}}
+
+### Find posts page 1
+
+# @name findManyPostsPageOne
+
+GET {{baseUrl}}/admin/posts?page=1
+Authorization: Bearer {{adminToken}}
+
+### Find posts page 2
+
+# @name findManyPostsPageTwo
+
+GET {{baseUrl}}/admin/posts?page=2
+Authorization: Bearer {{adminToken}}
+
+### Find posts with limit and page
+
+# @name findManyPostsPagination
+
+GET {{baseUrl}}/admin/posts?limit=1&page=2
+Authorization: Bearer {{adminToken}}
+
+### Find published posts by author
+
+# @name findManyPostsPublishedByAuthor
+
+GET {{baseUrl}}/admin/posts?published=true&authorId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find unpublished posts by author
+
+# @name findManyPostsUnpublishedByAuthor
+
+GET {{baseUrl}}/admin/posts?published=false&authorId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find posts by title and published
+
+# @name findManyPostsTitleAndPublished
+
+GET {{baseUrl}}/admin/posts?title=post&published=true
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author name and published
+
+# @name findManyPostsAuthorNameAndPublished
+
+GET {{baseUrl}}/admin/posts?authorName=Pedro&published=true
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author email and published
+
+# @name findManyPostsAuthorEmailAndPublished
+
+GET {{baseUrl}}/admin/posts?authorEmail=pedro&published=true
+Authorization: Bearer {{adminToken}}
+
+### Find posts by date range and published
+
+# @name findManyPostsDateRangeAndPublished
+
+GET {{baseUrl}}/admin/posts?startDate=2026-01-01&endDate=2026-12-31&published=true
+Authorization: Bearer {{adminToken}}
+
+### Find posts by title with pagination
+
+# @name findManyPostsTitlePagination
+
+GET {{baseUrl}}/admin/posts?title=post&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find posts by author with pagination
+
+# @name findManyPostsAuthorPagination
+
+GET {{baseUrl}}/admin/posts?authorId={{userId}}&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find posts with multiple filters and pagination
+
+# @name findManyPostsCombinedFilters
+
+GET {{baseUrl}}/admin/posts?title=post&published=true&authorId={{userId}}&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find posts - invalid page
+
+# @name findManyPostsInvalidPage
+
+GET {{baseUrl}}/admin/posts?page=0
+Authorization: Bearer {{adminToken}}
+
+### Find posts - invalid limit
+
+# @name findManyPostsInvalidLimit
+
+GET {{baseUrl}}/admin/posts?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Find posts - limit above maximum
+
+# @name findManyPostsLimitAboveMaximum
+
+GET {{baseUrl}}/admin/posts?limit=101
+Authorization: Bearer {{adminToken}}
+
+### Find posts - invalid published value
+
+# @name findManyPostsInvalidPublished
+
+GET {{baseUrl}}/admin/posts?published=invalid
+Authorization: Bearer {{adminToken}}
+
+# ==================================================
+
+# IMAGE - FIND MANY / FILTERS
+
+# ==================================================
+
+### Find many images - no filters
+
+# @name findManyImages
+
+GET {{baseUrl}}/admin/image
+Authorization: Bearer {{adminToken}}
+
+### Find images by id
+
+# @name findManyImagesById
+
+GET {{baseUrl}}/admin/image?id={{imageUuid}}
+Authorization: Bearer {{adminToken}}
+
+### Find images by non-existent id
+
+# @name findManyImagesByIdNotFound
+
+GET {{baseUrl}}/admin/image?id=00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminToken}}
+
+### Find images by exact url
+
+# @name findManyImagesByUrl
+
+GET {{baseUrl}}/admin/image?url={{imageUrl}}
+Authorization: Bearer {{adminToken}}
+
+### Find images by non-existent url
+
+# @name findManyImagesByUrlNotFound
+
+GET {{baseUrl}}/admin/image?url=https://example.com/image-not-found.jpg
+Authorization: Bearer {{adminToken}}
+
+### Find images by user id
+
+# @name findManyImagesByUserId
+
+GET {{baseUrl}}/admin/image?userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find images by user name
+
+# @name findManyImagesByUserName
+
+GET {{baseUrl}}/admin/image?userName=Pedro
+Authorization: Bearer {{adminToken}}
+
+### Find images by partial user name
+
+# @name findManyImagesByPartialUserName
+
+GET {{baseUrl}}/admin/image?userName=ped
+Authorization: Bearer {{adminToken}}
+
+### Find images by user email
+
+# @name findManyImagesByUserEmail
+
+GET {{baseUrl}}/admin/image?userEmail=pedro
+Authorization: Bearer {{adminToken}}
+
+### Find images by partial user email
+
+# @name findManyImagesByPartialUserEmail
+
+GET {{baseUrl}}/admin/image?userEmail=@example
+Authorization: Bearer {{adminToken}}
+
+### Find images by startDate
+
+# @name findManyImagesStartDate
+
+GET {{baseUrl}}/admin/image?startDate=2026-01-01
+Authorization: Bearer {{adminToken}}
+
+### Find images by endDate
+
+# @name findManyImagesEndDate
+
+GET {{baseUrl}}/admin/image?endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find images by date range
+
+# @name findManyImagesDateRange
+
+GET {{baseUrl}}/admin/image?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find images with limit
+
+# @name findManyImagesLimit
+
+GET {{baseUrl}}/admin/image?limit=1
+Authorization: Bearer {{adminToken}}
+
+### Find images page 1
+
+# @name findManyImagesPageOne
+
+GET {{baseUrl}}/admin/image?page=1
+Authorization: Bearer {{adminToken}}
+
+### Find images page 2
+
+# @name findManyImagesPageTwo
+
+GET {{baseUrl}}/admin/image?page=2
+Authorization: Bearer {{adminToken}}
+
+### Find images with limit and page
+
+# @name findManyImagesPagination
+
+GET {{baseUrl}}/admin/image?limit=1&page=2
+Authorization: Bearer {{adminToken}}
+
+### Find images by user id with pagination
+
+# @name findManyImagesUserPagination
+
+GET {{baseUrl}}/admin/image?userId={{userId}}&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find images by user name with pagination
+
+# @name findManyImagesUserNamePagination
+
+GET {{baseUrl}}/admin/image?userName=Pedro&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find images by user email with pagination
+
+# @name findManyImagesUserEmailPagination
+
+GET {{baseUrl}}/admin/image?userEmail=pedro&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find images by date range and user
+
+# @name findManyImagesDateRangeAndUser
+
+GET {{baseUrl}}/admin/image?startDate=2026-01-01&endDate=2026-12-31&userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find images by user name and email
+
+# @name findManyImagesUserNameAndEmail
+
+GET {{baseUrl}}/admin/image?userName=Pedro&userEmail=pedro
+Authorization: Bearer {{adminToken}}
+
+### Find images by multiple filters and pagination
+
+# @name findManyImagesCombinedFilters
+
+GET {{baseUrl}}/admin/image?userName=Pedro&startDate=2026-01-01&endDate=2026-12-31&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find images - invalid page
+
+# @name findManyImagesInvalidPage
+
+GET {{baseUrl}}/admin/image?page=0
+Authorization: Bearer {{adminToken}}
+
+### Find images - invalid limit
+
+# @name findManyImagesInvalidLimit
+
+GET {{baseUrl}}/admin/image?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Find images - limit above maximum
+
+# @name findManyImagesLimitAboveMaximum
+
+GET {{baseUrl}}/admin/image?limit=101
+Authorization: Bearer {{adminToken}}
+
+# ==================================================
+
+# LOG - FIND MANY / FILTERS
+
+# ==================================================
+
+### Find many logs - no filters
+
+# @name findManyLogs
+
+GET {{baseUrl}}/admin/logs
+Authorization: Bearer {{adminToken}}
+
+### Find logs by action
+
+# @name findManyLogsByAction
+
+GET {{baseUrl}}/admin/logs?action=create
+Authorization: Bearer {{adminToken}}
+
+### Find logs by user id
+
+# @name findManyLogsByUserId
+
+GET {{baseUrl}}/admin/logs?userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find logs by entity type
+
+# @name findManyLogsByEntityType
+
+GET {{baseUrl}}/admin/logs?entityType=post
+Authorization: Bearer {{adminToken}}
+
+### Find logs by entity id
+
+# @name findManyLogsByEntityId
+
+GET {{baseUrl}}/admin/logs?entityId={{targetPostId}}
+Authorization: Bearer {{adminToken}}
+
+### Find logs by startDate
+
+# @name findManyLogsStartDate
+
+GET {{baseUrl}}/admin/logs?startDate=2026-01-01
+Authorization: Bearer {{adminToken}}
+
+### Find logs by endDate
+
+# @name findManyLogsEndDate
+
+GET {{baseUrl}}/admin/logs?endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find logs by date range
+
+# @name findManyLogsDateRange
+
+GET {{baseUrl}}/admin/logs?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Find logs with limit
+
+# @name findManyLogsLimit
+
+GET {{baseUrl}}/admin/logs?limit=1
+Authorization: Bearer {{adminToken}}
+
+### Find logs page 1
+
+# @name findManyLogsPageOne
+
+GET {{baseUrl}}/admin/logs?page=1
+Authorization: Bearer {{adminToken}}
+
+### Find logs page 2
+
+# @name findManyLogsPageTwo
+
+GET {{baseUrl}}/admin/logs?page=2
+Authorization: Bearer {{adminToken}}
+
+### Find logs with limit and page
+
+# @name findManyLogsPagination
+
+GET {{baseUrl}}/admin/logs?limit=1&page=2
+Authorization: Bearer {{adminToken}}
+
+### Find logs by action and user
+
+# @name findManyLogsActionAndUser
+
+GET {{baseUrl}}/admin/logs?action=create&userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find logs by entity type and entity id
+
+# @name findManyLogsEntityTypeAndId
+
+GET {{baseUrl}}/admin/logs?entityType=post&entityId={{targetPostId}}
+Authorization: Bearer {{adminToken}}
+
+### Find logs by user and entity type
+
+# @name findManyLogsUserAndEntityType
+
+GET {{baseUrl}}/admin/logs?userId={{userId}}&entityType=post
+Authorization: Bearer {{adminToken}}
+
+### Find logs by date range and action
+
+# @name findManyLogsDateRangeAndAction
+
+GET {{baseUrl}}/admin/logs?startDate=2026-01-01&endDate=2026-12-31&action=create
+Authorization: Bearer {{adminToken}}
+
+### Find logs by date range and user
+
+# @name findManyLogsDateRangeAndUser
+
+GET {{baseUrl}}/admin/logs?startDate=2026-01-01&endDate=2026-12-31&userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find logs by multiple filters and pagination
+
+# @name findManyLogsCombinedFilters
+
+GET {{baseUrl}}/admin/logs?action=create&userId={{userId}}&entityType=post&limit=1&page=1
+Authorization: Bearer {{adminToken}}
+
+### Find logs - invalid page
+
+# @name findManyLogsInvalidPage
+
+GET {{baseUrl}}/admin/logs?page=0
+Authorization: Bearer {{adminToken}}
+
+### Find logs - invalid limit
+
+# @name findManyLogsInvalidLimit
+
+GET {{baseUrl}}/admin/logs?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Find logs - limit above maximum
+
+# @name findManyLogsLimitAboveMaximum
+
+GET {{baseUrl}}/admin/logs?limit=101
+Authorization: Bearer {{adminToken}}
+
+# ==================================================
+
+# FIND MANY - AUTHORIZATION
+
+# ==================================================
+
+### Find users without authentication
+
+# @name findManyUsersNoAuth
+
+GET {{baseUrl}}/admin/users
+
+### Find posts without authentication
+
+# @name findManyPostsNoAuth
+
+GET {{baseUrl}}/admin/posts
+
+### Find images without authentication
+
+# @name findManyImagesNoAuth
+
+GET {{baseUrl}}/admin/image
+
+### Find logs without authentication
+
+# @name findManyLogsNoAuth
+
+GET {{baseUrl}}/admin/logs
+
+### Normal user attempts to list users
+
+# @name findManyUsersNormalUser
+
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{userToken}}
+
+### Normal user attempts to list posts
+
+# @name findManyPostsNormalUser
+
+GET {{baseUrl}}/admin/posts
+Authorization: Bearer {{userToken}}
+
+### Normal user attempts to list images
+# @name findManyImagesNormalUser
+GET {{baseUrl}}/admin/image
+Authorization: Bearer {{userToken}}
+### Normal user attempts to list logs
+# @name findManyLogsNormalUser
+GET {{baseUrl}}/admin/logs
+Authorization: Bearer {{userToken}}
+</file>
+
+<file path="src/user/user.service.ts">
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import {
+  Between,
+  FindOptionsWhere,
+  ILike,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { HashingService } from 'src/commoun/hashing/hashing.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { ActionType } from 'src/activity-logs/enums/action-type.enum';
+import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
+import { UserRole } from './enum/user-role.enum';
+import { JwtPayload } from 'src/auth/types/jwt-payload.type';
+import { FiltersUserDto } from './dto/filters-user.dto';
+import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
+import { ConfirmAdminActionDto } from '../commoun/dto/confirm-admin-action.dto';
+
+@Injectable()
+export class UserService {
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly hashingService: HashingService,
+    private readonly logService: ActivityLogsService,
+  ) {}
+
+  private async assertPasswordMatches(
+    plainPassword: string,
+    passwordHash: string,
+  ): Promise<void> {
+    const isValid = await this.hashingService.compare(
+      plainPassword,
+      passwordHash,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException('Senha incorreta!');
+    }
+  }
+
+  async assertPasswordMatchesByUserId(
+    userId: string,
+    password: string,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: {
+        passwordHash: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    await this.assertPasswordMatches(password, user.passwordHash);
+  }
+
+  private async assertNotLastAdmin(): Promise<void> {
+    const adminCount = await this.userRepository.count({
+      where: { role: UserRole.ADMIN },
+    });
+
+    if (adminCount <= 1) {
+      throw new ConflictException(
+        'Não é possível remover o último administrador do sistema.',
+      );
+    }
+  }
+
+  async failIfEmailExists(email: string) {
+    const exists = await this.userRepository.existsBy({
+      email,
+    });
+
+    if (exists) {
+      throw new ConflictException('E-mail já cadastrado');
+    }
+  }
+
+  async findOneByOrFail(
+    id: string,
+    options: { includePassword?: boolean } = {},
+  ) {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id });
+
+    if (options.includePassword) {
+      query.addSelect('user.passwordHash');
+    }
+
+    const user = await query.getOne();
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
+  }
+
+  async create(dto: CreateUserDto) {
+    await this.failIfEmailExists(dto.email);
+
+    const hashedPassword = await this.hashingService.hash(dto.password);
+
+    const created = await this.userRepository.save({
+      name: dto.name,
+      email: dto.email,
+      passwordHash: hashedPassword,
+    });
+
+    await this.logService.create({
+      user: created,
+      action: ActionType.CREATED,
+      entityId: created.id,
+      entityType: EntityType.USER,
+      metadata: { after: { name: created.name } },
+    });
+
+    return created;
+  }
+
+  async createWithRole(userData: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+  }) {
+    const { name, email, password, role } = userData;
+
+    const passwordHash = await this.hashingService.hash(password);
+
+    const user = this.userRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        name,
+        email,
+        passwordHash,
+        role,
+      })
+      .execute();
+
+    return user;
+  }
+
+  findByEmail(email: string, options: { includePassword?: boolean } = {}) {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email });
+
+    if (options.includePassword) {
+      query.addSelect('user.passwordHash');
+    }
+
+    const user = query.getOne();
+
+    return user;
+  }
+
+  findById(id: string) {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async findMany(filters: FiltersUserDto) {
+    const {
+      id,
+      name,
+      email,
+      isBlocked,
+      forceLogout,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 20,
+    } = filters;
+
+    const where: FindOptionsWhere<User> = {};
+
+    if (id) {
+      where.id = id;
+    } else {
+      if (name) {
+        where.name = ILike(name);
+      }
+
+      if (email) {
+        where.email = ILike(email);
+      }
+
+      if (forceLogout !== undefined) {
+        where.forceLogout = forceLogout;
+      }
+
+      if (isBlocked !== undefined) {
+        where.isBlocked = isBlocked;
+      }
+
+      if (startDate && endDate) {
+        where.createdAt = Between(startDate, endDate);
+      } else if (startDate) {
+        where.createdAt = MoreThanOrEqual(startDate);
+      } else if (endDate) {
+        where.createdAt = LessThanOrEqual(endDate);
+      }
+    }
+
+    const [logs, total] = await this.userRepository.findAndCount({
+      where,
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: logs,
+      total,
+      page,
+      limit,
+    };
+  }
+
+  async updateSelf(user: JwtPayload, dto: UpdateUserDto) {
+    const updatedUser = await this.executeUpdate(user.sub, user, dto);
+    return updatedUser;
+  }
+
+  async updateByAdmin(
+    admin: JwtPayload,
+    targetId: string,
+    dto: UpdateUserAdminDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar este usuário',
+      );
+    }
+    const { reason, ...dtoWithoutReason } = dto;
+    const updatedUser = await this.executeUpdate(
+      targetId,
+      admin,
+      dtoWithoutReason,
+      {
+        isAdminAction: true,
+        reason,
+      },
+    );
+    return updatedUser;
+  }
+
+  private async executeUpdate(
+    targetId: string,
+    requestingUser: JwtPayload,
+    dto: UpdateUserDto,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    const userToUpdate = await this.findOneByOrFail(targetId);
+
+    if (!dto.name && !dto.email) {
+      throw new BadRequestException('Dados não enviados');
+    }
+
+    const isSelfUpdate = requestingUser.sub === userToUpdate.id;
+
+    if (!isSelfUpdate && requestingUser.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para atualizar este usuário',
+      );
+    }
+
+    const before = { name: userToUpdate.name, email: userToUpdate.email };
+
+    userToUpdate.name = dto.name ?? userToUpdate.name;
+
+    if (dto.email && dto.email !== userToUpdate.email) {
+      await this.failIfEmailExists(dto.email);
+
+      userToUpdate.email = dto.email;
+      userToUpdate.forceLogout = true;
+    }
+
+    const updatedUser = await this.save(userToUpdate);
+
+    const after = { name: updatedUser.name, email: updatedUser.email };
+
+    await this.logService.create({
+      user: { id: requestingUser.sub } as User,
+      action: ActionType.UPDATED,
+      entityId: updatedUser.id,
+      entityType: EntityType.USER,
+      metadata: {
+        selfUpdate: !options.isAdminAction,
+        before,
+        after,
+      },
+      reason: options.reason ?? null,
+    });
+
+    return updatedUser;
+  }
+
+  async updatePassword(id: string, dto: UpdatePasswordDto) {
+    const user = await this.findOneByOrFail(id, { includePassword: true });
+
+    await this.assertPasswordMatches(dto.currentPassword, user.passwordHash);
+
+    const isNewPasswordEqual = await this.hashingService.compare(
+      dto.newPassword,
+      user.passwordHash,
+    );
+
+    if (isNewPasswordEqual) {
+      throw new BadRequestException(
+        'A nova senha deve ser diferente da senha atual.',
+      );
+    }
+
+    user.passwordHash = await this.hashingService.hash(dto.newPassword);
+    user.forceLogout = true;
+
+    const updatedUser = await this.save(user);
+
+    await this.logService.create({
+      user: updatedUser,
+      action: ActionType.PASSWORD_CHANGE,
+      entityId: updatedUser.id,
+      entityType: EntityType.USER,
+      metadata: {},
+    });
+
+    return updatedUser;
+  }
+
+  async promoteToAdmin(
+    adminToken: JwtPayload,
+    dto: ConfirmAdminActionDto,
+    targetId: string,
+  ) {
+    if (adminToken.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
+
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+    if (user.role === UserRole.ADMIN) {
+      throw new ConflictException('Usuário já é administrador.');
+    }
+
+    const formerRole = user.role;
+    user.role = UserRole.ADMIN;
+    await this.userRepository.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.PROMOTE,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        previousRole: formerRole,
+        newRole: user.role,
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+      reason: dto.reason,
+    });
+
+    return user;
+  }
+
+  async demote(
+    adminToken: JwtPayload,
+    dto: ConfirmAdminActionDto,
+    targetId: string,
+  ) {
+    if (adminToken.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+
+    if (adminToken.sub === targetId) {
+      throw new ForbiddenException(
+        'Você não pode remover seu próprio acesso de administrador.',
+      );
+    }
+
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (user.role === UserRole.USER) {
+      throw new ConflictException('Usuário já possui esse cargo atualmente.');
+    }
+
+    await this.assertNotLastAdmin();
+
+    const formerRole = user.role;
+    user.role = UserRole.USER;
+    await this.userRepository.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.DEMOTE,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        previousRole: formerRole,
+        newRole: user.role,
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+      reason: dto.reason,
+    });
+
+    return user;
+  }
+
+  async block(
+    adminToken: JwtPayload,
+    dto: ConfirmAdminActionDto,
+    targetId: string,
+  ) {
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (user.isBlocked) {
+      throw new ConflictException('Usuário já está bloqueado.');
+    }
+
+    if (user.role === UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para bloquear outro administrador',
+      );
+    }
+
+    user.isBlocked = true;
+    await this.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.BLOCK_USER,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+      reason: dto.reason,
+    });
+
+    return user;
+  }
+
+  async unblock(
+    adminToken: JwtPayload,
+    dto: ConfirmAdminActionDto,
+    targetId: string,
+  ) {
+    const admin = await this.findOneByOrFail(adminToken.sub, {
+      includePassword: true,
+    });
+    await this.assertPasswordMatches(dto.password, admin.passwordHash);
+
+    const user = await this.findOneByOrFail(targetId);
+
+    if (!user.isBlocked) {
+      throw new ConflictException('Usuário não está bloqueado.');
+    }
+
+    if (user.role === UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para desbloquear outro administrador',
+      );
+    }
+
+    user.isBlocked = false;
+    await this.save(user);
+
+    await this.logService.create({
+      user: admin,
+      action: ActionType.UNBLOCK_USER,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      metadata: {
+        targetEmail: user.email,
+        performedByEmail: admin.email,
+      },
+      reason: dto.reason,
+    });
+
+    return user;
+  }
+
+  async restore(admin: JwtPayload, targetId: string, adminReason: string) {
+    const userToRestore = await this.userRepository.findOne({
+      where: { id: targetId },
+      withDeleted: true,
+    });
+
+    if (!userToRestore) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    if (!userToRestore.deletedAt) {
+      throw new ConflictException('Este usuário já está ativo');
+    }
+
+    const deletedAt = userToRestore.deletedAt;
+
+    await this.userRepository.restore(userToRestore.id);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      action: ActionType.RESTORED,
+      entityId: userToRestore.id,
+      entityType: EntityType.USER,
+      metadata: {
+        deletedAt: deletedAt,
+      },
+      reason: adminReason,
+    });
+
+    return userToRestore;
+  }
+
+  async removeSelf(user: JwtPayload) {
+    return this.executeSoftRemove(user.sub, user);
+  }
+
+  async removeByAdmin(targetId: string, admin: JwtPayload, reason?: string) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Apenas administradores podem executar esta ação.',
+      );
+    }
+    return this.executeSoftRemove(targetId, admin, {
+      isAdminAction: true,
+      reason,
+    });
+  }
+
+  private async executeSoftRemove(
+    targetId: string,
+    requestingUser: JwtPayload,
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
+  ) {
+    const userToDelete = await this.findOneByOrFail(targetId);
+
+    if (userToDelete.role === UserRole.ADMIN) {
+      await this.assertNotLastAdmin();
+    }
+
+    const removedUser = await this.userRepository.softRemove(userToDelete);
+
+    await this.logService.create({
+      user: { id: requestingUser.sub } as User,
+      action: ActionType.DELETED,
+      entityId: targetId,
+      entityType: EntityType.USER,
+      metadata: {
+        selfDelete: !options.isAdminAction,
+        targetSnapshot: {
+          name: removedUser.name,
+          email: removedUser.email,
+          role: removedUser.role,
+        },
+      },
+      reason: options.reason ?? null,
+    });
+
+    return removedUser;
+  }
+
+  save(user: User) {
+    return this.userRepository.save(user);
+  }
+}
+</file>
+
+</files>

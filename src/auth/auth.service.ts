@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -14,6 +15,7 @@ import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { User } from 'src/user/entities/user.entity';
 import { UserRole } from 'src/user/enum/user-role.enum';
+import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 
 @Injectable()
 export class AuthService {
@@ -75,22 +77,38 @@ export class AuthService {
     return this.executeLogout(user, user.sub);
   }
 
-  async forceLogout(admin: JwtPayload, userId: string) {
+  async forceLogout(
+    admin: JwtPayload,
+    userId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Você não tem permissão para realizar essa ação',
       );
     }
 
-    return this.executeLogout(admin, userId, { isAdminAction: true });
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+
+    return this.executeLogout(admin, userId, {
+      isAdminAction: true,
+      reason: dto.reason,
+    });
   }
 
   private async executeLogout(
     user: JwtPayload,
     targetId: string,
-    option: { isAdminAction?: boolean } = {},
+    options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const userToLogOut = await this.userService.findOneByOrFail(targetId);
+
+    if (userToLogOut.forceLogout === true) {
+      throw new ConflictException('Usuário já está com acesso bloqueado');
+    }
 
     userToLogOut.forceLogout = true;
 
@@ -101,9 +119,44 @@ export class AuthService {
       entityId: userLoggedOut.id,
       entityType: EntityType.USER,
       action: ActionType.LOGOUT,
+      reason: options.reason ?? null,
       metadata: {
-        selfLogOut: !option.isAdminAction,
+        selfLogOut: !options.isAdminAction,
       },
+    });
+  }
+
+  async revokeForceLogout(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Você não tem permissão para realizar essa ação',
+      );
+    }
+    await this.userService.assertPasswordMatchesByUserId(
+      admin.sub,
+      dto.password,
+    );
+    const user = await this.userService.findOneByOrFail(targetId);
+
+    if (user.forceLogout === false) {
+      throw new ConflictException('Usuário já está com acesso liberado');
+    }
+
+    user.forceLogout = false;
+
+    await this.userService.save(user);
+
+    await this.logService.create({
+      user: { id: admin.sub } as User,
+      entityId: user.id,
+      entityType: EntityType.USER,
+      action: ActionType.REVOKE_FORCE_LOGOUT,
+      reason: dto.reason,
+      metadata: {},
     });
   }
 }
