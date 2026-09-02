@@ -11,9 +11,8 @@
 @userNewPasswordForTesting = novaSenha456
 
 # Admin test data
-# ! REMOVA ANTES DO COMMIT
-@adminEmailForTesting = joao.paulo@email.com
-@adminPasswordForTesting = umaSenhaForte123
+@adminEmailForTesting = ADCIONE_EMAIL_DO_ENV
+@adminPasswordForTesting = ADCIONE_SENHA_DO_ENV
 
 # Tokens and IDs (to be populated dynamically)
 @userToken = {{loginUser.response.body.accessToken}}
