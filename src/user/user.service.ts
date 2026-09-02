@@ -8,14 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import {
-  Between,
-  FindOptionsWhere,
-  ILike,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -191,52 +184,51 @@ export class UserService {
       limit = 20,
     } = filters;
 
-    const where: FindOptionsWhere<User> = {};
+    const query = this.userRepository.createQueryBuilder('user');
 
     if (id) {
-      where.id = id;
+      query.andWhere('user.id = :id', { id });
     } else {
       if (name) {
-        where.name = ILike(`%${name}%`);
+        query.andWhere('unaccent(user.name) ILIKE unaccent(:name)', {
+          name: `%${name}%`,
+        });
       }
-
       if (email) {
-        where.email = ILike(`%${email}%`);
+        query.andWhere('user.email ILIKE :email', {
+          email: `%${email}%`,
+        });
       }
-
       if (role) {
-        where.role = role;
+        query.andWhere('user.role = :role', { role });
       }
-
       if (forceLogout !== undefined) {
-        where.forceLogout = forceLogout;
+        query.andWhere('user.forceLogout = :forceLogout', { forceLogout });
       }
-
       if (isBlocked !== undefined) {
-        where.isBlocked = isBlocked;
+        query.andWhere('user.isBlocked = :isBlocked', { isBlocked });
       }
-
       if (startDate && endDate) {
-        where.createdAt = Between(startDate, endDate);
+        query.andWhere('user.createdAt BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        });
       } else if (startDate) {
-        where.createdAt = MoreThanOrEqual(startDate);
+        query.andWhere('user.createdAt >= :startDate', { startDate });
       } else if (endDate) {
-        where.createdAt = LessThanOrEqual(endDate);
+        query.andWhere('user.createdAt <= :endDate', { endDate });
       }
     }
 
-    const [logs, total] = await this.userRepository.findAndCount({
-      where,
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const [users, count] = await query
+      .orderBy('user.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
 
     return {
-      data: logs,
-      total,
+      data: users,
+      total: count,
       page,
       limit,
     };

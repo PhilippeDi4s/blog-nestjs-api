@@ -75,7 +75,7 @@ export class ImagesService {
       query.andWhere('user.id = :userId', { userId });
     } else {
       if (userName) {
-        query.andWhere('user.name ILIKE  :userName', {
+        query.andWhere('unaccent(user.name) ILIKE  unaccent(:userName)', {
           userName: `%${userName}%`,
         });
       }

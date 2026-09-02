@@ -147,7 +147,9 @@ export class PostService {
     if (id) query.andWhere('post.id = :id', { id });
 
     if (title) {
-      query.andWhere('post.title ILIKE :title', { title: `%${title}%` });
+      query.andWhere('unaccent(post.title) ILIKE unaccent(:title)', {
+        title: `%${title}%`,
+      });
     }
 
     if (slug) {
@@ -172,7 +174,7 @@ export class PostService {
       query.andWhere('user.id = :authorId', { authorId });
     } else {
       if (authorName) {
-        query.andWhere('user.name ILIKE  :authorName', {
+        query.andWhere('unaccent(user.name) ILIKE  unaccent(:authorName)', {
           authorName: `%${authorName}%`,
         });
       }
