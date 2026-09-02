@@ -182,6 +182,7 @@ export class UserService {
       id,
       name,
       email,
+      role,
       isBlocked,
       forceLogout,
       startDate,
@@ -196,11 +197,15 @@ export class UserService {
       where.id = id;
     } else {
       if (name) {
-        where.name = ILike(name);
+        where.name = ILike(`%${name}%`);
       }
 
       if (email) {
-        where.email = ILike(email);
+        where.email = ILike(`%${email}%`);
+      }
+
+      if (role) {
+        where.role = role;
       }
 
       if (forceLogout !== undefined) {
@@ -539,10 +544,12 @@ export class UserService {
 
     await this.userRepository.restore(userToRestore.id);
 
+    const retoredUser = await this.findOneByOrFail(userToRestore.id);
+
     await this.logService.create({
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
-      entityId: userToRestore.id,
+      entityId: retoredUser.id,
       entityType: EntityType.USER,
       metadata: {
         deletedAt: deletedAt,
@@ -550,7 +557,7 @@ export class UserService {
       reason: adminReason,
     });
 
-    return userToRestore;
+    return retoredUser;
   }
 
   async removeSelf(user: JwtPayload) {

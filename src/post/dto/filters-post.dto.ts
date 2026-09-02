@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -21,6 +21,11 @@ export class FiltersPostDto {
   slug?: string;
 
   @IsOptional()
+  @Transform(({ value }): boolean => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   published?: boolean;
 

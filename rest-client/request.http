@@ -1,0 +1,679 @@
+# ==================================================
+# VARIABLES
+# ==================================================
+
+@baseUrl = http://localhost:3001
+
+# User test data
+@userNameForTesting = João Silva
+@userEmailForTesting = joao.silva@example.com
+@userPasswordForTesting = senha123
+@userNewPasswordForTesting = novaSenha456
+
+# Admin test data
+# ! REMOVA ANTES DO COMMIT
+@adminEmailForTesting = joao.paulo@email.com
+@adminPasswordForTesting = umaSenhaForte123
+
+# Tokens and IDs (to be populated dynamically)
+@userToken = {{loginUser.response.body.accessToken}}
+@userId = {{createUser.response.body.id}}
+
+@adminToken = {{loginAdmin.response.body.accessToken}}
+
+@imageId = {{uploadImage.response.body.id}}
+@imageUrl = {{uploadImage.response.body.url}}
+
+@postId = {{createPost.response.body.id}}
+@postSlug = {{createPost.response.body.slug}}
+
+
+# ==================================================
+# USER - AUTH
+# ==================================================
+
+# @name createUser
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "name": "{{userNameForTesting}}",
+  "email": "{{userEmailForTesting}}",
+  "password": "{{userPasswordForTesting}}"
+}
+
+### Capture user ID from response
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{userEmailForTesting}}",
+  "password": "{{userPasswordForTesting}}"
+}
+###
+# @name logoutUser
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{userToken}}
+###
+
+# ==================================================
+# USER - PROFILE
+# ==================================================
+
+# @name getCurrentUser
+GET {{baseUrl}}/user/me
+Authorization: Bearer {{userToken}}
+
+### @name updateCurrentUser
+PATCH {{baseUrl}}/user/me
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "name": "João Silva Atualizado"
+}
+
+### @name updatePassword
+PATCH {{baseUrl}}/user/me/password
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "{{userPasswordForTesting}}",
+  "newPassword": "{{userNewPasswordForTesting}}"
+}
+
+### Test: Update password with invalid current password
+# @name updatePasswordInvalid
+PATCH {{baseUrl}}/user/me/password
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "currentPassword": "senhaErrada123",
+  "newPassword": "outraSenha789"
+}
+###
+
+# ==================================================
+# USER - UPLOAD
+# ==================================================
+
+# @name uploadImage
+POST {{baseUrl}}/upload
+Authorization: Bearer {{userToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./dev/images/image.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+###
+
+# ==================================================
+# USER - IMAGES
+# ==================================================
+
+# @name getMyImages
+GET {{baseUrl}}/images/me
+Authorization: Bearer {{userToken}}
+
+### @name getImageById
+GET {{baseUrl}}/images/{{imageId}}
+Authorization: Bearer {{userToken}}
+
+### @name deleteImage
+DELETE {{baseUrl}}/images/{{imageId}}
+Authorization: Bearer {{userToken}}
+###
+
+# ==================================================
+# USER - POSTS
+# ==================================================
+
+# @name createPost
+POST {{baseUrl}}/post/me
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "title": "Introdução ao NestJS - Um Framework Excelente",
+  "excerpt": "Neste artigo, exploraremos os fundamentos do NestJS e como começar sua jornada.",
+  "content": "O NestJS é um framework Node.js baseado no Express que oferece uma arquitetura modular e escalável. Vamos explorar seus principais conceitos, padrões de design, e como construir aplicações robustas.",
+  "coverImage": "{{imageUrl}}",
+  "published": false
+}
+
+### @name getMyPosts
+GET {{baseUrl}}/post/me
+Authorization: Bearer {{userToken}}
+
+### @name getMyPostById
+GET {{baseUrl}}/post/me/{{postId}}
+Authorization: Bearer {{userToken}}
+
+### @name updateMyPost
+PATCH {{baseUrl}}/post/me/{{postId}}
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "title": "Introdução ao NestJS - Framework Moderno e Poderoso",
+  "excerpt": "Uma exploração profunda dos fundamentos do NestJS.",
+  "published": true
+}
+
+### @name deleteMyPost
+DELETE {{baseUrl}}/post/me/{{postId}}
+Authorization: Bearer {{userToken}}
+
+### Public: Get all published posts
+# @name getAllPublishedPosts
+GET {{baseUrl}}/post
+
+### Public: Get post by slug
+# @name getPostBySlug
+GET {{baseUrl}}/post/{{postSlug}}
+
+# ==================================================
+# ADMIN - AUTH
+# ==================================================
+### @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmailForTesting}}",
+  "password": "{{adminPasswordForTesting}}"
+}
+
+
+# ==================================================
+# ADMIN - USERS
+# ==================================================
+
+### @name adminFindManyUsers
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Find users with filter
+# @name adminFindUsersByName
+GET {{baseUrl}}/admin/users?name=João
+Authorization: Bearer {{adminToken}}
+
+### Find users paginated
+# @name adminFindUsersPaginated
+GET {{baseUrl}}/admin/users?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Find blocked users
+# @name adminFindBlockedUsers
+GET {{baseUrl}}/admin/users?isBlocked=true
+Authorization: Bearer {{adminToken}}
+
+### @name adminUpdateUser
+PATCH {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "João Silva - Atualizado pelo Admin",
+  "reason": "Atualização de dados do usuário realizada conforme solicitação gerencial e auditoria operacional."
+}
+
+### @name adminPromoteUser
+PATCH {{baseUrl}}/admin/users/{{userId}}/promote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Promoção para admin realizada devido à comprovada capacidade gerencial e confiabilidade operacional."
+}
+
+### @name adminDemoteUser
+PATCH {{baseUrl}}/admin/users/{{userId}}/demote
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Rebaixamento de permissões realizado conforme política de gestão de acessos e auditoria de segurança."
+}
+
+### @name adminBlockUser
+PATCH {{baseUrl}}/admin/users/{{userId}}/block
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Bloqueio de conta realizado devido a violação de termos de serviço e comportamento suspeito identificado."
+}
+
+### @name adminUnblockUser
+PATCH {{baseUrl}}/admin/users/{{userId}}/unblock
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Desbloqueio de conta realizado após verificação de cumprimento de políticas e resolução de infrações."
+}
+
+### @name adminRestoreUser
+PATCH {{baseUrl}}/admin/users/{{userId}}/restore
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Restauração de conta realizada conforme solicitação do usuário e revisão gerencial de elegibilidade."
+}
+
+### @name adminDeleteUser
+DELETE {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Exclusão permanente de conta realizada por decisão administrativa após análise de conformidade e regulamentações."
+}
+
+
+# ==================================================
+# ADMIN - AUTH / FORCE LOGOUT
+# ==================================================
+
+### @name adminForceLogout
+POST {{baseUrl}}/auth/admin/{{userId}}/logout
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Logout forçado realizado como medida de segurança por atividade suspeita detectada no sistema."
+}
+
+### @name adminRevokeForceLogout
+POST {{baseUrl}}/auth/admin/{{userId}}/revoke-logout
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Revogação de logout forçado realizada após resolução de incidente de segurança e liberação autorizada."
+}
+
+
+# ==================================================
+# ADMIN - POSTS
+# ==================================================
+
+### @name adminFindManyPosts
+GET {{baseUrl}}/admin/posts
+Authorization: Bearer {{adminToken}}
+
+### Find posts with filter
+# @name adminFindPostsByTitle
+GET {{baseUrl}}/admin/posts?title=NestJS
+Authorization: Bearer {{adminToken}}
+
+### Find published posts only
+# @name adminFindPublishedPosts
+GET {{baseUrl}}/admin/posts?published=true
+Authorization: Bearer {{adminToken}}
+
+### Find posts paginated
+# @name adminFindPostsPaginated
+GET {{baseUrl}}/admin/posts?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### @name adminUpdatePost
+PATCH {{baseUrl}}/admin/posts/{{postId}}/update
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "Título do Post Revisado Administrativamente",
+  "excerpt": "Excerto revisado pelo administrador",
+  "content": "Conteúdo revisado e atualizado conforme políticas editoriais",
+  "reason": "Atualização administrativa realizada para conformidade com padrões editoriais e política de conteúdo."
+}
+
+### @name adminRestorePost
+PATCH {{baseUrl}}/admin/posts/{{postId}}/restore
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Restauração de post realizada após solicitação do autor e revisão de conformidade editorial."
+}
+
+### @name adminDeletePost
+DELETE {{baseUrl}}/admin/posts/0d2b01b1-4eca-4c6e-aa8e-a60bd319dbcf
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Exclusão de post realizada por violação de política de conteúdo e revisão de conformidade editorial."
+}
+
+
+# ==================================================
+# ADMIN - IMAGES
+# ==================================================
+
+### @name adminFindManyImages
+GET {{baseUrl}}/admin/images
+Authorization: Bearer {{adminToken}}
+
+### Find images with filter by user
+# @name adminFindImagesByUser
+GET {{baseUrl}}/admin/images?userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Find images paginated
+# @name adminFindImagesPaginated
+GET {{baseUrl}}/admin/images?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### @name adminRestoreImage
+PATCH {{baseUrl}}/admin/images/{{imageId}}/restore
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Restauração de imagem realizada conforme solicitação do proprietário e revisão de segurança."
+}
+
+### @name adminDeleteImage
+DELETE {{baseUrl}}/admin/images/{{imageId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "password": "{{adminPasswordForTesting}}",
+  "reason": "Exclusão de imagem realizada por violação de políticas de conteúdo ou conformidade regulatória."
+}
+
+
+# ==================================================
+# ADMIN - ACTIVITY LOGS
+# ==================================================
+
+### @name adminFindManyLogs
+GET {{baseUrl}}/activity-logs
+Authorization: Bearer {{adminToken}}
+
+### Find logs paginated
+# @name adminFindLogsPaginated
+GET {{baseUrl}}/activity-logs?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Find logs with date range
+# @name adminFindLogsByDateRange
+GET {{baseUrl}}/activity-logs?startDate=2024-01-01T00:00:00.000Z&endDate=2026-12-31T23:59:59.999Z
+Authorization: Bearer {{adminToken}}
+
+
+# ==================================================
+# FIND MANY - USERS
+# ==================================================
+
+# Basic: all users
+### @name findAllUsers
+GET {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Filter by ID
+# @name findUserById
+GET {{baseUrl}}/admin/users?id={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by email
+# @name findUserByEmail
+GET {{baseUrl}}/admin/users?email={{userEmailForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by name
+# @name findUserByName
+GET {{baseUrl}}/admin/users?name={{userNameForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by force logout status
+# @name findUsersWithForceLogout
+GET {{baseUrl}}/admin/users?forceLogout=true
+Authorization: Bearer {{adminToken}}
+
+### Filter by blocked status - true
+# @name findBlockedUsers
+GET {{baseUrl}}/admin/users?isBlocked=true
+Authorization: Bearer {{adminToken}}
+
+### Filter by blocked status - false
+# @name findActiveUsers
+GET {{baseUrl}}/admin/users?isBlocked=false
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 1
+# @name findUsersPage1
+GET {{baseUrl}}/admin/users?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 2
+# @name findUsersPage2
+GET {{baseUrl}}/admin/users?page=2&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Combined filters: blocked users with custom limit
+# @name findBlockedUsersLimited
+GET {{baseUrl}}/admin/users?isBlocked=true&limit=5
+Authorization: Bearer {{adminToken}}
+
+### Invalid page value
+# @name findUsersInvalidPage
+GET {{baseUrl}}/admin/users?page=0
+Authorization: Bearer {{adminToken}}
+
+### Invalid limit value
+# @name findUsersInvalidLimit
+GET {{baseUrl}}/admin/users?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Limit exceeding maximum
+# @name findUsersLimitTooHigh
+GET {{baseUrl}}/admin/users?limit=150
+Authorization: Bearer {{adminToken}}
+
+
+# ==================================================
+# FIND MANY - POSTS
+# ==================================================
+
+# Basic: all posts
+### @name findAllPosts
+GET {{baseUrl}}/admin/posts
+Authorization: Bearer {{adminToken}}
+
+### Filter by ID
+# @name findPostById
+GET {{baseUrl}}/admin/posts?id={{postId}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by title
+# @name findPostsByTitle
+GET {{baseUrl}}/admin/posts?title=NestJS
+Authorization: Bearer {{adminToken}}
+
+### Filter by slug
+# @name findPostBySlug
+GET {{baseUrl}}/admin/posts?slug={{postSlug}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by published status - true
+# @name findPublishedPosts
+GET {{baseUrl}}/admin/posts?published=true
+Authorization: Bearer {{adminToken}}
+
+### Filter by published status - false
+# @name findDraftPosts
+GET {{baseUrl}}/admin/posts?published=false
+Authorization: Bearer {{adminToken}}
+
+### Filter by author ID
+# @name findPostsByAuthorId
+GET {{baseUrl}}/admin/posts?authorId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by author name
+# @name findPostsByAuthorName
+GET {{baseUrl}}/admin/posts?authorName={{userNameForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by author email
+# @name findPostsByAuthorEmail
+GET {{baseUrl}}/admin/posts?authorEmail={{userEmailForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 1
+# @name findPostsPage1
+GET {{baseUrl}}/admin/posts?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 2
+# @name findPostsPage2
+GET {{baseUrl}}/admin/posts?page=2&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Combined filters: published posts by author
+# @name findPublishedPostsByAuthor
+GET {{baseUrl}}/admin/posts?published=true&authorId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Invalid page value
+# @name findPostsInvalidPage
+GET {{baseUrl}}/admin/posts?page=0
+Authorization: Bearer {{adminToken}}
+
+### Invalid limit value
+# @name findPostsInvalidLimit
+GET {{baseUrl}}/admin/posts?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Limit exceeding maximum
+# @name findPostsLimitTooHigh
+GET {{baseUrl}}/admin/posts?limit=150
+Authorization: Bearer {{adminToken}}
+
+
+# ==================================================
+# FIND MANY - IMAGES
+# ==================================================
+
+### Basic: all images
+# @name findAllImages
+GET {{baseUrl}}/admin/images
+Authorization: Bearer {{adminToken}}
+
+### Filter by ID
+# @name findImageById
+GET {{baseUrl}}/admin/images?id={{imageId}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by URL
+# @name findImagesByUrl
+GET {{baseUrl}}/admin/images?url={{imageUrl}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by user ID
+# @name findImagesByUserId
+GET {{baseUrl}}/admin/images?userId={{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by user name
+# @name findImagesByUserName
+GET {{baseUrl}}/admin/images?userName={{userNameForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Filter by user email
+# @name findImagesByUserEmail
+GET {{baseUrl}}/admin/images?userEmail={{userEmailForTesting}}
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 1
+# @name findImagesPage1
+GET {{baseUrl}}/admin/images?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 2
+# @name findImagesPage2
+GET {{baseUrl}}/admin/images?page=2&limit=10
+Authorization: Bearer {{adminToken}}
+
+### Combined filters: images by user with limit
+# @name findImagesByUserPaginated
+GET {{baseUrl}}/admin/images?userId={{userId}}&limit=5
+Authorization: Bearer {{adminToken}}
+
+### Invalid page value
+# @name findImagesInvalidPage
+GET {{baseUrl}}/admin/images?page=0
+Authorization: Bearer {{adminToken}}
+
+### Invalid limit value
+# @name findImagesInvalidLimit
+GET {{baseUrl}}/admin/images?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Limit exceeding maximum
+# @name findImagesLimitTooHigh
+GET {{baseUrl}}/admin/images?limit=150
+Authorization: Bearer {{adminToken}}
+
+
+# ==================================================
+# FIND MANY - ACTIVITY LOGS
+# ==================================================
+
+# Basic: all logs
+# @name findAllLogs
+GET {{baseUrl}}/activity-logs
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 1
+# @name findLogsPage1
+GET {{baseUrl}}/activity-logs?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### Pagination: page 2
+# @name findLogsPage2
+GET {{baseUrl}}/activity-logs?page=2&limit=20
+Authorization: Bearer {{adminToken}}
+
+### Custom limit
+# @name findLogsCustomLimit
+GET {{baseUrl}}/activity-logs?limit=50
+Authorization: Bearer {{adminToken}}
+
+### Invalid page value
+# @name findLogsInvalidPage
+GET {{baseUrl}}/activity-logs?page=0
+Authorization: Bearer {{adminToken}}
+
+### Invalid limit value
+# @name findLogsInvalidLimit
+GET {{baseUrl}}/activity-logs?limit=0
+Authorization: Bearer {{adminToken}}
+
+### Limit exceeding maximum
+# @name findLogsLimitTooHigh
+GET {{baseUrl}}/activity-logs?limit=150
+Authorization: Bearer {{adminToken}}

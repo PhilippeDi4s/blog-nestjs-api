@@ -186,12 +186,14 @@ export class ImagesService {
 
     const deletedAt = imageToRestore.deletedAt;
 
+    const restoredImage = await this.findOneOrFail({ id: imageToRestore.id });
+
     await this.imagesRepository.restore(targetId);
 
     await this.logService.create({
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
-      entityId: imageToRestore.id,
+      entityId: restoredImage.id,
       entityType: EntityType.IMAGE,
       metadata: {
         deletedAt: deletedAt,
@@ -199,7 +201,7 @@ export class ImagesService {
       reason: dto.reason,
     });
 
-    return imageToRestore;
+    return restoredImage;
   }
 
   async selfRemove(user: JwtPayload, targetId: string) {

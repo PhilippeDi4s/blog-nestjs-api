@@ -1,13 +1,15 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsEnum,
   IsInt,
   IsOptional,
   IsUUID,
   Max,
   Min,
 } from 'class-validator';
+import { UserRole } from '../enum/user-role.enum';
 
 export class FiltersUserDto {
   @IsOptional()
@@ -21,10 +23,24 @@ export class FiltersUserDto {
   email?: string;
 
   @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
+
+  @IsOptional()
+  @Transform(({ value }): boolean => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   forceLogout?: boolean;
 
   @IsOptional()
+  @Transform(({ value }): boolean => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   isBlocked?: boolean;
 
