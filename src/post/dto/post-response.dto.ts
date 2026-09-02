@@ -9,15 +9,16 @@ export class PostResponseDto {
   readonly published: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
-  readonly coverImage: {
-    id: string;
-    uploadedBy: string;
-    url: string;
-  };
+  readonly deletedAt: Date | null;
   readonly author: {
     id: string;
     name: string;
     email: string;
+  };
+  readonly coverImage: {
+    id: string;
+    uploadedBy: string;
+    url: string;
   };
 
   constructor(post: Post) {
@@ -29,15 +30,16 @@ export class PostResponseDto {
     this.published = post.published;
     this.createdAt = post.createdAt;
     this.updatedAt = post.updatedAt;
-    this.coverImage = {
-      id: post.coverImage.id,
-      uploadedBy: post.coverImage.uploadedBy.id,
-      url: post.coverImage.url,
-    };
+    this.deletedAt = post.deletedAt;
     this.author = {
       id: post.author.id,
       name: post.author.name,
       email: post.author.email,
+    };
+    this.coverImage = {
+      id: post.coverImage.id,
+      uploadedBy: post.coverImage.uploadedBy.id,
+      url: post.coverImage.url,
     };
   }
 }

@@ -1,11 +1,3 @@
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +15,14 @@ import { FiltersPostDto } from './dto/filters-post.dto';
 import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 import { UserService } from 'src/user/user.service';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 
 @Injectable()
 export class PostService {
@@ -59,7 +59,7 @@ export class PostService {
       order: {
         createdAt: 'DESC',
       },
-      relations: { author: true },
+      relations: { coverImage: { uploadedBy: true }, author: true },
     });
 
     return posts;
@@ -92,7 +92,7 @@ export class PostService {
         ...(postData as FindOptionsWhere<Post>),
         author: { id: authorId },
       },
-      relations: { author: true },
+      relations: { coverImage: { uploadedBy: true }, author: true },
     });
 
     return post;
@@ -106,7 +106,7 @@ export class PostService {
       order: {
         createdAt: 'DESC',
       },
-      relations: { author: true },
+      relations: { coverImage: { uploadedBy: true }, author: true },
     });
 
     return posts;
@@ -130,13 +130,26 @@ export class PostService {
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoin('post.author', 'user')
-      .addSelect(['user.id', 'user.name', 'user.email']);
+      .leftJoin('post.coverImage', 'coverImage')
+      .leftJoin('coverImage.uploadedBy', 'uploadedBy')
+      .addSelect([
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.role',
+        'coverImage.id',
+        'coverImage.url',
+        'uploadedBy.id',
+        'uploadedBy.name',
+        'uploadedBy.email',
+      ]);
 
     if (id) query.andWhere('post.id = :id', { id });
 
     if (title) {
       query.andWhere('post.title ILIKE :title', { title: `%${title}%` });
     }
+
     if (slug) {
       query.andWhere('post.slug ILIKE :slug', { slug: `%${slug}%` });
     }
@@ -341,10 +354,12 @@ export class PostService {
 
     await this.postRepository.restore(postToRestore.id);
 
+    const retoredPost = await this.findOneOrFail({ id: postToRestore.id });
+
     await this.logService.create({
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
-      entityId: postToRestore.id,
+      entityId: retoredPost.id,
       entityType: EntityType.POST,
       metadata: {
         deletedAt: deletedAt,
@@ -352,7 +367,7 @@ export class PostService {
       reason: dto.reason,
     });
 
-    return postToRestore;
+    return retoredPost;
   }
 
   async removeSelf(targetId: string, user: JwtPayload) {
