@@ -27,6 +27,11 @@ export class AuthService {
     private readonly logService: ActivityLogsService,
   ) {}
 
+  async getAuthenticatedUser(userToken: JwtPayload) {
+    const user = await this.userService.findOneByOrFail(userToken.sub);
+    return user;
+  }
+
   async login(loginDto: LoginDto) {
     const user = await this.userService.findByEmail(loginDto.email, {
       includePassword: true,

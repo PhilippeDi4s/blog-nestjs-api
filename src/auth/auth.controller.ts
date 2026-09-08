@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   Req,
@@ -16,10 +17,18 @@ import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get('me')
+  async getAuthenticatedUser(@Req() req: AuthenticatedRequest) {
+    const user = await this.authService.getAuthenticatedUser(req.user);
+    return new UserResponseDto(user);
+  }
+
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
