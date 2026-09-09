@@ -216,6 +216,7 @@ Os endpoints protegidos aceitam `Authorization: Bearer <JWT>`. Os endpoints sob 
 
 | Método | Rota | Acesso | Corpo principal |
 |---|---|---|---|
+| GET | `/auth/me` | Autenticado | — |
 | POST | `/auth/login` | Público | `{ "email": "user@example.com", "password": "******" }` |
 | POST | `/auth/logout` | Autenticado | — |
 | POST | `/auth/admin/:id/logout` | Admin | `{ "password": "******", "reason": "Motivo com pelo menos 10 caracteres" }` |
