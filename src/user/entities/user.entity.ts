@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserRole } from '../enum/user-role.enum';
+import { Min } from 'class-validator';
 
 @Entity('users')
 export class User {
@@ -20,6 +21,7 @@ export class User {
   email: string;
 
   @Column({ select: false })
+  @Min(6)
   passwordHash: string;
 
   @Column({ default: false })

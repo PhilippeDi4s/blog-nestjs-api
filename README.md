@@ -237,8 +237,8 @@ Os endpoints protegidos aceitam `Authorization: Bearer <JWT>`. Os endpoints sob 
 | PATCH | `/admin/users/:id/demote` | Admin; confirmação de senha e motivo |
 | PATCH | `/admin/users/:id/block` | Admin; confirmação de senha e motivo |
 | PATCH | `/admin/users/:id/unblock` | Admin; confirmação de senha e motivo |
-| PATCH | `/admin/users/:id/restore` | Admin; motivo |
-| DELETE | `/admin/users/:id` | Admin; motivo |
+| PATCH | `/admin/users/:id/restore` | Admin; confirmação de senha e motivo |
+| DELETE | `/admin/users/:id` | Admin; confirmação de senha e motivo |
 
 ### Posts
 

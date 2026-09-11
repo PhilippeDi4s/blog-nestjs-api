@@ -117,6 +117,6 @@ export class UploadService {
       },
     });
 
-    return savedImage;
+    return savedImage.url;
   }
 }

@@ -103,7 +103,7 @@ export class AdminUserController {
     const restoredUser = await this.userService.restore(
       req.user,
       targetId,
-      dto.reason,
+      dto,
     );
     return new UserResponseDto(restoredUser);
   }
@@ -117,7 +117,7 @@ export class AdminUserController {
     const removedUser = await this.userService.removeByAdmin(
       targetId,
       req.user,
-      dto.reason,
+      dto,
     );
     return new UserResponseDto(removedUser);
   }

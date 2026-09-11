@@ -518,7 +518,12 @@ export class UserService {
     return user;
   }
 
-  async restore(admin: JwtPayload, targetId: string, adminReason: string) {
+  async restore(
+    admin: JwtPayload,
+    targetId: string,
+    dto: ConfirmAdminActionDto,
+  ) {
+    await this.assertPasswordMatchesByUserId(admin.sub, dto.password);
     const userToRestore = await this.userRepository.findOne({
       where: { id: targetId },
       withDeleted: true,
@@ -546,7 +551,7 @@ export class UserService {
       metadata: {
         deletedAt: deletedAt,
       },
-      reason: adminReason,
+      reason: dto.reason,
     });
 
     return retoredUser;
@@ -556,7 +561,11 @@ export class UserService {
     return this.executeSoftRemove(user.sub, user);
   }
 
-  async removeByAdmin(targetId: string, admin: JwtPayload, reason?: string) {
+  async removeByAdmin(
+    targetId: string,
+    admin: JwtPayload,
+    dto: ConfirmAdminActionDto,
+  ) {
     if (admin.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Apenas administradores podem executar esta ação.',
@@ -564,15 +573,31 @@ export class UserService {
     }
     return this.executeSoftRemove(targetId, admin, {
       isAdminAction: true,
-      reason,
+      reason: dto.reason,
+      password: dto.password,
     });
   }
 
   private async executeSoftRemove(
     targetId: string,
     requestingUser: JwtPayload,
-    options: { isAdminAction?: boolean; reason?: string | null } = {},
+    options: {
+      isAdminAction?: boolean;
+      reason?: string;
+      password?: string;
+    } = {},
   ) {
+    if (options.isAdminAction && !options.password) {
+      throw new BadRequestException('A senha é obrigatória');
+    }
+
+    if (options.isAdminAction) {
+      await this.assertPasswordMatchesByUserId(
+        requestingUser.sub,
+        options.password!,
+      );
+    }
+
     const userToDelete = await this.findOneByOrFail(targetId);
 
     if (userToDelete.role === UserRole.ADMIN) {
