@@ -291,6 +291,10 @@ export class PostService {
       published: post.published,
     };
 
+    if (dto.title && dto.title !== post.title) {
+      post.slug = createSlugFromText(dto.title);
+    }
+
     post.title = dto.title ?? post.title;
     post.content = dto.content ?? post.content;
     post.excerpt = dto.excerpt ?? post.excerpt;

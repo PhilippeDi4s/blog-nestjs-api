@@ -232,7 +232,7 @@ Os endpoints protegidos aceitam `Authorization: Bearer <JWT>`. Os endpoints sob 
 | PATCH | `/user/me/password` | Autenticado |
 | DELETE | `/user/me` | Autenticado |
 | GET | `/admin/users` | Admin; filtros e paginação |
-| PATCH | `/admin/users/:id` | Admin |
+| PATCH | `/admin/users/:id` | Admin; confirmação de senha e motivo |
 | PATCH | `/admin/users/:id/promote` | Admin; confirmação de senha e motivo |
 | PATCH | `/admin/users/:id/demote` | Admin; confirmação de senha e motivo |
 | PATCH | `/admin/users/:id/block` | Admin; confirmação de senha e motivo |
@@ -252,7 +252,7 @@ Os endpoints protegidos aceitam `Authorization: Bearer <JWT>`. Os endpoints sob 
 | PATCH | `/post/me/:id` | Autenticado |
 | DELETE | `/post/me/:id` | Autenticado |
 | GET | `/admin/posts` | Admin; filtros e paginação |
-| PATCH | `/admin/posts/:id/update` | Admin |
+| PATCH | `/admin/posts/:id/update` | Admin; motivo |
 | PATCH | `/admin/posts/:id/restore` | Admin; confirmação de senha e motivo |
 | DELETE | `/admin/posts/:id` | Admin; confirmação de senha e motivo |
 

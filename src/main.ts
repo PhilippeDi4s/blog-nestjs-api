@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { parseCorsWhitelist } from './commoun/utils/parseCorsWhitelist';
 import cookieParser from 'cookie-parser';
@@ -34,6 +34,14 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => {
+        const formatted = errors.map((err) => ({
+          code: `INVALID_${err.property.toUpperCase()}`,
+          field: err.property,
+          message: Object.values(err.constraints ?? {})[0],
+        }));
+        return new BadRequestException({ errors: formatted });
+      },
     }),
   );
 

@@ -249,16 +249,11 @@ export class UserService {
         'Você não tem permissão para atualizar este usuário',
       );
     }
-    const { reason, ...dtoWithoutReason } = dto;
-    const updatedUser = await this.executeUpdate(
-      targetId,
-      admin,
-      dtoWithoutReason,
-      {
-        isAdminAction: true,
-        reason,
-      },
-    );
+    const { reason, ...userData } = dto;
+    const updatedUser = await this.executeUpdate(targetId, admin, userData, {
+      isAdminAction: true,
+      reason,
+    });
     return updatedUser;
   }
 

@@ -36,7 +36,15 @@ export class AdminUserController {
     };
   }
 
-  @Patch(':id')
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async findOne(@Param('id', ParseUUIDPipe) targetId: string) {
+    const user = await this.userService.findOneByOrFail(targetId);
+    return new UserResponseDto(user);
+  }
+
+  @Patch(':id/update')
   async updateUser(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,
@@ -108,7 +116,7 @@ export class AdminUserController {
     return new UserResponseDto(restoredUser);
   }
 
-  @Delete(':id')
+  @Delete(':id/archive')
   async softRemove(
     @Req() req: AuthenticatedRequest,
     @Param('id', ParseUUIDPipe) targetId: string,

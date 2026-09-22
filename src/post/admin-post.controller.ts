@@ -36,6 +36,14 @@ export class AdminPostController {
     };
   }
 
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async findOne(@Param('id', ParseUUIDPipe) targetId: string) {
+    const post = await this.postService.findOneOrFail({ id: targetId });
+    return new PostResponseDto(post);
+  }
+
   @Patch(':id/update')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
