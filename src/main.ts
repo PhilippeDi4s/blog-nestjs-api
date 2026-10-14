@@ -36,7 +36,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
         const formatted = errors.map((err) => ({
-          code: `INVALID_${err.property.toUpperCase()}`,
+          code: `INVALID_VALIDATION`,
           field: err.property,
           message: Object.values(err.constraints ?? {})[0],
         }));

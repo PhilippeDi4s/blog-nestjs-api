@@ -63,7 +63,9 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync(JwtPayload);
 
-    user.forceLogout = false;
+    const { exp } = this.jwtService.decode<{ exp: number }>(accessToken);
+    user.isLogged = true;
+    user.sessionExpiresAt = new Date(exp * 1000);
 
     await this.userService.save(user);
 
@@ -111,11 +113,12 @@ export class AuthService {
   ) {
     const userToLogOut = await this.userService.findOneByOrFail(targetId);
 
-    if (userToLogOut.forceLogout === true) {
+    if (!userToLogOut.isLogged) {
       throw new ConflictException('Usuário já está com acesso bloqueado');
     }
 
-    userToLogOut.forceLogout = true;
+    userToLogOut.isLogged = false;
+    userToLogOut.sessionExpiresAt = null;
 
     const userLoggedOut = await this.userService.save(userToLogOut);
 
@@ -128,40 +131,6 @@ export class AuthService {
       metadata: {
         selfLogOut: !options.isAdminAction,
       },
-    });
-  }
-
-  async revokeForceLogout(
-    admin: JwtPayload,
-    targetId: string,
-    dto: ConfirmAdminActionDto,
-  ) {
-    if (admin.role !== UserRole.ADMIN) {
-      throw new ForbiddenException(
-        'Você não tem permissão para realizar essa ação',
-      );
-    }
-    await this.userService.assertPasswordMatchesByUserId(
-      admin.sub,
-      dto.password,
-    );
-    const user = await this.userService.findOneByOrFail(targetId);
-
-    if (user.forceLogout === false) {
-      throw new ConflictException('Usuário já está com acesso liberado');
-    }
-
-    user.forceLogout = false;
-
-    await this.userService.save(user);
-
-    await this.logService.create({
-      user: { id: admin.sub } as User,
-      entityId: user.id,
-      entityType: EntityType.USER,
-      action: ActionType.REVOKE_FORCE_LOGOUT,
-      reason: dto.reason,
-      metadata: {},
     });
   }
 }

@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -23,6 +22,7 @@ import { UserResponseDto } from 'src/user/dto/user-response.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   async getAuthenticatedUser(@Req() req: AuthenticatedRequest) {
     const user = await this.authService.getAuthenticatedUser(req.user);
@@ -30,39 +30,18 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Body() loginDto: LoginDto) {
     const { accessToken } = await this.authService.login(loginDto);
-
-    res.cookie(`${process.env.COOKIE_NAME}`, accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
-      maxAge: Number(process.env.JWT_EXPIRES_IN_MS),
-    });
     return {
       accessToken,
+      expiresIn: Number(process.env.JWT_EXPIRES_IN_SEC),
     };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logOut(
-    @Req() req: AuthenticatedRequest,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logOut(@Req() req: AuthenticatedRequest) {
     await this.authService.logout(req.user);
-
-    res.clearCookie(process.env.COOKIE_NAME!, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      path: '/',
-    });
-
     return {
       message: 'Logout realizado com sucesso',
     };
@@ -80,21 +59,6 @@ export class AuthController {
 
     return {
       message: 'Logout realizado com sucesso',
-    };
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Post('admin/:id/revoke-logout')
-  async revokeLogoutByAdmin(
-    @Req() req: AuthenticatedRequest,
-    @Param('id') targetId: string,
-    @Body() dto: ConfirmAdminActionDto,
-  ) {
-    await this.authService.revokeForceLogout(req.user, targetId, dto);
-
-    return {
-      message: 'Acesso do usuário restaurado com sucesso',
     };
   }
 }

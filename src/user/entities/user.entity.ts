@@ -24,10 +24,13 @@ export class User {
   @Min(6)
   passwordHash: string;
 
-  @Column({ default: false })
-  forceLogout: boolean;
+  @Column({ type: 'boolean', default: false })
+  isLogged: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'timestamptz', nullable: true })
+  sessionExpiresAt: Date | null;
+
+  @Column({ type: 'boolean', default: false })
   isBlocked: boolean;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })

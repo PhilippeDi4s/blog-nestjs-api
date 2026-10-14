@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDate,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsUUID,
@@ -10,6 +11,7 @@ import {
   Min,
 } from 'class-validator';
 import { UserRole } from '../enum/user-role.enum';
+import type { SessionStatus } from 'src/auth/types/session-status';
 
 export class FiltersUserDto {
   @IsOptional()
@@ -42,7 +44,7 @@ export class FiltersUserDto {
     return value;
   })
   @IsBoolean()
-  isBlocked?: boolean;
+  isLogged?: boolean;
 
   @IsOptional()
   @Type(() => Date)
@@ -66,4 +68,18 @@ export class FiltersUserDto {
   @Min(1)
   @Max(100)
   limit?: number;
+
+  @IsOptional()
+  @IsIn(['ACTIVE', 'EXPIRED', 'LOGGED_OUT'])
+  sessionStatus?: SessionStatus;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  sessionExpiresStartDate?: Date;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  sessionExpiresEndDate?: Date;
 }

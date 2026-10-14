@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -176,10 +176,12 @@ export class UserService {
       name,
       email,
       role,
-      isBlocked,
-      forceLogout,
+      isLogged,
       startDate,
       endDate,
+      sessionStatus,
+      sessionExpiresStartDate,
+      sessionExpiresEndDate,
       page = 1,
       limit = 20,
     } = filters;
@@ -202,11 +204,11 @@ export class UserService {
       if (role) {
         query.andWhere('user.role = :role', { role });
       }
-      if (forceLogout !== undefined) {
-        query.andWhere('user.forceLogout = :forceLogout', { forceLogout });
+      if (isLogged !== undefined) {
+        query.andWhere('user.isLogged = :isLogged', { isLogged });
       }
-      if (isBlocked !== undefined) {
-        query.andWhere('user.isBlocked = :isBlocked', { isBlocked });
+      if (isLogged !== undefined) {
+        query.andWhere('user.isLogged = :isLogged', { isLogged });
       }
       if (startDate && endDate) {
         query.andWhere('user.createdAt BETWEEN :startDate AND :endDate', {
@@ -217,6 +219,55 @@ export class UserService {
         query.andWhere('user.createdAt >= :startDate', { startDate });
       } else if (endDate) {
         query.andWhere('user.createdAt <= :endDate', { endDate });
+      }
+      if (sessionStatus === 'ACTIVE') {
+        query
+          .andWhere('user.isLogged = :activeLogged', {
+            activeLogged: true,
+          })
+          .andWhere('user.sessionExpiresAt > :now', {
+            now: new Date(),
+          });
+      }
+
+      if (sessionStatus === 'EXPIRED') {
+        query
+          .andWhere('user.isLogged = :expiredLogged', {
+            expiredLogged: true,
+          })
+          .andWhere(
+            new Brackets((qb) => {
+              qb.where('user.sessionExpiresAt IS NULL').orWhere(
+                'user.sessionExpiresAt <= :now',
+                {
+                  now: new Date(),
+                },
+              );
+            }),
+          );
+      }
+
+      if (sessionStatus === 'LOGGED_OUT') {
+        query.andWhere('user.isLogged = :loggedOut', {
+          loggedOut: false,
+        });
+      }
+      if (sessionExpiresStartDate && sessionExpiresEndDate) {
+        query.andWhere(
+          'user.sessionExpiresAt BETWEEN :sessionExpiresStartDate AND :sessionExpiresEndDate',
+          {
+            sessionExpiresStartDate,
+            sessionExpiresEndDate,
+          },
+        );
+      } else if (sessionExpiresStartDate) {
+        query.andWhere('user.sessionExpiresAt >= :sessionExpiresStartDate', {
+          sessionExpiresStartDate,
+        });
+      } else if (sessionExpiresEndDate) {
+        query.andWhere('user.sessionExpiresAt <= :sessionExpiresEndDate', {
+          sessionExpiresEndDate,
+        });
       }
     }
 
@@ -285,7 +336,7 @@ export class UserService {
       await this.failIfEmailExists(dto.email);
 
       userToUpdate.email = dto.email;
-      userToUpdate.forceLogout = true;
+      userToUpdate.isLogged = true;
     }
 
     const updatedUser = await this.save(userToUpdate);
@@ -325,7 +376,7 @@ export class UserService {
     }
 
     user.passwordHash = await this.hashingService.hash(dto.newPassword);
-    user.forceLogout = true;
+    user.isLogged = true;
 
     const updatedUser = await this.save(user);
 
@@ -456,6 +507,7 @@ export class UserService {
     }
 
     user.isBlocked = true;
+    user.isLogged = true;
     await this.save(user);
 
     await this.logService.create({

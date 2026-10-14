@@ -117,6 +117,8 @@ export class UploadService {
       },
     });
 
-    return savedImage.url;
+    return {
+      url: savedImage.url,
+    };
   }
 }

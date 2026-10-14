@@ -1,4 +1,3 @@
-// cloudinary/cloudinary.provider.ts
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { Provider } from '@nestjs/common';
