@@ -37,8 +37,6 @@ export class AdminUserController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
   async findOne(@Param('id', ParseUUIDPipe) targetId: string) {
     const user = await this.userService.findOneByOrFail(targetId);
     return new UserResponseDto(user);

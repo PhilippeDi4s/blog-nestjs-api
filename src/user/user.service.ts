@@ -90,7 +90,8 @@ export class UserService {
   ) {
     const query = this.userRepository
       .createQueryBuilder('user')
-      .where('user.id = :id', { id });
+      .where('user.id = :id', { id })
+      .withDeleted();
 
     if (options.includePassword) {
       query.addSelect('user.passwordHash');
@@ -187,7 +188,7 @@ export class UserService {
       limit = 20,
     } = filters;
 
-    const query = this.userRepository.createQueryBuilder('user');
+    const query = this.userRepository.createQueryBuilder('user').withDeleted();
 
     if (id) {
       query.andWhere('user.id = :id', { id });
@@ -495,14 +496,14 @@ export class UserService {
 
     const user = await this.findOneByOrFail(targetId);
 
-    if (user.isBlocked) {
-      throw new ConflictException('Usuário já está bloqueado.');
+    if (user.id === adminToken.sub) {
+      throw new ForbiddenException(
+        'Você não tem permissão para bloquear a si mesmo',
+      );
     }
 
-    if (user.role === UserRole.ADMIN) {
-      throw new ForbiddenException(
-        'Você não tem permissão para bloquear outro administrador',
-      );
+    if (user.isBlocked) {
+      throw new ConflictException('Usuário já está bloqueado.');
     }
 
     user.isBlocked = true;
@@ -540,12 +541,6 @@ export class UserService {
 
     if (!user.isBlocked) {
       throw new ConflictException('Usuário não está bloqueado.');
-    }
-
-    if (user.role === UserRole.ADMIN) {
-      throw new ForbiddenException(
-        'Você não tem permissão para desbloquear outro administrador',
-      );
     }
 
     user.isBlocked = false;
@@ -619,6 +614,13 @@ export class UserService {
         'Apenas administradores podem executar esta ação.',
       );
     }
+
+    if (admin.sub === targetId) {
+      throw new ForbiddenException(
+        'Não é permitido arquivar a própria conta pela área administrativa',
+      );
+    }
+
     return this.executeSoftRemove(targetId, admin, {
       isAdminAction: true,
       reason: dto.reason,

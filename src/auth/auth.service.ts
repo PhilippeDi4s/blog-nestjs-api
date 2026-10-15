@@ -95,6 +95,12 @@ export class AuthService {
       );
     }
 
+    if (userId === admin.sub) {
+      throw new ForbiddenException(
+        'Você não tem permissão para forçar seu próprio logout',
+      );
+    }
+
     await this.userService.assertPasswordMatchesByUserId(
       admin.sub,
       dto.password,
