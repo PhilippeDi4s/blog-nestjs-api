@@ -32,11 +32,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (user.isBlocked) {
-      throw new UnauthorizedException('Usuário bloqueado.');
+      throw new UnauthorizedException({
+        code: 'USER_BLOCKED',
+        message: 'Usuário bloqueado.',
+      });
     }
 
     if (!user.isLogged) {
-      throw new UnauthorizedException('Sessão encerrada. Faça login novamente');
+      throw new UnauthorizedException({
+        code: 'SESSION_REVOKED',
+        message: 'Sessão encerrada. Faça login novamente',
+      });
     }
 
     return { sub: user.id, role: user.role };
