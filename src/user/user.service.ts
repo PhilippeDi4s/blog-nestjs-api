@@ -506,7 +506,9 @@ export class UserService {
     }
 
     user.isBlocked = true;
-    user.isLogged = true;
+    user.isLogged = false;
+    user.sessionExpiresAt = null;
+
     await this.save(user);
 
     await this.logService.create({
@@ -649,6 +651,9 @@ export class UserService {
     if (userToDelete.role === UserRole.ADMIN) {
       await this.assertNotLastAdmin();
     }
+
+    userToDelete.isLogged = false;
+    userToDelete.sessionExpiresAt = null;
 
     const removedUser = await this.userRepository.softRemove(userToDelete);
 
