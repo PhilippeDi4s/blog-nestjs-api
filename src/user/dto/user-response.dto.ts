@@ -10,6 +10,7 @@ export class UserResponseDto {
   readonly isLogged: boolean;
   readonly sessionExpiresAt: Date | null;
   readonly sessionStatus: SessionStatus;
+  readonly isBlocked: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly deletedAt: Date | null;
@@ -18,9 +19,10 @@ export class UserResponseDto {
     this.id = user.id;
     this.name = user.name;
     this.email = user.email;
-    this.isLogged = user.isBlocked;
+    this.isLogged = user.isLogged;
     this.sessionExpiresAt = user.sessionExpiresAt;
     this.sessionStatus = getSessionStatus(user);
+    this.isBlocked = user.isBlocked;
     this.role = user.role;
     this.createdAt = user.createdAt;
     this.updatedAt = user.updatedAt;

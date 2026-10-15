@@ -176,6 +176,7 @@ export class UserService {
       name,
       email,
       role,
+      isBlocked,
       isLogged,
       startDate,
       endDate,
@@ -204,8 +205,8 @@ export class UserService {
       if (role) {
         query.andWhere('user.role = :role', { role });
       }
-      if (isLogged !== undefined) {
-        query.andWhere('user.isLogged = :isLogged', { isLogged });
+      if (isBlocked !== undefined) {
+        query.andWhere('user.isBlocked = :isBlocked', { isBlocked });
       }
       if (isLogged !== undefined) {
         query.andWhere('user.isLogged = :isLogged', { isLogged });
@@ -229,7 +230,6 @@ export class UserService {
             now: new Date(),
           });
       }
-
       if (sessionStatus === 'EXPIRED') {
         query
           .andWhere('user.isLogged = :expiredLogged', {
@@ -246,7 +246,6 @@ export class UserService {
             }),
           );
       }
-
       if (sessionStatus === 'LOGGED_OUT') {
         query.andWhere('user.isLogged = :loggedOut', {
           loggedOut: false,
