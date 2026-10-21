@@ -179,13 +179,14 @@ export class UserService {
       role,
       isBlocked,
       isLogged,
+      isDeleted,
       startDate,
       endDate,
       sessionStatus,
       sessionExpiresStartDate,
       sessionExpiresEndDate,
       page = 1,
-      limit = 20,
+      limit = 8,
     } = filters;
 
     const query = this.userRepository.createQueryBuilder('user').withDeleted();
@@ -211,6 +212,14 @@ export class UserService {
       }
       if (isLogged !== undefined) {
         query.andWhere('user.isLogged = :isLogged', { isLogged });
+      }
+      if (isDeleted !== undefined) {
+        if (isDeleted) {
+          query.andWhere('user.deletedAt IS NOT NULL');
+        }
+        if (!isDeleted) {
+          query.andWhere('user.deletedAt IS NULL');
+        }
       }
       if (startDate && endDate) {
         query.andWhere('user.createdAt BETWEEN :startDate AND :endDate', {

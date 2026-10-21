@@ -7,7 +7,7 @@ import { UserRole } from 'src/user/enum/user-role.enum';
 import { FiltersImagetDto } from 'src/images/dto/filters-image.dto';
 import { LogResponseDto } from './dto/log-response.dto';
 
-@Controller('activity-logs')
+@Controller('admin/activity-logs')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class ActivityLogsController {

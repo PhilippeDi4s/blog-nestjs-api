@@ -47,6 +47,15 @@ export class FiltersUserDto {
   isBlocked?: boolean;
 
   @IsOptional()
+  @Transform(({ value }): boolean => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean()
+  isDeleted?: boolean;
+
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   startDate?: Date;

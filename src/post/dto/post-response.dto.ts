@@ -17,9 +17,9 @@ export class PostResponseDto {
   };
   readonly coverImage: {
     id: string;
-    uploadedBy: string;
+    uploadedBy: string | null;
     url: string;
-  };
+  } | null;
 
   constructor(post: Post) {
     this.id = post.id;
@@ -36,10 +36,12 @@ export class PostResponseDto {
       name: post.author.name,
       email: post.author.email,
     };
-    this.coverImage = {
-      id: post.coverImage.id,
-      uploadedBy: post.coverImage.uploadedBy.id,
-      url: post.coverImage.url,
-    };
+    this.coverImage = post.coverImage
+      ? {
+          id: post.coverImage.id,
+          uploadedBy: post.coverImage.uploadedBy?.id ?? null,
+          url: post.coverImage.url,
+        }
+      : null;
   }
 }
