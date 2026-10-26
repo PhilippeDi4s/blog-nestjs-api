@@ -32,6 +32,7 @@ export class ActivityLogsService {
 
   async findMany(filters: FiltersLogDto) {
     const {
+      id,
       action,
       userId,
       entityType,
@@ -44,30 +45,34 @@ export class ActivityLogsService {
 
     const where: FindOptionsWhere<ActivityLog> = {};
 
-    if (action) {
-      where.action = action;
-    }
+    if (id) {
+      where.activityLogId = id;
+    } else {
+      if (action) {
+        where.action = action;
+      }
 
-    if (userId) {
-      where.user = {
-        id: userId,
-      };
-    }
+      if (userId) {
+        where.user = {
+          id: userId,
+        };
+      }
 
-    if (entityType) {
-      where.entityType = entityType;
-    }
+      if (entityType) {
+        where.entityType = entityType;
+      }
 
-    if (entityId) {
-      where.entityId = entityId;
-    }
+      if (entityId) {
+        where.entityId = entityId;
+      }
 
-    if (startDate && endDate) {
-      where.createdAt = Between(startDate, endDate);
-    } else if (startDate) {
-      where.createdAt = MoreThanOrEqual(startDate);
-    } else if (endDate) {
-      where.createdAt = LessThanOrEqual(endDate);
+      if (startDate && endDate) {
+        where.createdAt = Between(startDate, endDate);
+      } else if (startDate) {
+        where.createdAt = MoreThanOrEqual(startDate);
+      } else if (endDate) {
+        where.createdAt = LessThanOrEqual(endDate);
+      }
     }
 
     const [logs, total] = await this.activityLogRepository.findAndCount({

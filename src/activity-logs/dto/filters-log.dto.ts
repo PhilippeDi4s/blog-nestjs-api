@@ -13,6 +13,10 @@ import { EntityType } from '../enums/entity-type.enum';
 
 export class FiltersLogDto {
   @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @IsOptional()
   @IsEnum(ActionType)
   action?: ActionType;
 
