@@ -4,8 +4,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
-import { FiltersImagetDto } from 'src/images/dto/filters-image.dto';
 import { LogResponseDto } from './dto/log-response.dto';
+import { FiltersLogDto } from './dto/filters-log.dto';
 
 @Controller('admin/activity-logs')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -14,7 +14,7 @@ export class ActivityLogsController {
   constructor(private readonly activityLogsService: ActivityLogsService) {}
 
   @Get()
-  async findMany(@Query() filters: FiltersImagetDto) {
+  async findMany(@Query() filters: FiltersLogDto) {
     const logs = await this.activityLogsService.findMany(filters);
     return {
       ...logs,
