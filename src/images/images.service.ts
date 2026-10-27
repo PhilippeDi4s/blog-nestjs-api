@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  forwardRef,
   Inject,
   Injectable,
   Logger,
@@ -22,6 +23,7 @@ import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { FiltersImagetDto } from './dto/filters-image.dto';
 import { UserService } from 'src/user/user.service';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
+import { PostService } from 'src/post/post.service';
 
 @Injectable()
 export class ImagesService {
@@ -33,6 +35,9 @@ export class ImagesService {
 
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
+
+    @Inject(forwardRef(() => PostService))
+    private readonly postService: PostService,
 
     private readonly logService: ActivityLogsService,
     private readonly userService: UserService,
@@ -243,6 +248,14 @@ export class ImagesService {
       throw new ForbiddenException(
         'Você não tem permissão para excluir esta imagem',
       );
+    }
+
+    const isImageUsed = await this.postService.findMany({
+      coverImageUrl: imageToDelete.url,
+    });
+
+    if (isImageUsed) {
+      throw new ConflictException('Imagem em uso, não é possível excluir');
     }
 
     const deletedImage = await this.imagesRepository.softRemove(imageToDelete);

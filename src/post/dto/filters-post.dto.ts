@@ -40,6 +40,9 @@ export class FiltersPostDto {
   authorEmail?: string;
 
   @IsOptional()
+  coverImageUrl?: string;
+
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   startDate?: Date;

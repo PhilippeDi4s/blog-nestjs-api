@@ -11,7 +11,11 @@ export class LogResponseDto {
   };
   readonly action: ActionType;
   readonly entityType: EntityType;
-  readonly entityId: string;
+  readonly entity: {
+    id: string;
+    name: string;
+    email: string;
+  };
   readonly metadata: Record<string, unknown> | null;
   readonly reason: string | null;
   readonly createdAt: Date;
@@ -25,7 +29,11 @@ export class LogResponseDto {
     };
     this.action = log.action;
     this.entityType = log.entityType;
-    this.entityId = log.entityId;
+    this.entity = {
+      id: log.user.id,
+      name: log.user.name,
+      email: log.user.email,
+    };
     this.metadata = log.metadata;
     this.reason = log.reason;
     this.createdAt = log.createdAt;

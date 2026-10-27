@@ -1,15 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLog } from './entities/activity.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Between,
-  FindOptionsWhere,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateActivityLogDto } from './dto/create-log.dto';
 import { FiltersLogDto } from './dto/filters-log.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ActivityLogsService {
@@ -43,53 +38,63 @@ export class ActivityLogsService {
       page = 1,
     } = filters;
 
-    const where: FindOptionsWhere<ActivityLog> = {};
-
+    const query = this.activityLogRepository
+      .createQueryBuilder('log')
+      .leftJoin('log.user', 'user')
+      .leftJoin(
+        User,
+        'entity',
+        'entity.id = CAST(log.entityId AS uuid) AND log.entityType = :entityType',
+        { entityType: 'USER' },
+      )
+      .addSelect([
+        'user.id',
+        'user.name',
+        'user.email',
+        'entity.id',
+        'entity.name',
+        'entity.email',
+      ]);
     if (id) {
-      where.activityLogId = id;
+      query.andWhere('log.id = :id', { id });
     } else {
       if (action) {
-        where.action = action;
+        query.andWhere('log.action = :action', { action });
       }
 
       if (userId) {
-        where.user = {
-          id: userId,
-        };
+        query.andWhere('log.userId = :userId', { userId });
       }
 
       if (entityType) {
-        where.entityType = entityType;
+        query.andWhere('log.entityType = :entityType', { entityType });
       }
 
       if (entityId) {
-        where.entityId = entityId;
+        query.andWhere('log.entityId = :entityId', { entityId });
       }
 
       if (startDate && endDate) {
-        where.createdAt = Between(startDate, endDate);
+        query.andWhere('log.createdAt BETWEEN :startDate AND :endDate', {
+          startDate,
+          endDate,
+        });
       } else if (startDate) {
-        where.createdAt = MoreThanOrEqual(startDate);
+        query.andWhere('log.createdAt >= :startDate', { startDate });
       } else if (endDate) {
-        where.createdAt = LessThanOrEqual(endDate);
+        query.andWhere('log.createdAt <= :endDate', { endDate });
       }
     }
 
-    const [logs, total] = await this.activityLogRepository.findAndCount({
-      where,
-      relations: {
-        user: true,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const [logs, count] = await query
+      .orderBy('log.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
 
     return {
       data: logs,
-      total,
+      total: count,
       page,
       limit,
     };

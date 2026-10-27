@@ -19,6 +19,8 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -29,6 +31,7 @@ export class PostService {
   private readonly logger = new Logger(PostService.name);
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    @Inject(forwardRef(() => ImagesService))
     private readonly imageService: ImagesService,
     private readonly logService: ActivityLogsService,
     private readonly userService: UserService,
@@ -121,6 +124,7 @@ export class PostService {
       authorId,
       authorEmail,
       authorName,
+      coverImageUrl,
       startDate,
       endDate,
       limit = 20,
@@ -157,6 +161,10 @@ export class PostService {
     }
     if (published !== undefined) {
       query.andWhere('post.published = :published', { published });
+    }
+
+    if (coverImageUrl) {
+      query.andWhere('coverImage.url = :coverImageUrl', { coverImageUrl });
     }
 
     if (startDate && endDate) {
