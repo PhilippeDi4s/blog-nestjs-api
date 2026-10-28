@@ -108,6 +108,7 @@ export class UploadService {
       user: { id: userId } as User,
       action: ActionType.CREATED,
       entityId: savedImage.id,
+      affectedUserId: userId,
       entityType: EntityType.IMAGE,
       metadata: {
         after: {

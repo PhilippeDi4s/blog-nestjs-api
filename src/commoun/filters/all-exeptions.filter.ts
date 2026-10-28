@@ -26,6 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let messages: string[] = [defaultMessage];
     let errorName = defaultError;
     let code: string | undefined;
+    let field: string | undefined;
 
     if (isHttpException) {
       const responseData = exception.getResponse();
@@ -39,10 +40,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
           message,
           error,
           code: responseCode,
+          field: responseField,
         } = responseData as Record<string, any>;
 
         if (typeof responseCode === 'string') {
           code = responseCode;
+        }
+
+        if (typeof responseField === 'string') {
+          field = responseField;
         }
 
         if (Array.isArray(message)) {
@@ -71,6 +77,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       error: errorName,
       statusCode: status,
       ...(code && { code }),
+      ...(field && { field }),
     });
   }
 }

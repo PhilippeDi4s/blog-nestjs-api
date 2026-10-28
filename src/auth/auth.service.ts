@@ -72,6 +72,7 @@ export class AuthService {
     await this.logService.create({
       user,
       entityId: user.id,
+      affectedUserId: user.id,
       entityType: EntityType.USER,
       action: ActionType.LOGIN,
       metadata: {},
@@ -131,6 +132,7 @@ export class AuthService {
     await this.logService.create({
       user: { id: user.sub } as User,
       entityId: userLoggedOut.id,
+      affectedUserId: userLoggedOut.id,
       entityType: EntityType.USER,
       action: ActionType.LOGOUT,
       reason: options.reason ?? null,

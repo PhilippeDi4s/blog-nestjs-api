@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateActivityLogDto } from './dto/create-log.dto';
 import { FiltersLogDto } from './dto/filters-log.dto';
-import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ActivityLogsService {
@@ -32,6 +31,7 @@ export class ActivityLogsService {
       userId,
       entityType,
       entityId,
+      affectedUserId,
       startDate,
       endDate,
       limit = 20,
@@ -40,21 +40,16 @@ export class ActivityLogsService {
 
     const query = this.activityLogRepository
       .createQueryBuilder('log')
-      .leftJoin('log.user', 'user')
-      .leftJoin(
-        User,
-        'entity',
-        'entity.id = CAST(log.entityId AS uuid) AND log.entityType = :entityType',
-        { entityType: 'USER' },
-      )
-      .addSelect([
-        'user.id',
-        'user.name',
-        'user.email',
-        'entity.id',
-        'entity.name',
-        'entity.email',
-      ]);
+      .leftJoin('log.user', 'actor')
+      .leftJoin('log.affectedUser', 'affectedUser')
+      .addSelect(['actor.id', 'actor.name', 'actor.email']);
+
+    query.addSelect([
+      'affectedUser.id',
+      'affectedUser.name',
+      'affectedUser.email',
+    ]);
+
     if (id) {
       query.andWhere('log.id = :id', { id });
     } else {
@@ -72,6 +67,12 @@ export class ActivityLogsService {
 
       if (entityId) {
         query.andWhere('log.entityId = :entityId', { entityId });
+      }
+
+      if (affectedUserId) {
+        query.andWhere('log.affectedUserId = :affectedUserId', {
+          affectedUserId,
+        });
       }
 
       if (startDate && endDate) {

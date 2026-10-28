@@ -3,6 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -16,6 +18,14 @@ export class ActivityLog {
 
   @ManyToOne(() => User)
   user: User;
+
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  affectedUserId: string | null;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'affectedUserId' })
+  affectedUser: User | null;
 
   @Column({ type: 'enum', enum: EntityType })
   entityType: EntityType;

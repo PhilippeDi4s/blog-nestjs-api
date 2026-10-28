@@ -33,6 +33,10 @@ export class FiltersLogDto {
   entityId?: string;
 
   @IsOptional()
+  @IsUUID()
+  affectedUserId?: string;
+
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   startDate?: Date;

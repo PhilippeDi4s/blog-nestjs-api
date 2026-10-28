@@ -399,8 +399,8 @@ Content-Type: application/json
 # ==================================================
 
 ### @name adminFindManyLogs
-GET {{baseUrl}}/activity-logs
-Authorization: Bearer {{adminToken}}
+GET {{baseUrl}}/admin/activity-logs?entityType=POST
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMjNkZTgxZS0wMGVhLTQ0NTktODEwNi0zZjgzODQ3OTUzMzMiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3OTMyMDAwMDMsImV4cCI6MTc5MzI4NjQwM30.__Gj69GLj1sGrk2fxLn13xMJImgK5CGGH9IW0-imxG4
 
 ### Find logs paginated
 # @name adminFindLogsPaginated

@@ -6,6 +6,7 @@ export class CreateActivityLogDto {
   user: User;
   entityType: EntityType;
   entityId: string;
+  affectedUserId: string | null;
   action: ActionType;
   metadata: Record<string, unknown>;
   reason?: string | null;

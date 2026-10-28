@@ -234,6 +234,7 @@ export class PostService {
       user: { id: authorToken.sub } as User,
       action: ActionType.CREATED,
       entityId: createdPost.id,
+      affectedUserId: authorToken.sub,
       entityType: EntityType.POST,
       metadata: {
         after: {
@@ -329,6 +330,7 @@ export class PostService {
       user: { id: user.sub } as User,
       action: ActionType.UPDATED,
       entityId: updatedPost.id,
+      affectedUserId: post.author.id,
       entityType: EntityType.POST,
       reason: options.reason ?? null,
       metadata: {
@@ -374,6 +376,7 @@ export class PostService {
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
       entityId: retoredPost.id,
+      affectedUserId: postToRestore.author.id,
       entityType: EntityType.POST,
       metadata: {
         deletedAt: deletedAt,
@@ -429,6 +432,7 @@ export class PostService {
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
       entityId: removedPost.id,
+      affectedUserId: postToDelete.author.id,
       entityType: EntityType.POST,
       metadata: {
         selfDelete: !options.isAdminAction,

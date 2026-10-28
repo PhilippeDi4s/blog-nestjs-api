@@ -199,6 +199,7 @@ export class ImagesService {
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
       entityId: restoredImage.id,
+      affectedUserId: imageToRestore.uploadedBy.id,
       entityType: EntityType.IMAGE,
       metadata: {
         deletedAt: deletedAt,
@@ -266,6 +267,7 @@ export class ImagesService {
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
       entityId: deletedImage.id,
+      affectedUserId: imageToDelete.uploadedBy.id,
       entityType: EntityType.IMAGE,
       metadata: {
         selfDelete: !options.isAdminAction,

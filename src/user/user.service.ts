@@ -40,7 +40,10 @@ export class UserService {
     );
 
     if (!isValid) {
-      throw new UnauthorizedException('Senha incorreta!');
+      throw new UnauthorizedException({
+        message: ['Senha incorreta!'],
+        field: 'password',
+      });
     }
   }
 
@@ -121,6 +124,7 @@ export class UserService {
       user: created,
       action: ActionType.CREATED,
       entityId: created.id,
+      affectedUserId: created.id,
       entityType: EntityType.USER,
       metadata: { after: { name: created.name } },
     });
@@ -356,6 +360,7 @@ export class UserService {
       user: { id: requestingUser.sub } as User,
       action: ActionType.UPDATED,
       entityId: updatedUser.id,
+      affectedUserId: updatedUser.id,
       entityType: EntityType.USER,
       metadata: {
         selfUpdate: !options.isAdminAction,
@@ -393,6 +398,7 @@ export class UserService {
       user: updatedUser,
       action: ActionType.PASSWORD_CHANGE,
       entityId: updatedUser.id,
+      affectedUserId: updatedUser.id,
       entityType: EntityType.USER,
       metadata: {},
     });
@@ -429,6 +435,7 @@ export class UserService {
       user: admin,
       action: ActionType.PROMOTE,
       entityId: user.id,
+      affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
         previousRole: formerRole,
@@ -480,6 +487,7 @@ export class UserService {
       user: admin,
       action: ActionType.DEMOTE,
       entityId: user.id,
+      affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
         previousRole: formerRole,
@@ -525,6 +533,7 @@ export class UserService {
       user: admin,
       action: ActionType.BLOCK_USER,
       entityId: user.id,
+      affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
         targetEmail: user.email,
@@ -559,6 +568,7 @@ export class UserService {
       user: admin,
       action: ActionType.UNBLOCK_USER,
       entityId: user.id,
+      affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
         targetEmail: user.email,
@@ -599,6 +609,7 @@ export class UserService {
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
       entityId: retoredUser.id,
+      affectedUserId: retoredUser.id,
       entityType: EntityType.USER,
       metadata: {
         deletedAt: deletedAt,
@@ -672,6 +683,7 @@ export class UserService {
       user: { id: requestingUser.sub } as User,
       action: ActionType.DELETED,
       entityId: targetId,
+      affectedUserId: userToDelete.id,
       entityType: EntityType.USER,
       metadata: {
         selfDelete: !options.isAdminAction,
