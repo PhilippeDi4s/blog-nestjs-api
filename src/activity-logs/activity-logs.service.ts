@@ -28,7 +28,7 @@ export class ActivityLogsService {
     const {
       id,
       action,
-      userId,
+      actorId,
       entityType,
       entityId,
       affectedUserId,
@@ -57,8 +57,8 @@ export class ActivityLogsService {
         query.andWhere('log.action = :action', { action });
       }
 
-      if (userId) {
-        query.andWhere('log.userId = :userId', { userId });
+      if (actorId) {
+        query.andWhere('log.userId = :actorId', { actorId });
       }
 
       if (entityType) {

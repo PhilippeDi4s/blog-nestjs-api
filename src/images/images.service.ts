@@ -255,7 +255,7 @@ export class ImagesService {
       coverImageUrl: imageToDelete.url,
     });
 
-    if (isImageUsed) {
+    if (isImageUsed.data.length > 0) {
       throw new ConflictException('Imagem em uso, não é possível excluir');
     }
 

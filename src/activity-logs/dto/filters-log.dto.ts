@@ -22,7 +22,7 @@ export class FiltersLogDto {
 
   @IsOptional()
   @IsUUID()
-  userId?: string;
+  actorId?: string;
 
   @IsOptional()
   @IsEnum(EntityType)
