@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { EntityManager, FindOptionsWhere, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -115,6 +115,21 @@ export class PostService {
     return posts;
   }
 
+  async findIdsByCoverImageId(id: string): Promise<string[]> {
+    const posts = await this.postRepository.find({
+      select: { id: true },
+      where: { coverImage: { id: id } },
+      withDeleted: true,
+    });
+    return posts.map((post) => post.id);
+  }
+  async clearCoverImage(postIds: string[], manager?: EntityManager) {
+    if (postIds.length === 0) return;
+
+    const repo = manager ? manager.getRepository(Post) : this.postRepository;
+    await repo.update(postIds, { coverImage: null });
+  }
+
   async findMany(filters: FiltersPostDto) {
     const {
       id,
@@ -127,7 +142,7 @@ export class PostService {
       coverImageUrl,
       startDate,
       endDate,
-      limit = 20,
+      limit = 8,
       page = 1,
     } = filters;
 
@@ -143,6 +158,7 @@ export class PostService {
         'user.role',
         'coverImage.id',
         'coverImage.url',
+        'coverImage.createdAt',
         'uploadedBy.id',
         'uploadedBy.name',
         'uploadedBy.email',

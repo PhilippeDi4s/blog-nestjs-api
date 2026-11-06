@@ -34,7 +34,7 @@ export class ActivityLogsService {
       affectedUserId,
       startDate,
       endDate,
-      limit = 20,
+      limit = 8,
       page = 1,
     } = filters;
 

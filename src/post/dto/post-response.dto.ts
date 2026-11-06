@@ -17,7 +17,12 @@ export class PostResponseDto {
   };
   readonly coverImage: {
     id: string;
-    uploadedBy: string | null;
+    uploadedBy: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    createdAt: Date;
     url: string;
   } | null;
 
@@ -39,8 +44,13 @@ export class PostResponseDto {
     this.coverImage = post.coverImage
       ? {
           id: post.coverImage.id,
-          uploadedBy: post.coverImage.uploadedBy?.id ?? null,
+          uploadedBy: {
+            id: post.coverImage.uploadedBy.id ?? null,
+            name: post.coverImage.uploadedBy.name ?? null,
+            email: post.coverImage.uploadedBy.email ?? null,
+          },
           url: post.coverImage.url,
+          createdAt: post.coverImage.createdAt,
         }
       : null;
   }

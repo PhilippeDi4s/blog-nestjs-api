@@ -52,7 +52,7 @@ export class ImagesService {
       userName,
       startDate,
       endDate,
-      limit = 20,
+      limit = 8,
       page = 1,
     } = filters;
 
@@ -242,8 +242,9 @@ export class ImagesService {
     options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
     const imageToDelete = await this.findOneOrFail({ id: targetId });
+    const uploader = imageToDelete.uploadedBy;
 
-    const isImageOwner = user.sub === imageToDelete.uploadedBy.id;
+    const isImageOwner = user.sub === uploader?.id;
 
     if (!isImageOwner && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
@@ -251,39 +252,43 @@ export class ImagesService {
       );
     }
 
-    const isImageUsed = await this.postService.findMany({
-      coverImageUrl: imageToDelete.url,
-    });
+    const affectedPostIds = await this.postService.findIdsByCoverImageId(
+      imageToDelete.id,
+    );
+    const isInUse = affectedPostIds.length > 0;
 
-    if (isImageUsed.data.length > 0) {
+    if (isInUse && !options.isAdminAction) {
       throw new ConflictException('Imagem em uso, não é possível excluir');
     }
 
-    const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
+    if (isInUse) {
+      await this.postService.clearCoverImage(affectedPostIds);
+    }
 
-    await this.storageProvider.delete(deletedImage.publicId);
+    const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
 
     await this.logService.create({
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
       entityId: deletedImage.id,
-      affectedUserId: imageToDelete.uploadedBy.id,
+      affectedUserId: uploader?.id ?? null,
       entityType: EntityType.IMAGE,
       metadata: {
         selfDelete: !options.isAdminAction,
+        affectedPostIds,
         targetSnapshot: {
           url: deletedImage.url,
           folder: deletedImage.folder,
           uploadedAt: deletedImage.createdAt,
-          uploadedBy: {
-            id: deletedImage.uploadedBy.id,
-            name: deletedImage.uploadedBy.name,
-            email: deletedImage.uploadedBy.email,
-          },
+          uploadedBy: uploader
+            ? { id: uploader.id, name: uploader.name, email: uploader.email }
+            : null,
         },
       },
       reason: options.reason ?? null,
     });
+
+    await this.storageProvider.delete(deletedImage.publicId);
 
     return deletedImage;
   }
