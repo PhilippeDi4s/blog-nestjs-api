@@ -24,8 +24,8 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: 10000,
-          limit: 10,
+          ttl: 60000,
+          limit: 100,
           blockDuration: 5000,
         },
       ],

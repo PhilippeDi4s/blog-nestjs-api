@@ -17,11 +17,13 @@ import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/user/enum/user-role.enum';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 import { UserResponseDto } from 'src/user/dto/user-response.dto';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @SkipThrottle()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getAuthenticatedUser(@Req() req: AuthenticatedRequest) {
@@ -29,6 +31,7 @@ export class AuthController {
     return new UserResponseDto(user);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     const { accessToken } = await this.authService.login(loginDto);

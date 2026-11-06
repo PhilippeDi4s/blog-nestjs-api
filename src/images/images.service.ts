@@ -24,6 +24,7 @@ import { FiltersImagetDto } from './dto/filters-image.dto';
 import { UserService } from 'src/user/user.service';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 import { PostService } from 'src/post/post.service';
+import { PaginationDto } from 'src/commoun/dto/pagination.dto';
 
 @Injectable()
 export class ImagesService {
@@ -105,16 +106,18 @@ export class ImagesService {
     };
   }
 
-  async findAllOwned(author: JwtPayload) {
-    const images = this.imagesRepository.find({
-      where: {
-        uploadedBy: { id: author.sub },
-      },
-      relations: {
-        uploadedBy: true,
-      },
+  async findAllOwned(author: JwtPayload, filters: PaginationDto) {
+    const { page = 1, limit = 2 } = filters;
+
+    const [images, count] = await this.imagesRepository.findAndCount({
+      where: { uploadedBy: { id: author.sub } },
+      relations: { uploadedBy: true },
+      order: { createdAt: 'DESC', id: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
-    return images;
+
+    return { data: images, total: count, page, limit };
   }
 
   async findOne(imageData: Partial<Images>) {

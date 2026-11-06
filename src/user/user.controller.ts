@@ -15,6 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('user')
 export class UserController {
@@ -27,6 +28,7 @@ export class UserController {
     return new UserResponseDto(user);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post()
   async create(@Body() dto: CreateUserDto) {
     const user = await this.userService.create(dto);
