@@ -52,7 +52,7 @@ export class ImagesService {
       userName,
       startDate,
       endDate,
-      limit = 8,
+      limit = 5,
       page = 1,
     } = filters;
 
