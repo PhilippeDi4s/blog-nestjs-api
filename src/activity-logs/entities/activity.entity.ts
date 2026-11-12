@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { ActionType } from '../enums/action-type.enum';
 import { EntityType } from '../enums/entity-type.enum';
+import { AnyLogMetadata } from '../types/log-metadata.types';
 
 @Entity('activity_logs')
 export class ActivityLog {
@@ -37,7 +38,7 @@ export class ActivityLog {
   action: ActionType;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, unknown> | null;
+  metadata: AnyLogMetadata | null;
 
   @Column({ type: 'text', nullable: true })
   reason: string | null;

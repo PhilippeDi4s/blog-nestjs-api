@@ -2,8 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ActivityLog } from './entities/activity.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateActivityLogDto } from './dto/create-log.dto';
 import { FiltersLogDto } from './dto/filters-log.dto';
+import {
+  AnyLogMetadata,
+  CreateActivityLogInput,
+  LoggableAction,
+} from './types/log-metadata.types';
 
 @Injectable()
 export class ActivityLogsService {
@@ -14,9 +18,14 @@ export class ActivityLogsService {
     private readonly activityLogRepository: Repository<ActivityLog>,
   ) {}
 
-  async create(logData: CreateActivityLogDto): Promise<void> {
+  async create<A extends LoggableAction, T>(
+    logData: CreateActivityLogInput<A, T>,
+  ): Promise<void> {
     try {
-      const log = this.activityLogRepository.create(logData);
+      const log = this.activityLogRepository.create({
+        ...logData,
+        metadata: logData.metadata as AnyLogMetadata,
+      });
       await this.activityLogRepository.save(log);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

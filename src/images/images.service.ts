@@ -25,6 +25,10 @@ import { UserService } from 'src/user/user.service';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 import { PostService } from 'src/post/post.service';
 import { PaginationDto } from 'src/commoun/dto/pagination.dto';
+import {
+  ImageLogSnapshot,
+  toImageLogSnapshot,
+} from './types/image-log-snapshot';
 
 @Injectable()
 export class ImagesService {
@@ -107,7 +111,7 @@ export class ImagesService {
   }
 
   async findAllOwned(author: JwtPayload, filters: PaginationDto) {
-    const { page = 1, limit = 2 } = filters;
+    const { page = 1, limit = 5 } = filters;
 
     const [images, count] = await this.imagesRepository.findAndCount({
       where: { uploadedBy: { id: author.sub } },
@@ -169,50 +173,6 @@ export class ImagesService {
     return savedUrl;
   }
 
-  async restore(
-    admin: JwtPayload,
-    targetId: string,
-    dto: ConfirmAdminActionDto,
-  ) {
-    await this.userService.assertPasswordMatchesByUserId(
-      admin.sub,
-      dto.password,
-    );
-    const imageToRestore = await this.imagesRepository.findOne({
-      where: { id: targetId },
-      withDeleted: true,
-      relations: { uploadedBy: true },
-    });
-
-    if (!imageToRestore) {
-      throw new NotFoundException('Imagem não encontrada');
-    }
-
-    if (!imageToRestore.deletedAt) {
-      throw new ConflictException('Esta imagem já está ativa');
-    }
-
-    const deletedAt = imageToRestore.deletedAt;
-
-    const restoredImage = await this.findOneOrFail({ id: imageToRestore.id });
-
-    await this.imagesRepository.restore(targetId);
-
-    await this.logService.create({
-      user: { id: admin.sub } as User,
-      action: ActionType.RESTORED,
-      entityId: restoredImage.id,
-      affectedUserId: imageToRestore.uploadedBy.id,
-      entityType: EntityType.IMAGE,
-      metadata: {
-        deletedAt: deletedAt,
-      },
-      reason: dto.reason,
-    });
-
-    return restoredImage;
-  }
-
   async selfRemove(user: JwtPayload, targetId: string) {
     const deletedImage = await this.executeSoftRemove(user, targetId);
     return deletedImage;
@@ -270,23 +230,15 @@ export class ImagesService {
 
     const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.DELETED, ImageLogSnapshot>({
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
       entityId: deletedImage.id,
       affectedUserId: uploader?.id ?? null,
       entityType: EntityType.IMAGE,
       metadata: {
-        selfDelete: !options.isAdminAction,
-        affectedPostIds,
-        targetSnapshot: {
-          url: deletedImage.url,
-          folder: deletedImage.folder,
-          uploadedAt: deletedImage.createdAt,
-          uploadedBy: uploader
-            ? { id: uploader.id, name: uploader.name, email: uploader.email }
-            : null,
-        },
+        isAdminAction: options.isAdminAction ?? false,
+        deleted: toImageLogSnapshot(deletedImage),
       },
       reason: options.reason ?? null,
     });

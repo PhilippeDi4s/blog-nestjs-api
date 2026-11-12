@@ -16,6 +16,10 @@ import { ActionType } from 'src/activity-logs/enums/action-type.enum';
 import { EntityType } from 'src/activity-logs/enums/entity-type.enum';
 import { UserService } from 'src/user/user.service';
 import { slugify } from 'src/commoun/utils/slugify';
+import {
+  ImageLogSnapshot,
+  toImageLogSnapshot,
+} from 'src/images/types/image-log-snapshot';
 
 @Injectable()
 export class UploadService {
@@ -104,17 +108,15 @@ export class UploadService {
       folder,
     );
 
-    await this.logService.create({
+    await this.logService.create<ActionType.CREATED, ImageLogSnapshot>({
       user: { id: userId } as User,
       action: ActionType.CREATED,
       entityId: savedImage.id,
       affectedUserId: userId,
       entityType: EntityType.IMAGE,
       metadata: {
-        after: {
-          url: savedImage.url,
-          folder,
-        },
+        isAdminAction: false,
+        created: toImageLogSnapshot(savedImage),
       },
     });
 

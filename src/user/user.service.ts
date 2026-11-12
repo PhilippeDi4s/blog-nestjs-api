@@ -21,6 +21,12 @@ import { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { FiltersUserDto } from './dto/filters-user.dto';
 import { UpdateUserAdminDto } from './dto/update-user-admin.dto';
 import { ConfirmAdminActionDto } from '../commoun/dto/confirm-admin-action.dto';
+import {
+  toUserLogSnapshot,
+  toUserProfileLogSnapshot,
+  UserLogSnapshot,
+  UserProfileLogSnapshot,
+} from './types/user-log-snapshot';
 
 @Injectable()
 export class UserService {
@@ -120,13 +126,16 @@ export class UserService {
       passwordHash: hashedPassword,
     });
 
-    await this.logService.create({
+    await this.logService.create<ActionType.CREATED, UserLogSnapshot>({
       user: created,
       action: ActionType.CREATED,
       entityId: created.id,
       affectedUserId: created.id,
       entityType: EntityType.USER,
-      metadata: { after: { name: created.name } },
+      metadata: {
+        isAdminAction: false,
+        created: toUserLogSnapshot(created),
+      },
     });
 
     return created;
@@ -341,7 +350,7 @@ export class UserService {
       );
     }
 
-    const before = { name: userToUpdate.name, email: userToUpdate.email };
+    const before = toUserProfileLogSnapshot(userToUpdate);
 
     userToUpdate.name = dto.name ?? userToUpdate.name;
 
@@ -354,16 +363,15 @@ export class UserService {
 
     const updatedUser = await this.save(userToUpdate);
 
-    const after = { name: updatedUser.name, email: updatedUser.email };
-
-    await this.logService.create({
+    const after = toUserProfileLogSnapshot(updatedUser);
+    await this.logService.create<ActionType.UPDATED, UserProfileLogSnapshot>({
       user: { id: requestingUser.sub } as User,
       action: ActionType.UPDATED,
       entityId: updatedUser.id,
       affectedUserId: updatedUser.id,
       entityType: EntityType.USER,
       metadata: {
-        selfUpdate: !options.isAdminAction,
+        isAdminAction: options.isAdminAction ?? false,
         before,
         after,
       },
@@ -394,13 +402,13 @@ export class UserService {
 
     const updatedUser = await this.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.PASSWORD_CHANGE, unknown>({
       user: updatedUser,
       action: ActionType.PASSWORD_CHANGE,
       entityId: updatedUser.id,
       affectedUserId: updatedUser.id,
       entityType: EntityType.USER,
-      metadata: {},
+      metadata: { isAdminAction: false },
     });
 
     return updatedUser;
@@ -431,17 +439,16 @@ export class UserService {
     user.role = UserRole.ADMIN;
     await this.userRepository.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.UPDATED, Pick<User, 'role'>>({
       user: admin,
-      action: ActionType.PROMOTE,
+      action: ActionType.UPDATED,
       entityId: user.id,
       affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
-        previousRole: formerRole,
-        newRole: user.role,
-        targetEmail: user.email,
-        performedByEmail: admin.email,
+        isAdminAction: true,
+        before: { role: formerRole },
+        after: { role: user.role },
       },
       reason: dto.reason,
     });
@@ -483,17 +490,16 @@ export class UserService {
     user.role = UserRole.USER;
     await this.userRepository.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.UPDATED, Pick<User, 'role'>>({
       user: admin,
-      action: ActionType.DEMOTE,
+      action: ActionType.UPDATED,
       entityId: user.id,
       affectedUserId: user.id,
       entityType: EntityType.USER,
       metadata: {
-        previousRole: formerRole,
-        newRole: user.role,
-        targetEmail: user.email,
-        performedByEmail: admin.email,
+        isAdminAction: true,
+        before: { role: formerRole },
+        after: { role: user.role },
       },
       reason: dto.reason,
     });
@@ -529,16 +535,13 @@ export class UserService {
 
     await this.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.BLOCK_USER, unknown>({
       user: admin,
       action: ActionType.BLOCK_USER,
       entityId: user.id,
       affectedUserId: user.id,
       entityType: EntityType.USER,
-      metadata: {
-        targetEmail: user.email,
-        performedByEmail: admin.email,
-      },
+      metadata: { isAdminAction: true },
       reason: dto.reason,
     });
 
@@ -564,16 +567,13 @@ export class UserService {
     user.isBlocked = false;
     await this.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.UNBLOCK_USER, unknown>({
       user: admin,
       action: ActionType.UNBLOCK_USER,
       entityId: user.id,
       affectedUserId: user.id,
       entityType: EntityType.USER,
-      metadata: {
-        targetEmail: user.email,
-        performedByEmail: admin.email,
-      },
+      metadata: { isAdminAction: true },
       reason: dto.reason,
     });
 
@@ -605,13 +605,14 @@ export class UserService {
 
     const retoredUser = await this.findOneByOrFail(userToRestore.id);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.RESTORED, unknown>({
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
       entityId: retoredUser.id,
       affectedUserId: retoredUser.id,
       entityType: EntityType.USER,
       metadata: {
+        isAdminAction: true,
         deletedAt: deletedAt,
       },
       reason: dto.reason,
@@ -679,19 +680,15 @@ export class UserService {
 
     const removedUser = await this.userRepository.softRemove(userToDelete);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.DELETED, UserLogSnapshot>({
       user: { id: requestingUser.sub } as User,
       action: ActionType.DELETED,
       entityId: targetId,
       affectedUserId: userToDelete.id,
       entityType: EntityType.USER,
       metadata: {
-        selfDelete: !options.isAdminAction,
-        targetSnapshot: {
-          name: removedUser.name,
-          email: removedUser.email,
-          role: removedUser.role,
-        },
+        isAdminAction: options.isAdminAction ?? false,
+        deleted: toUserLogSnapshot(removedUser),
       },
       reason: options.reason ?? null,
     });

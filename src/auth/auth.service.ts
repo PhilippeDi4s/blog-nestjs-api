@@ -69,13 +69,13 @@ export class AuthService {
 
     await this.userService.save(user);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.LOGIN, unknown>({
       user,
       entityId: user.id,
       affectedUserId: user.id,
       entityType: EntityType.USER,
       action: ActionType.LOGIN,
-      metadata: {},
+      metadata: { isAdminAction: false },
     });
 
     return { accessToken };
@@ -129,16 +129,14 @@ export class AuthService {
 
     const userLoggedOut = await this.userService.save(userToLogOut);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.LOGOUT, unknown>({
       user: { id: user.sub } as User,
       entityId: userLoggedOut.id,
       affectedUserId: userLoggedOut.id,
       entityType: EntityType.USER,
       action: ActionType.LOGOUT,
       reason: options.reason ?? null,
-      metadata: {
-        selfLogOut: !options.isAdminAction,
-      },
+      metadata: { isAdminAction: options.isAdminAction ?? false },
     });
   }
 }

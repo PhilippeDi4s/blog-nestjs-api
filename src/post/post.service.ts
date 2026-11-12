@@ -15,6 +15,7 @@ import { FiltersPostDto } from './dto/filters-post.dto';
 import { UpdatePostAdminDto } from './dto/update-post-admin.dto';
 import { ConfirmAdminActionDto } from 'src/commoun/dto/confirm-admin-action.dto';
 import { UserService } from 'src/user/user.service';
+import { PostLogSnapshot, toPostLogSnapshot } from './types/post-log-snapshot';
 import {
   BadRequestException,
   ConflictException,
@@ -246,18 +247,15 @@ export class PostService {
         throw new BadRequestException('Erro ao criar o post');
       });
 
-    await this.logService.create({
+    await this.logService.create<ActionType.CREATED, PostLogSnapshot>({
       user: { id: authorToken.sub } as User,
       action: ActionType.CREATED,
       entityId: createdPost.id,
       affectedUserId: authorToken.sub,
       entityType: EntityType.POST,
       metadata: {
-        after: {
-          title: createdPost.title,
-          exerpt: createdPost.excerpt,
-          Ispublished: createdPost.published,
-        },
+        isAdminAction: false,
+        created: toPostLogSnapshot(createdPost),
       },
     });
 
@@ -305,16 +303,11 @@ export class PostService {
 
     if (!isPostOwned && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
-        'Você não tem permissão para excluir esse post',
+        'Você não tem permissão para atualizar esse post',
       );
     }
 
-    const before: Partial<Post> = {
-      title: post.title,
-      content: post.content,
-      excerpt: post.excerpt,
-      published: post.published,
-    };
+    const before = toPostLogSnapshot(post);
 
     if (dto.title && dto.title !== post.title) {
       post.slug = createSlugFromText(dto.title);
@@ -335,14 +328,8 @@ export class PostService {
 
     const updatedPost = await this.postRepository.save(post);
 
-    const after: Partial<Post> = {
-      title: updatedPost.title,
-      content: updatedPost.content,
-      excerpt: updatedPost.excerpt,
-      published: updatedPost.published,
-    };
-
-    await this.logService.create({
+    const after = toPostLogSnapshot(updatedPost);
+    await this.logService.create<ActionType.UPDATED, PostLogSnapshot>({
       user: { id: user.sub } as User,
       action: ActionType.UPDATED,
       entityId: updatedPost.id,
@@ -350,7 +337,7 @@ export class PostService {
       entityType: EntityType.POST,
       reason: options.reason ?? null,
       metadata: {
-        selfUpdate: !options.isAdminAction,
+        isAdminAction: options.isAdminAction ?? false,
         before,
         after,
       },
@@ -388,13 +375,14 @@ export class PostService {
 
     const retoredPost = await this.findOneOrFail({ id: postToRestore.id });
 
-    await this.logService.create({
+    await this.logService.create<ActionType.RESTORED, unknown>({
       user: { id: admin.sub } as User,
       action: ActionType.RESTORED,
       entityId: retoredPost.id,
       affectedUserId: postToRestore.author.id,
       entityType: EntityType.POST,
       metadata: {
+        isAdminAction: true,
         deletedAt: deletedAt,
       },
       reason: dto.reason,
@@ -444,20 +432,15 @@ export class PostService {
 
     const removedPost = await this.postRepository.softRemove(postToDelete);
 
-    await this.logService.create({
+    await this.logService.create<ActionType.DELETED, PostLogSnapshot>({
       user: { id: user.sub } as User,
       action: ActionType.DELETED,
       entityId: removedPost.id,
       affectedUserId: postToDelete.author.id,
       entityType: EntityType.POST,
       metadata: {
-        selfDelete: !options.isAdminAction,
-        targetSnapshot: {
-          title: removedPost.title,
-          wasPublished: removedPost.published,
-          author: removedPost.author.name,
-          email: removedPost.author.email,
-        },
+        isAdminAction: options.isAdminAction ?? false,
+        deleted: toPostLogSnapshot(removedPost),
       },
       reason: options.reason ?? null,
     });
