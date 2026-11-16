@@ -1,6 +1,7 @@
 import { ActivityLog } from '../entities/activity.entity';
 import { ActionType } from '../enums/action-type.enum';
 import { EntityType } from '../enums/entity-type.enum';
+import { AnyLogMetadata } from '../types/log-metadata.types';
 
 export class LogResponseDto {
   readonly activityLogId: string;
@@ -17,7 +18,7 @@ export class LogResponseDto {
     name: string;
     email: string;
   } | null;
-  readonly metadata: Record<string, unknown> | null;
+  readonly metadata: AnyLogMetadata | null;
   readonly reason: string | null;
   readonly createdAt: Date;
 

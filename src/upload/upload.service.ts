@@ -113,7 +113,7 @@ export class UploadService {
       action: ActionType.CREATED,
       entityId: savedImage.id,
       affectedUserId: userId,
-      entityType: EntityType.IMAGE,
+      entityType: EntityType.UPLOAD,
       metadata: {
         isAdminAction: false,
         created: toImageLogSnapshot(savedImage),

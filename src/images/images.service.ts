@@ -174,7 +174,7 @@ export class ImagesService {
   }
 
   async selfRemove(user: JwtPayload, targetId: string) {
-    const deletedImage = await this.executeSoftRemove(user, targetId);
+    const deletedImage = await this.executeRemove(user, targetId);
     return deletedImage;
   }
 
@@ -192,14 +192,14 @@ export class ImagesService {
       admin.sub,
       dto.password,
     );
-    const deletedImage = await this.executeSoftRemove(admin, targetId, {
+    const deletedImage = await this.executeRemove(admin, targetId, {
       isAdminAction: true,
       reason: dto.reason,
     });
     return deletedImage;
   }
 
-  private async executeSoftRemove(
+  private async executeRemove(
     user: JwtPayload,
     targetId: string,
     options: { isAdminAction?: boolean; reason?: string | null } = {},
@@ -228,7 +228,7 @@ export class ImagesService {
       await this.postService.clearCoverImage(affectedPostIds);
     }
 
-    const deletedImage = await this.imagesRepository.softRemove(imageToDelete);
+    const deletedImage = await this.imagesRepository.remove(imageToDelete);
 
     await this.logService.create<ActionType.DELETED, ImageLogSnapshot>({
       user: { id: user.sub } as User,

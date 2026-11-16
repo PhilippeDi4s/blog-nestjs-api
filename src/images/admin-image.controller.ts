@@ -4,7 +4,6 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
-  Patch,
   Req,
   UseGuards,
   Body,
@@ -33,20 +32,6 @@ export class AdminImageController {
       ...images,
       data: images.data.map((image) => new ImageResponseDto(image)),
     };
-  }
-
-  @Patch(':id/restore')
-  async restore(
-    @Param('id', ParseUUIDPipe) targetId: string,
-    @Req() req: AuthenticatedRequest,
-    @Body() dto: ConfirmAdminActionDto,
-  ) {
-    const restoredImage = await this.imageService.restore(
-      req.user,
-      targetId,
-      dto,
-    );
-    return new ImageResponseDto(restoredImage);
   }
 
   @Delete(':id')
