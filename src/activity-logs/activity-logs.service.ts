@@ -50,12 +50,26 @@ export class ActivityLogsService {
       .createQueryBuilder('log')
       .leftJoin('log.user', 'actor')
       .leftJoin('log.affectedUser', 'affectedUser')
-      .addSelect(['actor.id', 'actor.name', 'actor.email']);
+      .addSelect([
+        'actor.id',
+        'actor.name',
+        'actor.email',
+        'actor.createdAt',
+        'actor.deletedAt',
+        'actor.isBlocked',
+        'actor.role',
+        'actor.updatedAt',
+      ]);
 
     query.addSelect([
       'affectedUser.id',
       'affectedUser.name',
       'affectedUser.email',
+      'affectedUser.createdAt',
+      'affectedUser.deletedAt',
+      'affectedUser.isBlocked',
+      'affectedUser.role',
+      'affectedUser.updatedAt',
     ]);
 
     if (activityLogId) {

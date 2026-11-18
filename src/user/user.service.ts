@@ -336,6 +336,7 @@ export class UserService {
     dto: UpdateUserDto,
     options: { isAdminAction?: boolean; reason?: string | null } = {},
   ) {
+    console.log(dto);
     const userToUpdate = await this.findOneByOrFail(targetId);
 
     if (!dto.name && !dto.email) {
