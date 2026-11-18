@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FiltersLogDto } from './dto/filters-log.dto';
 import {
-  AnyLogMetadata,
   CreateActivityLogInput,
   LoggableAction,
 } from './types/log-metadata.types';
@@ -24,7 +23,7 @@ export class ActivityLogsService {
     try {
       const log = this.activityLogRepository.create({
         ...logData,
-        metadata: logData.metadata as AnyLogMetadata,
+        metadata: logData.metadata,
       });
       await this.activityLogRepository.save(log);
     } catch (error) {
@@ -35,7 +34,7 @@ export class ActivityLogsService {
 
   async findMany(filters: FiltersLogDto) {
     const {
-      id,
+      activityLogId,
       action,
       actorId,
       entityType,
@@ -59,8 +58,8 @@ export class ActivityLogsService {
       'affectedUser.email',
     ]);
 
-    if (id) {
-      query.andWhere('log.id = :id', { id });
+    if (activityLogId) {
+      query.andWhere('log.activityLogId = :activityLogId', { activityLogId });
     } else {
       if (action) {
         query.andWhere('log.action = :action', { action });

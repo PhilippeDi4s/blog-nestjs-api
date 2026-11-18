@@ -14,7 +14,7 @@ import { EntityType } from '../enums/entity-type.enum';
 export class FiltersLogDto {
   @IsOptional()
   @IsUUID()
-  id?: string;
+  activityLogId?: string;
 
   @IsOptional()
   @IsEnum(ActionType)

@@ -435,11 +435,12 @@ export class UserService {
       throw new ConflictException('Usuário já é administrador.');
     }
 
-    const formerRole = user.role;
+    const before = toUserLogSnapshot(user);
     user.role = UserRole.ADMIN;
-    await this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    const after = toUserLogSnapshot(updatedUser);
 
-    await this.logService.create<ActionType.UPDATED, Pick<User, 'role'>>({
+    await this.logService.create<ActionType.UPDATED, UserLogSnapshot>({
       user: admin,
       action: ActionType.UPDATED,
       entityId: user.id,
@@ -447,8 +448,8 @@ export class UserService {
       entityType: EntityType.USER,
       metadata: {
         isAdminAction: true,
-        before: { role: formerRole },
-        after: { role: user.role },
+        before,
+        after,
       },
       reason: dto.reason,
     });
@@ -486,11 +487,12 @@ export class UserService {
 
     await this.assertNotLastAdmin();
 
-    const formerRole = user.role;
+    const before = toUserLogSnapshot(user);
     user.role = UserRole.USER;
-    await this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    const after = toUserLogSnapshot(updatedUser);
 
-    await this.logService.create<ActionType.UPDATED, Pick<User, 'role'>>({
+    await this.logService.create<ActionType.UPDATED, UserLogSnapshot>({
       user: admin,
       action: ActionType.UPDATED,
       entityId: user.id,
@@ -498,8 +500,8 @@ export class UserService {
       entityType: EntityType.USER,
       metadata: {
         isAdminAction: true,
-        before: { role: formerRole },
-        after: { role: user.role },
+        before,
+        after,
       },
       reason: dto.reason,
     });
