@@ -359,7 +359,7 @@ export class UserService {
       await this.failIfEmailExists(dto.email);
 
       userToUpdate.email = dto.email;
-      userToUpdate.isLogged = true;
+      userToUpdate.isLogged = false;
     }
 
     const updatedUser = await this.save(userToUpdate);
@@ -399,7 +399,7 @@ export class UserService {
     }
 
     user.passwordHash = await this.hashingService.hash(dto.newPassword);
-    user.isLogged = true;
+    user.isLogged = false;
 
     const updatedUser = await this.save(user);
 
