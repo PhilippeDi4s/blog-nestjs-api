@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { UserProfileResponseDto } from './dto/user-profile-response.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 import { Throttle } from '@nestjs/throttler';
@@ -20,6 +21,16 @@ import { Throttle } from '@nestjs/throttler';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me/profile')
+  async getMyProfile(@Req() req: AuthenticatedRequest) {
+    const user = await this.userService.findOneByOrFail(req.user.sub);
+    const publishedPostsCount = await this.userService.countPublishedPosts(
+      req.user.sub,
+    );
+    return new UserProfileResponseDto(user, publishedPostsCount);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')

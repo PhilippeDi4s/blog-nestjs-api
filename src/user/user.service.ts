@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { Post } from 'src/post/entities/post.entity';
 import { Brackets, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashingService } from 'src/commoun/hashing/hashing.service';
@@ -32,6 +33,7 @@ import {
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly hashingService: HashingService,
     private readonly logService: ActivityLogsService,
   ) {}
@@ -310,6 +312,12 @@ export class UserService {
   async updateSelf(user: JwtPayload, dto: UpdateUserDto) {
     const updatedUser = await this.executeUpdate(user.sub, user, dto);
     return updatedUser;
+  }
+
+  async countPublishedPosts(userId: string): Promise<number> {
+    return this.postRepository.count({
+      where: { author: { id: userId }, published: true },
+    });
   }
 
   async updateByAdmin(
