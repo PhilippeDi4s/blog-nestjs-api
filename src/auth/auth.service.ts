@@ -121,7 +121,7 @@ export class AuthService {
     const userToLogOut = await this.userService.findOneByOrFail(targetId);
 
     if (!userToLogOut.isLogged) {
-      throw new ConflictException('Usuário já está com acesso bloqueado');
+      throw new ConflictException('Usuário já está deslogado');
     }
 
     userToLogOut.isLogged = false;

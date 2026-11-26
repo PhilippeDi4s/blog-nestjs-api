@@ -387,7 +387,10 @@ export class UserService {
       reason: options.reason ?? null,
     });
 
-    return updatedUser;
+    return {
+      updatedUser,
+      requiresReauthentication: dto.email !== userToUpdate.email,
+    };
   }
 
   async updatePassword(id: string, dto: UpdatePasswordDto) {

@@ -53,7 +53,7 @@ export class AdminUserController {
       targetId,
       dto,
     );
-    return new UserResponseDto(updatedUser);
+    return new UserResponseDto(updatedUser.updatedUser);
   }
 
   @Patch(':id/promote')

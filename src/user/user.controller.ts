@@ -57,7 +57,10 @@ export class UserController {
   @Patch('me')
   async update(@Req() req: AuthenticatedRequest, @Body() dto: UpdateUserDto) {
     const user = await this.userService.updateSelf(req.user, dto);
-    return new UserResponseDto(user);
+    return {
+      user: new UserResponseDto(user.updatedUser),
+      requiresReauthentication: user.requiresReauthentication,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
