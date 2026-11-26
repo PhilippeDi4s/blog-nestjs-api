@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, ParseUUIDPipe, Query, UseGuards } from '@nestjs/common';
 import { ActivityLogsService } from './activity-logs.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -20,5 +20,12 @@ export class ActivityLogsController {
       ...logs,
       data: logs.data.map((log) => new LogResponseDto(log)),
     };
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const log = await this.activityLogsService.findOne(id);
+    if (!log) throw new NotFoundException('Log não encontrado');
+    return new LogResponseDto(log);
   }
 }

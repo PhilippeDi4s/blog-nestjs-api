@@ -6,7 +6,7 @@ import { AnyLogMetadata } from '../types/log-metadata.types';
 
 export class LogResponseDto {
   readonly activityLogId: string;
-  readonly actor: Omit<User, 'passwordHash' | 'sessionExpiresAt' | 'isLogged'>;
+  readonly actor: Omit<User, 'passwordHash' | 'sessionExpiresAt' | 'isLogged'> | null;
   readonly action: ActionType;
   readonly entityType: EntityType;
   readonly entityId: string;
@@ -20,7 +20,7 @@ export class LogResponseDto {
 
   constructor(log: ActivityLog) {
     this.activityLogId = log.activityLogId;
-    this.actor = {
+    this.actor = log.user ? {
       id: log.user.id,
       name: log.user.name,
       email: log.user.email,
@@ -29,7 +29,7 @@ export class LogResponseDto {
       isBlocked: log.user.isBlocked,
       role: log.user.role,
       updatedAt: log.user.updatedAt,
-    };
+    } : null;
     this.action = log.action;
     this.entityType = log.entityType;
     this.entityId = log.entityId;

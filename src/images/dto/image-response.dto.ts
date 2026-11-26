@@ -8,16 +8,16 @@ export class ImageResponseDto {
     id: string;
     name: string;
     email: string;
-  };
+  } | null;
 
   constructor(images: Images) {
     this.id = images.id;
     this.url = images.url;
     this.createdAt = images.createdAt;
-    this.uploadedBy = {
+    this.uploadedBy = images.uploadedBy ? {
       id: images.uploadedBy.id,
       name: images.uploadedBy.name,
       email: images.uploadedBy.email,
-    };
+    } : null;
   }
 }

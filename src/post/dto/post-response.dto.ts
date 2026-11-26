@@ -14,14 +14,14 @@ export class PostResponseDto {
     id: string;
     name: string;
     email: string;
-  };
+  } | null;
   readonly coverImage: {
     id: string;
     uploadedBy: {
       id: string;
-      name: string;
-      email: string;
-    };
+      name: string | null;
+      email: string | null;
+    } | null;
     createdAt: Date;
     url: string;
   } | null;
@@ -36,19 +36,23 @@ export class PostResponseDto {
     this.createdAt = post.createdAt;
     this.updatedAt = post.updatedAt;
     this.deletedAt = post.deletedAt;
-    this.author = {
-      id: post.author.id,
-      name: post.author.name,
-      email: post.author.email,
-    };
+    this.author = post.author
+      ? {
+          id: post.author.id,
+          name: post.author.name,
+          email: post.author.email,
+        }
+      : null;
     this.coverImage = post.coverImage
       ? {
           id: post.coverImage.id,
-          uploadedBy: {
-            id: post.coverImage.uploadedBy.id ?? null,
-            name: post.coverImage.uploadedBy.name ?? null,
-            email: post.coverImage.uploadedBy.email ?? null,
-          },
+          uploadedBy: post.coverImage.uploadedBy
+            ? {
+                id: post.coverImage.uploadedBy.id,
+                name: post.coverImage.uploadedBy.name ?? null,
+                email: post.coverImage.uploadedBy.email ?? null,
+              }
+            : null,
           url: post.coverImage.url,
           createdAt: post.coverImage.createdAt,
         }

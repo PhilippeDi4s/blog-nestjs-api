@@ -49,33 +49,42 @@ export class PostService {
   }
 
   async findOne(postData: Partial<Post>) {
-    const post = await this.postRepository.findOne({
-      where: postData as FindOptionsWhere<Post>,
-      relations: { coverImage: { uploadedBy: true }, author: true },
-    });
+    const post = await this.postRepository
+      .createQueryBuilder('post')
+      .withDeleted()
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.coverImage', 'coverImage')
+      .leftJoinAndSelect('coverImage.uploadedBy', 'uploadedBy')
+      .where(postData as FindOptionsWhere<Post>)
+      .andWhere('post.deletedAt IS NULL')
+      .getOne();
 
     return post;
   }
 
   async findAllPublic() {
-    const posts = await this.postRepository.find({
-      where: { published: true },
-      order: {
-        createdAt: 'DESC',
-      },
-      relations: { coverImage: { uploadedBy: true }, author: true },
-    });
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .withDeleted()
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.coverImage', 'coverImage')
+      .leftJoinAndSelect('coverImage.uploadedBy', 'uploadedBy')
+      .where('post.published = :published', { published: true })
+      .andWhere('post.deletedAt IS NULL')
+      .orderBy('post.createdAt', 'DESC')
+      .getMany();
 
     return posts;
   }
 
   async findAll() {
-    const posts = await this.postRepository.find({
-      order: {
-        createdAt: 'DESC',
-      },
-      relations: { author: true },
-    });
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .withDeleted()
+      .leftJoinAndSelect('post.author', 'author')
+      .where('post.deletedAt IS NULL')
+      .orderBy('post.createdAt', 'DESC')
+      .getMany();
 
     return posts;
   }
@@ -91,27 +100,33 @@ export class PostService {
   }
 
   async findOneOwned(postData: Partial<Post>, authorId: string) {
-    const post = await this.postRepository.findOne({
-      where: {
+    const post = await this.postRepository
+      .createQueryBuilder('post')
+      .withDeleted()
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.coverImage', 'coverImage')
+      .leftJoinAndSelect('coverImage.uploadedBy', 'uploadedBy')
+      .where({
         ...(postData as FindOptionsWhere<Post>),
         author: { id: authorId },
-      },
-      relations: { coverImage: { uploadedBy: true }, author: true },
-    });
+      })
+      .andWhere('post.deletedAt IS NULL')
+      .getOne();
 
     return post;
   }
 
   async findAllOwned(author: JwtPayload) {
-    const posts = await this.postRepository.find({
-      where: {
-        author: { id: author.sub },
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-      relations: { coverImage: { uploadedBy: true }, author: true },
-    });
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .withDeleted()
+      .leftJoinAndSelect('post.author', 'author')
+      .leftJoinAndSelect('post.coverImage', 'coverImage')
+      .leftJoinAndSelect('coverImage.uploadedBy', 'uploadedBy')
+      .where('author.id = :authorId', { authorId: author.sub })
+      .andWhere('post.deletedAt IS NULL')
+      .orderBy('post.createdAt', 'DESC')
+      .getMany();
 
     return posts;
   }
@@ -152,6 +167,8 @@ export class PostService {
       .leftJoin('post.author', 'user')
       .leftJoin('post.coverImage', 'coverImage')
       .leftJoin('coverImage.uploadedBy', 'uploadedBy')
+      .withDeleted()
+      .andWhere('post.deletedAt IS NULL')
       .addSelect([
         'user.id',
         'user.name',

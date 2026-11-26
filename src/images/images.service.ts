@@ -63,8 +63,10 @@ export class ImagesService {
 
     const query = this.imagesRepository
       .createQueryBuilder('image')
+      .withDeleted()
       .leftJoin('image.uploadedBy', 'user')
-      .addSelect(['user.id', 'user.name', 'user.email']);
+      .addSelect(['user.id', 'user.name', 'user.email'])
+      .andWhere('image.deletedAt IS NULL');
 
     if (id) query.andWhere('image.id = :id', { id });
 
@@ -113,22 +115,29 @@ export class ImagesService {
   async findAllOwned(author: JwtPayload, filters: PaginationDto) {
     const { page = 1, limit = 5 } = filters;
 
-    const [images, count] = await this.imagesRepository.findAndCount({
-      where: { uploadedBy: { id: author.sub } },
-      relations: { uploadedBy: true },
-      order: { createdAt: 'DESC', id: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const [images, count] = await this.imagesRepository
+      .createQueryBuilder('image')
+      .withDeleted()
+      .leftJoinAndSelect('image.uploadedBy', 'uploadedBy')
+      .where('uploadedBy.id = :userId', { userId: author.sub })
+      .andWhere('image.deletedAt IS NULL')
+      .orderBy('image.createdAt', 'DESC')
+      .addOrderBy('image.id', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
 
     return { data: images, total: count, page, limit };
   }
 
   async findOne(imageData: Partial<Images>) {
-    const image = await this.imagesRepository.findOne({
-      where: imageData as FindOptionsWhere<Images>,
-      relations: { uploadedBy: true },
-    });
+    const image = await this.imagesRepository
+      .createQueryBuilder('image')
+      .withDeleted()
+      .leftJoinAndSelect('image.uploadedBy', 'uploadedBy')
+      .where(imageData as FindOptionsWhere<Images>)
+      .andWhere('image.deletedAt IS NULL')
+      .getOne();
 
     return image;
   }

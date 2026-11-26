@@ -48,6 +48,7 @@ export class ActivityLogsService {
 
     const query = this.activityLogRepository
       .createQueryBuilder('log')
+      .withDeleted()
       .leftJoin('log.user', 'actor')
       .leftJoin('log.affectedUser', 'affectedUser')
       .addSelect([
@@ -121,5 +122,22 @@ export class ActivityLogsService {
       page,
       limit,
     };
+  }
+
+  async findOne(activityLogId: string) {
+    return this.activityLogRepository
+      .createQueryBuilder('log')
+      .withDeleted()
+      .leftJoin('log.user', 'actor')
+      .leftJoin('log.affectedUser', 'affectedUser')
+      .addSelect([
+        'actor.id', 'actor.name', 'actor.email', 'actor.createdAt',
+        'actor.deletedAt', 'actor.isBlocked', 'actor.role', 'actor.updatedAt',
+        'affectedUser.id', 'affectedUser.name', 'affectedUser.email',
+        'affectedUser.createdAt', 'affectedUser.deletedAt',
+        'affectedUser.isBlocked', 'affectedUser.role', 'affectedUser.updatedAt',
+      ])
+      .where('log.activityLogId = :activityLogId', { activityLogId })
+      .getOne();
   }
 }
